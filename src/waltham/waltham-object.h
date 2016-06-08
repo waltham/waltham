@@ -28,19 +28,31 @@
 #ifndef __WTH_OBJECT__
 #define __WTH_OBJECT__
 
+#define APICALL __attribute__ ((visibility ("default")))
+
 /* FIXME: move to waltham-private.h ? */
 struct wth_object {
 	struct wth_display *display;
 	uint32_t id;
+
+	void (**vfunc)(void);
+	void *user_data;
 };
 
 /* FIXME: move to waltham-object.c and add a wth_object_lookup func */
 extern GHashTable *hash;
 
 struct wth_object *
-wth_object_new_with_id (uint32_t id);
+wth_object_new_with_id (uint32_t id) APICALL;
 
 struct wth_object *
-wth_object_new (void);
+wth_object_new (void) APICALL;
+
+void
+wth_object_set_listener(struct wth_object *obj,
+			void (**listener)(void), void *user_data) APICALL;
+
+void *
+wth_object_get_user_data(struct wth_object *obj) APICALL;
 
 #endif /* __WTH_OBJECT__ */

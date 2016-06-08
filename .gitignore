@@ -28,6 +28,8 @@ Makefile.in
 /m4/
 /src/util/util_generated.c
 /src/waltham/*.c
+/src/waltham/waltham-client.h
+/src/waltham/waltham-server.h
 /stamp-h1
 /tests/client
 /tests/server

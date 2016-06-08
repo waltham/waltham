@@ -57,3 +57,20 @@ wth_object_new (void)
 {
 	return wth_object_new_with_id (global_id++);
 }
+
+void
+wth_object_set_listener(struct wth_object *obj,
+			void (**listener)(void), void *user_data)
+{
+	if (obj->vfunc)
+		g_warning ("vfunc table already set!");
+
+	obj->vfunc = listener;
+	obj->user_data = user_data;
+}
+
+void *
+wth_object_get_user_data(struct wth_object *obj)
+{
+	return obj->user_data;
+}

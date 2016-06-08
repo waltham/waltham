@@ -22,15 +22,25 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include "waltham-object.h"
-#ifdef WALTHAM_CLIENT
-#include "waltham-client.h"
-#else
-#include "waltham-server.h"
-#endif
+#include <stdint.h>
+#include <wayland-util.h>
 
-#include "gael_log.h"
-#include "gael_serialization.h"
+struct wth_display;
+struct wthp_blob_factory;
+struct wthp_buffer;
+struct wthp_callback;
+struct wthp_compositor;
+struct wthp_farstream;
+struct wthp_farstream_remote;
+struct wthp_keyboard;
+struct wthp_output;
+struct wthp_pointer;
+struct wthp_region;
+struct wthp_registry;
+struct wthp_resource;
+struct wthp_seat;
+struct wthp_surface;
+struct wthp_touch;
 
-#include <wayland-client.h>
+#define APICALL __attribute__ ((visibility ("default")))
 

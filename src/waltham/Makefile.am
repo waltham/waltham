@@ -1,12 +1,14 @@
 BUILT_SOURCES = \
+	waltham-client.h \
 	client-serialice.c \
 	client-deserialice.c \
+	waltham-server.h \
 	server-serialice.c \
 	server-deserialice.c \
 	$(NULL)
 
 CLEANFILES = $(BUILT_SOURCES)
-EXTRA_DIST = serial-preamble.txt deserial-preamble.txt
+EXTRA_DIST = header-preamble.txt serial-preamble.txt deserial-preamble.txt
 
 AM_CFLAGS = \
 	@GCC_CFLAGS@ @GLIB_CFLAGS@ \
@@ -39,7 +41,15 @@ tools = \
 core_interface = \
 	$(top_srcdir)/data/command.xml
 
-client-serialice.c: $(tools) $(core_interface) $(extensions) $(srcdir)/serial-preamble.txt
+waltham-client.h: $(tools) $(core_interface) $(extensions) $(srcdir)/header-preamble.txt
+	$(top_srcdir)/tools/gen.py \
+		-p $(srcdir)/header-preamble.txt \
+		-i $(core_interface) \
+		-o $@ \
+		-m client \
+		-t header
+
+client-serialice.c: $(tools) $(core_interface) $(extensions) $(srcdir)/serial-preamble.txt waltham-client.h
 	$(top_srcdir)/tools/gen.py \
 		-p $(srcdir)/serial-preamble.txt \
 		-i $(core_interface) \
@@ -47,7 +57,7 @@ client-serialice.c: $(tools) $(core_interface) $(extensions) $(srcdir)/serial-pr
 		-m client \
 		-t gael
 
-client-deserialice.c: $(core_interface) $(tools) $(srcdir)/deserial-preamble.txt
+client-deserialice.c: $(core_interface) $(tools) $(srcdir)/deserial-preamble.txt waltham-client.h
 	$(top_srcdir)/tools/gen.py \
 		-p $(srcdir)/deserial-preamble.txt \
 		-i $(top_srcdir)/data/command.xml \
@@ -62,7 +72,17 @@ nodist_libwalthamclient_la_SOURCES = \
 	client-serialice.c \
 	client-deserialice.c
 
-server-serialice.c: $(tools) $(core_interface) $(extensions) $(srcdir)/serial-preamble.txt
+libwalthamclient_la_CFLAGS = $(AM_CFLAGS) -DWALTHAM_CLIENT
+
+waltham-server.h: $(tools) $(core_interface) $(extensions) $(srcdir)/header-preamble.txt
+	$(top_srcdir)/tools/gen.py \
+		-p $(srcdir)/header-preamble.txt \
+		-i $(core_interface) \
+		-o $@ \
+		-m server \
+		-t header
+
+server-serialice.c: $(tools) $(core_interface) $(extensions) $(srcdir)/serial-preamble.txt waltham-server.h
 	$(top_srcdir)/tools/gen.py \
 		-p $(srcdir)/serial-preamble.txt \
 		-i $(core_interface) \
@@ -70,7 +90,7 @@ server-serialice.c: $(tools) $(core_interface) $(extensions) $(srcdir)/serial-pr
 		-m server \
 		-t gael
 
-server-deserialice.c: $(core_interface) $(tools) $(srcdir)/deserial-preamble.txt
+server-deserialice.c: $(core_interface) $(tools) $(srcdir)/deserial-preamble.txt waltham-server.h
 	$(top_srcdir)/tools/gen.py \
 		-p $(srcdir)/deserial-preamble.txt \
 		-i $(top_srcdir)/data/command.xml \
@@ -84,3 +104,5 @@ libwalthamserver_la_SOURCES = \
 nodist_libwalthamserver_la_SOURCES = \
 	server-serialice.c \
 	server-deserialice.c
+
+libwalthamserver_la_CFLAGS = $(AM_CFLAGS) -DWALTHAM_SERVER

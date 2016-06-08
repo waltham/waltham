@@ -38,7 +38,9 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <errno.h>
+#include <assert.h>
 
+#include <waltham-object.h>
 #include <waltham-client.h>
 
 #include "util/log.h"
@@ -144,6 +146,42 @@ connect_to_server (EPollLoop *loop)
   return TRUE;
 }
 
+static void
+seat_handle_capabilities (struct wthp_seat * wthp_seat, uint32_t capabilities)
+{
+}
+
+static void
+seat_handle_name (struct wthp_seat * wthp_seat, char * name)
+{
+}
+
+struct wthp_seat_listener seat_listener = {
+  &seat_handle_capabilities,
+  &seat_handle_name,
+};
+
+static void
+registry_handle_global (struct wthp_registry * wthp_registry, uint32_t name, char * interface, uint32_t version)
+{
+  printf ("%s\n", __func__);
+
+  assert (name == 5);
+  assert (strcmp (interface, "wthp_seat") == 0);
+  assert (version == 8);
+}
+
+void
+registry_handle_global_remove (struct wthp_registry * wthp_registry, uint32_t name)
+{
+  printf ("%s\n", __func__);
+}
+
+struct wthp_registry_listener registry_listener = {
+  &registry_handle_global,
+  &registry_handle_global_remove,
+};
+
 int
 main(int argc, char **argv)
 {
@@ -178,7 +216,7 @@ main(int argc, char **argv)
   if (!ret)
     goto out;
 
-  struct wth_display { void *display; int id } display;
+  struct wth_display { void *display; int id; } display;
   struct wthp_registry *registry;
   struct wthp_compositor *compositor;
   struct wthp_seat *seat;
@@ -192,10 +230,14 @@ main(int argc, char **argv)
   //display = wth_display_connect (NULL);
 
   registry = wth_display_get_registry (&display);
+  wthp_registry_set_listener (registry, &registry_listener, NULL);
 
   seat = wthp_registry_bind (registry, 5);
+  //wthp_seat_set_listener (seat, &seat_listener, NULL);
 
   touch = wthp_seat_get_touch (seat);
+  //wthp_touch_set_listener (touch, &touch_listener, NULL);
+
   wthp_touch_release (touch);
 
   compositor = wthp_registry_bind (registry, 8);

@@ -28,6 +28,11 @@
 #include <stdio.h>
 
 #include "waltham-object.h"
+#ifdef WALTHAM_CLIENT
+#include "waltham-client.h"
+#else
+#include "waltham-server.h"
+#endif
 
 #include "waltham-message.h"
 #include "util/log.h"

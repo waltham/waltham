@@ -11,7 +11,7 @@ client_CFLAGS = \
 	-I$(top_srcdir)/src/waltham/ \
 	-I$(top_srcdir)/include/ \
 	-I$(top_srcdir)/src/
-client_SOURCES = client.c client-cmd.c
+client_SOURCES = client.c
 
 server_LDADD = \
 	@GLIB_LIBS@ \
@@ -23,4 +23,4 @@ server_CFLAGS = \
 	-I$(top_srcdir)/src/grayley/ \
 	-I$(top_srcdir)/include/ \
 	-I$(top_srcdir)/src/util/
-server_SOURCES = server.c server-cmd.c
+server_SOURCES = server.c

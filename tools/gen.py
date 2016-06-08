@@ -37,7 +37,12 @@ from customcode import grayley_post_call_custom_code
 infunc = 0
 infuncelementname = 0
 interface = ''
+
 outstr = ''
+header_structs = ''
+header_funcs = ''
+header_interface = ''
+
 funcdef = dict()
 paramcnt = 0
 target = ''
@@ -69,6 +74,9 @@ ignorelist = dict({
     {
     },
   "util":
+    {
+    },
+  "header":
     {
     },
 })
@@ -416,15 +424,14 @@ def grayley_generator(funcdef, opcode):
       code += grayley_pre_call_custom_code.get(apifuncname)
       code += '\n'
 
-   code += '    START_TIMING();\n'
+   objname = funcdef['param0']['val']
+   listener = 'struct ' + objname + '_listener *'
+   vfunc = funcdef['origname']
 
-   code += '#ifdef OVERRIDE_' + apifuncname + '_CALL\n'
-   code += '        override_' + apifuncname + '\n'
-   code += '#else\n'
-   code += '        ' + apifuncname + '\n'
-   code += '#endif\n'
+   code += '  START_TIMING();\n'
+   code += '  ((' + listener + ')(((struct wth_object *)' + objname + ')->vfunc))->' + vfunc + '\n'
    code += '    (' + params_call + ');\n'
-   code += '    END_TIMING("' + apifuncname +'");\n'
+   code += '  END_TIMING("' + apifuncname +'");\n'
 
    # some extra code defined in customcode.py.
    if apifuncname in grayley_post_call_custom_code:
@@ -468,6 +475,81 @@ def util_generator(funcdef, opcode):
    generated_funcs[int(opcode)] = funcdef.get('name')
    util_funcs[int(opcode)] = expect_reply
 
+   return ""
+
+def get_func_params(funcdef):
+   outstr = ''
+
+   outstr += '('
+
+   # func params, retains param order from parsing
+   comma = ''
+   paramitr = 0
+   while True:
+      searchstr = ('param' + str(paramitr))
+      paramitr += 1
+      if not searchstr in funcdef:
+         break
+
+      param = funcdef.get(searchstr)
+      type_ = param.get('type')
+      if param.get('new_id'):
+         if mode == "client":
+            continue
+         else:
+            type_ = param.get('objtype')
+
+      outstr += comma + type_ + ' ' + param.get('val')
+      comma = ', '
+
+   outstr += ')'
+
+   return outstr
+
+def get_func_prototype(funcdef):
+   outstr = ""
+
+   if 'rettype' in funcdef:
+      outstr += funcdef.get('rettype') + '\n'
+   else:
+      outstr += 'void\n'
+
+   # func name
+   outstr += funcdef.get('name') + ' '
+   outstr += get_func_params(funcdef)
+
+   return outstr
+
+def header_generator(funcdef, type_):
+   global header_structs
+   global header_funcs
+   global header_interface
+   global interface
+
+   if (mode == "client" and type_ == "event") \
+      or (mode == "server" and type_ == "request"):
+      if interface != header_interface:
+         if header_interface != "":
+            header_structs += "};\n\n"
+            # wthp_foo_set_listener func
+            header_structs += "static inline void\n"
+            #header_structs += foo + "_set_listener (" + type_ + ", struct \n"
+            header_structs += "{0}_set_listener(struct {0} *self, struct {0}_listener *listener, void *user_data)\n".format(header_interface)
+            header_structs += "{\n"
+            header_structs += "  wth_object_set_listener((struct wth_object *)self, (void (**)(void)) listener, user_data);\n"
+            header_structs += "}\n\n"
+
+         # new interface. declare the struct
+         header_interface = interface
+         # FIXME call it _interface on the server side?
+         header_structs += "struct " + interface + "_listener {\n"
+
+      header_structs += "  void (*" + funcdef.get('origname') + ") " + get_func_params(funcdef) + ";\n"
+      return ""
+   elif mode == "server" and type_ == "request":
+      return ""
+
+   header_funcs += get_func_prototype (funcdef) + ' APICALL;\n\n'
    return ""
 
 def generate_func(funcdef, elemtype):
@@ -542,6 +624,7 @@ def start_element(elementname, attrs):
           funcdef['name'] = interface + '_send_' + attrs.get('name')
       else:
           funcdef['name'] = interface + '_' + attrs.get('name')
+      funcdef['origname'] = attrs.get('name')
       opcode = str(int(opcode) + 1)
       if typegen == 'grayley' or typegen == 'gael':
          while (int(opcode) in handwritten_funcs) and funcdef['name'] != handwritten_funcs[int(opcode)][0]:
@@ -552,10 +635,8 @@ def start_element(elementname, attrs):
    # arguments
    if infunc == 1 and (elementname == "arg" or elementname == "request" or elementname == "event"):
       paramentry = 'param' + str(paramcnt)
-      if elementname == "request":
+      if elementname == "request" or elementname == "event":
          funcdef[paramentry] = dict([('type', 'struct ' + interface + ' *'), ('val', interface), ('object', True)])
-      elif elementname == "event":
-         funcdef[paramentry] = dict([('type', 'struct wthp_resource *'), ('val', 'resource_')])
       else:
          funcdef[paramentry] = dict([('type', attrs.get('type')), ('val', attrs.get('name'))])
       # FIXME we can probably get rid of some of these options
@@ -574,7 +655,7 @@ def start_element(elementname, attrs):
          if attrs.get('interface'):
             funcdef[paramentry]['type'] = 'struct ' + attrs.get('interface') + ' *'
          else:
-            funcdef[paramentry]['type'] = 'struct wthp_resource *'
+            funcdef[paramentry]['type'] = 'struct wth_object *'
       if attrs.get('type') == "new_id":
          funcdef[paramentry]['type'] = 'uint32_t'
          funcdef[paramentry]['new_id'] = True
@@ -614,6 +695,8 @@ def end_element(elementname):
             outstr = grayley_generator(funcdef, opcode)
          elif typegen == "util":
             outstr = util_generator(funcdef, opcode)
+         elif typegen == "header":
+            outstr = header_generator(funcdef, elementname)
          else:
             outstr = ''
 
@@ -683,6 +766,14 @@ if typegen == 'grayley':
       else:
          out.write("  NULL,\n")
    out.write("};\n")
+
+if typegen == 'header':
+   if header_structs != "":
+      # close the last struct
+      header_structs += "};\n\n"
+
+   out.write(header_structs)
+   out.write(header_funcs)
 
 if typegen == 'util':
    out.write("#include <string.h>\n\n")
