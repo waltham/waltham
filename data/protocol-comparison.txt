@@ -1,0 +1,93 @@
+Comparison of Waltham protocols to Wayland protocols
+
+
+command.xml started as a copy of wayland.xml from Wayland upstream, and
+was then renamed and modified to suit Waltham while maintaining
+similarity with Wayland. Unless otherwise documented, things are
+expected to behave the same as in Wayland. Even the interface versions
+are copied from Wayland, to be able to mirror the capabilities of the
+remote-side Wayland server.
+
+Everything wl_ was renamed to wthp_ to avoid namespace clashes with
+Wayland. wl_display was rename to wth_display to signify it is
+different from all the other wthp_ things which are code-generated to C
+API.
+
+Protocol parts that were out of scope so far were removed.
+
+All type="fd" arguments were converted to something else since file
+descriptors cannot be sent over a network. Waltham adds a type="data"
+argument which allows sending a bulk data blob inline in the
+connection, when repeated or two-way data sharing is not needed.
+
+In Waltham, everything is in little-endian byte-order, rather than
+host-endian.
+
+
+Specific interface changes:
+
+	wth_display
+
+Added messages "client_version" and "server_version" to allow extending
+wth_display interface for Waltham internal operations. Wayland lacks
+any way to extend wl_display, but a way to do that would have been
+beneficial.
+
+	wl_shm, wl_shm_pool
+
+These Wayland interfaces are removed completely, because they do not
+map well to a networked protocol. They are built on the assumption of
+shared memory.
+
+	wthp_blob_factory
+
+This is a replacement for wl_shm, except it is horribly inefficient.
+The raw pixel data is passed as is through the Waltham connection,
+blocking anything else during the sending. It is meant to allow
+developement of other features while better buffer factories have not
+been implemented yet.
+
+	wthp_buffer
+
+This is quite different from wl_buffer, because the backing storage can
+never be shared between the server and the client. Hence, a "release"
+event it not useful.
+
+It is not a given that a wthp_buffer can be repeatedly used once
+created, that is left for the factory interface to define. It is
+possible a factory interface specifies that a buffer can only be
+attached once and immediately destroyed. That may be necessary with
+video stream based buffer factories.
+
+A "complete" event is added to wthp_buffer. When a wthp_buffer is
+created, transmitting the content to the server usually takes time and
+could be done out-of-band, so a notification that the contents have
+arrived is useful.
+
+wthp_buffer defines a few generic error codes for the cases when attach
+with it cannot work.
+
+	wthp_surface
+
+The "attach" request specification is updated to account for
+wthp_buffer differences from Wayland. As there is no generic "release"
+event, any possible mechanisms and their side-effects are left to be
+specified by the buffer factories.
+
+The "damage" request is also updated, because lacking shared storage,
+the buffer factory interface could imply full damage on every attach,
+e.g. for iteratively enhancing the image quality.
+
+	wthp_keyboard
+
+The "keymap" event needs to deliver the keymap data to the client. In
+Wayland this relied file descriptor sharing, on Waltham one needs to
+send the data on the connection. Argument type="data" is used for this,
+as keymaps are sent rarely and they are not too large.
+
+	wthp_farstream
+
+This is a new wthp_buffer factory for supporting Farstream video
+streams for surfaces.
+
+

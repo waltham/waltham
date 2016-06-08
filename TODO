@@ -1,0 +1,14 @@
+general:
+- implement wth_display_*
+
+generator:
+- data type: autogenerate the foo_sz arg
+
+serialiser:
+- generate headers
+
+deserialiser:
+- per-object listener structs
+
+tests:
+- fix server read error when client disconnects
