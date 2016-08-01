@@ -425,7 +425,7 @@ def grayley_generator(funcdef, opcode):
       code += '\n'
 
    objname = funcdef['param0']['val']
-   listener = 'struct ' + objname + '_listener *'
+   listener = 'struct {}_{} *'.format(objname, "listener" if mode == "client" else "interface")
    vfunc = funcdef['origname']
 
    code += '  START_TIMING();\n'
@@ -533,16 +533,14 @@ def header_generator(funcdef, type_):
             header_structs += "};\n\n"
             # wthp_foo_set_listener func
             header_structs += "static inline void\n"
-            #header_structs += foo + "_set_listener (" + type_ + ", struct \n"
-            header_structs += "{0}_set_listener(struct {0} *self, struct {0}_listener *listener, void *user_data)\n".format(header_interface)
+            header_structs += "{0}_set_{1}(struct {0} *self, struct {0}_{1} *funcs, void *user_data)\n".format(header_interface, "listener" if mode == "client" else "interface")
             header_structs += "{\n"
-            header_structs += "  wth_object_set_listener((struct wth_object *)self, (void (**)(void)) listener, user_data);\n"
+            header_structs += "  wth_object_set_listener((struct wth_object *)self, (void (**)(void)) funcs, user_data);\n"
             header_structs += "}\n\n"
 
          # new interface. declare the struct
          header_interface = interface
-         # FIXME call it _interface on the server side?
-         header_structs += "struct " + interface + "_listener {\n"
+         header_structs += "struct {}_{} {{\n".format(interface, "listener" if mode == "client" else "interface")
 
       header_structs += "  void (*" + funcdef.get('origname') + ") " + get_func_params(funcdef) + ";\n"
       return ""
