@@ -55,14 +55,14 @@ max_opcode = 0
 preamble_files = []
 input_files = []
 output_file = "-"
-typegen = "gael"
+typegen = "marshaller"
 mode = "client"
 
 accepted_enums = dict()
 
 
 ignorelist = dict({
-  "gael":
+  "marshaller":
     {
     },
   "grayley":
@@ -92,7 +92,7 @@ type_formats = {
 }
 
 
-def gael_generator(funcdef, opcode):
+def marshaller_generator(funcdef, opcode):
    # func return type
    if 'rettype' in funcdef:
       outstr = funcdef.get('rettype') + '\n'
@@ -527,12 +527,12 @@ def generate_func(funcdef, elemtype):
    global typegen
 
    if mode == "client":
-      if typegen == "gael" and elemtype == "event":
+      if typegen == "marshaller" and elemtype == "event":
          return False
       elif typegen == "grayley" and elemtype == "request":
          return False
    elif mode == "server":
-      if typegen == "gael" and elemtype == "request":
+      if typegen == "marshaller" and elemtype == "request":
          return False
       elif typegen == "grayley" and elemtype == "event":
          return False
@@ -597,7 +597,7 @@ def start_element(elementname, attrs):
           funcdef['name'] = interface + '_' + attrs.get('name')
       funcdef['origname'] = attrs.get('name')
       opcode = str(int(opcode) + 1)
-      if typegen == 'grayley' or typegen == 'gael':
+      if typegen == 'grayley' or typegen == 'marshaller':
          while (int(opcode) in handwritten_funcs) and funcdef['name'] != handwritten_funcs[int(opcode)][0]:
             opcode = str(int(opcode) + 1)
       if (int(opcode) > max_opcode):
@@ -660,8 +660,8 @@ def end_element(elementname):
 
       outstr = ''
       if generate_func(funcdef, elementname):
-         if typegen == "gael":
-            outstr = gael_generator(funcdef, opcode)
+         if typegen == "marshaller":
+            outstr = marshaller_generator(funcdef, opcode)
          elif typegen == "grayley":
             outstr = grayley_generator(funcdef, opcode)
          elif typegen == "util":

@@ -56,7 +56,7 @@ client-serialice.c: $(tools) $(core_interface) $(extensions) $(srcdir)/serial-pr
 		-i $(core_interface) \
 		-o $@ \
 		-m client \
-		-t gael
+		-t marshaller
 
 client-deserialice.c: $(core_interface) $(tools) $(srcdir)/deserial-preamble.txt waltham-client.h
 	$(top_srcdir)/tools/gen.py \
@@ -89,7 +89,7 @@ server-serialice.c: $(tools) $(core_interface) $(extensions) $(srcdir)/serial-pr
 		-i $(core_interface) \
 		-o $@ \
 		-m server \
-		-t gael
+		-t marshaller
 
 server-deserialice.c: $(core_interface) $(tools) $(srcdir)/deserial-preamble.txt waltham-server.h
 	$(top_srcdir)/tools/gen.py \
