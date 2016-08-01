@@ -37,7 +37,7 @@
 #include "waltham-connection.h"
 
 #include "util/message.h"
-#include "gael_serialization.h"
+#include "marshaller.h"
 #include "grayley.h"
 
 // FIXME
@@ -108,7 +108,7 @@ wth_connection_from_fd(int fd, enum wth_connection_side side)
     }
 
   /* XXX: get rid of this and use the wth_connection.fd instead. */
-  gael_set_fd(fd);
+  marshaller_set_fd(fd);
 
   return conn;
 }

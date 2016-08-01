@@ -29,42 +29,42 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-#include "gael_serialization.h"
+#include "marshaller.h"
 
-pthread_mutex_t gael_mutex __attribute__ ((visibility ("default"))) = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t marshaller_mutex __attribute__ ((visibility ("default"))) = PTHREAD_MUTEX_INITIALIZER;
 int timing_level __attribute__ ((visibility ("default"))) = 0;
 
 int request_id = 0;
 int client_id = 0;
 
-static int gael_fd = -1;
+static int marshaller_fd = -1;
 
 int
-gael_get_client_id (void)
+marshaller_get_client_id (void)
 {
    return client_id;
 }
 
 int
-gael_get_new_request_id (void)
+marshaller_get_new_request_id (void)
 {
    return request_id++;
 }
 
 int
-gael_get_request_id (void)
+marshaller_get_request_id (void)
 {
    return request_id;
 }
 
 void
-gael_set_fd (int fd)
+marshaller_set_fd (int fd)
 {
-   gael_fd = fd;
+   marshaller_fd = fd;
 }
 
 int
-gael_get_fd (void)
+marshaller_get_fd (void)
 {
-   return gael_fd;
+   return marshaller_fd;
 }

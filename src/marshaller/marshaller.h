@@ -22,8 +22,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef __GAEL_SERIALIZATION_H__
-#define __GAEL_SERIALIZATION_H__
+#ifndef __MARSHALLER_H__
+#define __MARSHALLER_H__
 
 #include <stdio.h>
 #include <unistd.h>
@@ -37,20 +37,20 @@
 #include <poll.h>
 
 #include "waltham-message.h"
-#include "gael_log.h"
+#include "marshaller_log.h"
 
 /* All shared libraries in a process wanting to serialize data
  * to the AD side need to LOCK the common mutex first */
 
 /* This variable should only be declared in one shared library */
-extern pthread_mutex_t gael_mutex;
+extern pthread_mutex_t marshaller_mutex;
 
 /* These functions should only be implemented in one shared library */
-int gael_get_client_id (void) __attribute__ ((visibility ("default")));
-int gael_get_request_id (void) __attribute__ ((visibility ("default")));
-int gael_get_new_request_id (void) __attribute__ ((visibility ("default")));
-int gael_get_fd (void) __attribute__ ((visibility ("default")));
-void gael_set_fd (int fd) __attribute__ ((visibility ("default")));
+int marshaller_get_client_id (void) __attribute__ ((visibility ("default")));
+int marshaller_get_request_id (void) __attribute__ ((visibility ("default")));
+int marshaller_get_new_request_id (void) __attribute__ ((visibility ("default")));
+int marshaller_get_fd (void) __attribute__ ((visibility ("default")));
+void marshaller_set_fd (int fd) __attribute__ ((visibility ("default")));
 
 static inline int send_all (int sock, const struct iovec *iov, int iovcnt)
 {
@@ -98,27 +98,27 @@ static inline int recv_all (int sock, struct iovec *iov, int iovcnt)
 
 
 #define LOCK()                          \
-   pthread_mutex_lock(&gael_mutex)
+   pthread_mutex_lock(&marshaller_mutex)
 #define UNLOCK()                        \
-   pthread_mutex_unlock(&gael_mutex)
+   pthread_mutex_unlock(&marshaller_mutex)
 
 #define PADDED(sz) \
    (((sz) + 3) & ~3)
 
 #define START_MESSAGE(name, sz, api, opcode) \
    const char *msg_name __attribute__((unused)) = name; \
-   hdr_t hdr = { gael_get_client_id(), gael_get_new_request_id(), sz, api, opcode, 0 }; \
+   hdr_t hdr = { marshaller_get_client_id(), marshaller_get_new_request_id(), sz, api, opcode, 0 }; \
    int send_ret; \
-   struct iovec gael_params[16]; \
-   int gael_paramid = 1; \
+   struct iovec marshaller_params[16]; \
+   int marshaller_paramid = 1; \
    int param_padding __attribute__((unused)) = 0; \
-   gael_params[0].iov_base = (void *) &hdr; \
-   gael_params[0].iov_len = sizeof(hdr_t); \
+   marshaller_params[0].iov_base = (void *) &hdr; \
+   marshaller_params[0].iov_len = sizeof(hdr_t); \
    DEBUG_STAMP (); \
    STREAM_DEBUG ((unsigned char *) &hdr, sizeof (hdr), "header -> ");
 
 #define END_MESSAGE() \
-   send_ret = send_all (gael_get_fd (), gael_params, gael_paramid); \
+   send_ret = send_all (marshaller_get_fd (), marshaller_params, marshaller_paramid); \
    if (send_ret == -1) \
       exit (errno); \
    DEBUG_TYPE(msg_name);
@@ -126,54 +126,54 @@ static inline int recv_all (int sock, struct iovec *iov, int iovcnt)
 #define ADD_PADDING(sz) \
    param_padding = (4 - ((sz) & 3)) & 3; \
    if (param_padding > 0) { \
-      gael_params[gael_paramid].iov_base = (void *) &gael_paramid; \
-      gael_params[gael_paramid].iov_len = param_padding; \
-      gael_paramid++; \
+      marshaller_params[marshaller_paramid].iov_base = (void *) &marshaller_paramid; \
+      marshaller_params[marshaller_paramid].iov_len = param_padding; \
+      marshaller_paramid++; \
    }
 
 #define SERIALIZE_PARAM(param, sz) \
-   gael_params[gael_paramid].iov_base = (void *) param; \
-   gael_params[gael_paramid].iov_len = sz; \
-   gael_paramid++; \
+   marshaller_params[marshaller_paramid].iov_base = (void *) param; \
+   marshaller_params[marshaller_paramid].iov_len = sz; \
+   marshaller_paramid++; \
    ADD_PADDING (sz); \
    STREAM_DEBUG ((unsigned char *) param, sz, "param  -> ");
 
 #define SERIALIZE_PARAM_SILENT(param, sz) \
-   gael_params[gael_paramid].iov_base = param; \
-   gael_params[gael_paramid].iov_len = sz; \
-   gael_paramid++; \
+   marshaller_params[marshaller_paramid].iov_base = param; \
+   marshaller_params[marshaller_paramid].iov_len = sz; \
+   marshaller_paramid++; \
    ADD_PADDING (sz); \
    STREAM_DEBUG_DATA (param, sz);
 
 #define SERIALIZE_DATA(data, sz) \
-   gael_params[gael_paramid].iov_base = (void *) &sz; \
-   gael_params[gael_paramid].iov_len = sizeof (int); \
-   gael_paramid++; \
+   marshaller_params[marshaller_paramid].iov_base = (void *) &sz; \
+   marshaller_params[marshaller_paramid].iov_len = sizeof (int); \
+   marshaller_paramid++; \
    STREAM_DEBUG ((unsigned char *) &sz, sizeof (int), "data sz   -> "); \
-   gael_params[gael_paramid].iov_base = data; \
-   gael_params[gael_paramid].iov_len = sz; \
-   gael_paramid++; \
+   marshaller_params[marshaller_paramid].iov_base = data; \
+   marshaller_params[marshaller_paramid].iov_len = sz; \
+   marshaller_paramid++; \
    ADD_PADDING (sz); \
    STREAM_DEBUG ((unsigned char *) data, sz, "data   -> ");
 
 #define SERIALIZE_ARRAY(array) \
-   gael_params[gael_paramid].iov_base = (void *) &array->size; \
-   gael_params[gael_paramid].iov_len = sizeof (size_t); \
-   gael_paramid++; \
+   marshaller_params[marshaller_paramid].iov_base = (void *) &array->size; \
+   marshaller_params[marshaller_paramid].iov_len = sizeof (size_t); \
+   marshaller_paramid++; \
    STREAM_DEBUG ((unsigned char *) &sz, sizeof (int), "array sz  -> "); \
-   gael_params[gael_paramid].iov_base = array->data; \
-   gael_params[gael_paramid].iov_len = array->size; \
-   gael_paramid++; \
+   marshaller_params[marshaller_paramid].iov_base = array->data; \
+   marshaller_params[marshaller_paramid].iov_len = array->size; \
+   marshaller_paramid++; \
    ADD_PADDING (array->size); \
    STREAM_DEBUG ((unsigned char *) array->data, array->size, "array  -> ");
 
 #define FLUSH_RECV() \
-   if (gael_paramid > 0) { \
+   if (marshaller_paramid > 0) { \
       int recv_ret; \
-      recv_ret = recv_all (gael_get_fd (), gael_params, gael_paramid); \
+      recv_ret = recv_all (marshaller_get_fd (), marshaller_params, marshaller_paramid); \
       if (recv_ret == -1) \
          exit (errno); \
-      gael_paramid = 0; \
+      marshaller_paramid = 0; \
    }
 
 //STREAM_DEBUG ((unsigned char *) param, sz, "       <- ");
@@ -183,9 +183,9 @@ static inline int recv_all (int sock, struct iovec *iov, int iovcnt)
    int data_sz __attribute__((unused)); \
    char recv_buffer[10] __attribute__((unused)); \
    char padding_buffer[4] __attribute__((unused)); \
-   gael_paramid = 1; \
-   gael_params[0].iov_base = (void *) &hdr; \
-   gael_params[0].iov_len = sizeof(hdr_t); \
+   marshaller_paramid = 1; \
+   marshaller_params[0].iov_base = (void *) &hdr; \
+   marshaller_params[0].iov_len = sizeof(hdr_t); \
    DEBUG_STAMP(); \
 
 #define END_REPLY(type) \
@@ -204,27 +204,27 @@ static inline int recv_all (int sock, struct iovec *iov, int iovcnt)
 #define SKIP_PADDING(sz) \
    param_padding = (4 - ((sz) & 3)) & 3; \
    if (param_padding > 0) { \
-      gael_params[gael_paramid].iov_base = (void *) &padding_buffer; \
-      gael_params[gael_paramid].iov_len = param_padding; \
-      gael_paramid++; \
+      marshaller_params[marshaller_paramid].iov_base = (void *) &padding_buffer; \
+      marshaller_params[marshaller_paramid].iov_len = param_padding; \
+      marshaller_paramid++; \
    }
 
 #define DESERIALIZE_PARAM(param, sz) \
-   gael_params[gael_paramid].iov_base = (void *) param; \
-   gael_params[gael_paramid].iov_len = sz; \
-   gael_paramid++; \
+   marshaller_params[marshaller_paramid].iov_base = (void *) param; \
+   marshaller_params[marshaller_paramid].iov_len = sz; \
+   marshaller_paramid++; \
    SKIP_PADDING(sz);
 
 #define DESERIALIZE_PARAM_SILENT(param, sz) \
-   gael_params[gael_paramid].iov_base = (void *) param; \
-   gael_params[gael_paramid].iov_len = sz; \
-   gael_paramid++; \
+   marshaller_params[marshaller_paramid].iov_base = (void *) param; \
+   marshaller_params[marshaller_paramid].iov_len = sz; \
+   marshaller_paramid++; \
    SKIP_PADDING(sz);
 
 #define DESERIALIZE_DATA(data) \
-   gael_params[gael_paramid].iov_base = (void *) &data_sz; \
-   gael_params[gael_paramid].iov_len = sizeof (data_sz); \
-   gael_paramid++; \
+   marshaller_params[marshaller_paramid].iov_base = (void *) &data_sz; \
+   marshaller_params[marshaller_paramid].iov_len = sizeof (data_sz); \
+   marshaller_paramid++; \
    FLUSH_RECV(); \
    if (data_sz > 0) { \
       DESERIALIZE_PARAM (data, data_sz) \
