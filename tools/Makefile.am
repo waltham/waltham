@@ -1,3 +1,3 @@
-EXTRA_DIST = gen.py varsize.py customcode.py
+EXTRA_DIST = gen.py varsize.py
 
-CLEANFILES = varsize.pyc customcode.pyc
+CLEANFILES = varsize.pyc

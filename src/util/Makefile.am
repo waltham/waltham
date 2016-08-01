@@ -7,7 +7,6 @@ CLEANFILES = $(BUILT_SOURCES)
 
 tools = \
 	$(top_srcdir)/tools/gen.py			\
-	$(top_srcdir)/tools/customcode.py		\
 	$(top_srcdir)/tools/varsize.py
 
 extensions = \

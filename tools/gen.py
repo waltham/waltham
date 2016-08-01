@@ -29,11 +29,6 @@ import xml.parsers.expat
 from varsize import variable_size_attributes
 from varsize import output_variable_size_attributes
 
-from customcode import gael_custom_code
-from customcode import gael_post_call_custom_code
-from customcode import grayley_pre_call_custom_code
-from customcode import grayley_post_call_custom_code
-
 infunc = 0
 infuncelementname = 0
 interface = ''
@@ -174,11 +169,6 @@ def gael_generator(funcdef, opcode):
 
    outstr += '   START_TIMING("' + funcname + '", "' + fmt_string + '"' + fmt_params + ');\n'
 
-   # some extra code defined in customcode.py.
-   if funcname in gael_custom_code:
-      outstr += gael_custom_code.get(funcname)
-      outstr += '\n'
-
    outstr += '   LOCK();\n'
 
    #serialize message header
@@ -266,12 +256,6 @@ def gael_generator(funcdef, opcode):
       receive_reply = (receive_reply + '   DESERIALIZE_PARAM( (void *)&ret, ' + param_size + ' );\n')
 
    outstr += '   UNLOCK();\n'
-
-   # some extra code defined in customcode.py.
-   if funcname in gael_post_call_custom_code:
-      outstr += '\n'
-      outstr += gael_post_call_custom_code.get(funcname)
-      outstr += '\n'
 
    outstr += '   END_TIMING(' + fmt_ret + ');\n'
 
@@ -419,11 +403,6 @@ def grayley_generator(funcdef, opcode):
    code += '  log_debug ("' + apifuncname + '(' + fmt_string + ') (opcode ' \
            + str(opcode) + ') called."' + fmt_params + ');\n'
 
-   # some extra code defined in customcode.py.
-   if apifuncname in grayley_pre_call_custom_code:
-      code += grayley_pre_call_custom_code.get(apifuncname)
-      code += '\n'
-
    objname = funcdef['param0']['val']
    listener = 'struct {}_{} *'.format(objname, "listener" if mode == "client" else "interface")
    vfunc = funcdef['origname']
@@ -432,12 +411,6 @@ def grayley_generator(funcdef, opcode):
    code += '  ((' + listener + ')(((struct wth_object *)' + objname + ')->vfunc))->' + vfunc + '\n'
    code += '    (' + params_call + ');\n'
    code += '  END_TIMING("' + apifuncname +'");\n'
-
-   # some extra code defined in customcode.py.
-   if apifuncname in grayley_post_call_custom_code:
-      code += '\n'
-      code += grayley_post_call_custom_code.get(apifuncname)
-      code += '\n'
 
    if size_output != '':
       code += "\n"
