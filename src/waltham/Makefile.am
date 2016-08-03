@@ -29,6 +29,8 @@ libwalthamserver_la_LIBADD = \
 	$(top_builddir)/src/gael/libgael.la
 
 common_src = \
+	waltham-connection.c \
+	waltham-connection.h \
 	waltham-object.c \
 	waltham-object.h \
 	$(NULL)
