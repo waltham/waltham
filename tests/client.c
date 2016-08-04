@@ -139,7 +139,6 @@ connect_to_server (EPollLoop *loop)
     }
 
   gael_set_fd (server_fd);
-  gael_connect_client ();
 
   reader = new_reader (0);
   epoll_loop_add_fd (loop, server_fd, G_IO_IN, server_readable, reader);

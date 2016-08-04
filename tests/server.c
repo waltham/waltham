@@ -89,26 +89,6 @@ error_cleanup (void)
 	client_reader = NULL;
 }
 
-static gboolean
-connect_client (msg_t *msg)
-{
-	msg_t r;
-	hdr_t hdr;
-	int body = 2;
-
-	g_debug ("Connecting client (id=%i)", msg->hdr->client_id);
-
-	memcpy (&hdr, msg->hdr, sizeof (hdr));
-	hdr.opcode = OPCODE_REPLY;
-	hdr.sz = sizeof (hdr_t) + sizeof (body);
-
-	memset (&r, 0, sizeof (r));
-	r.hdr = &hdr;
-	r.body = (void *) &body;
-
-	return forward_raw_msg (client_fd, &r);
-}
-
 static void
 exec_msg (msg_t *msg)
 {
@@ -117,13 +97,6 @@ exec_msg (msg_t *msg)
 	gboolean ret;
 	msg_t *reply = &scratch_reply;
 	data_t data_reply = {0,};
-
-	/* Connecting client - Send it the handles */
-	if (msg->hdr->api == API_CONTROL && opcode == API_CONTROL_CONNECT_CLIENT) {
-		if (!connect_client (msg))
-			error_cleanup ();
-		return;
-	}
 
 	/* Disconnecting client - Dispatch */
 	if (api == API_CONTROL && opcode == API_CONTROL_DISCONNECT_CLIENT) {

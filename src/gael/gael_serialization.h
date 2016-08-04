@@ -51,7 +51,6 @@ int gael_get_request_id (void) __attribute__ ((visibility ("default")));
 int gael_get_new_request_id (void) __attribute__ ((visibility ("default")));
 int gael_get_fd (void) __attribute__ ((visibility ("default")));
 void gael_set_fd (int fd) __attribute__ ((visibility ("default")));
-void gael_connect_client (void) __attribute__ ((visibility ("default")));
 
 static inline int send_all (int sock, const struct iovec *iov, int iovcnt)
 {

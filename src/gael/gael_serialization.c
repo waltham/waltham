@@ -39,34 +39,6 @@ int client_id = 0;
 
 static int gael_fd = -1;
 
-void
-gael_connect_client (void)
-{
-   struct iovec gael_params[2];
-   int fd = gael_get_fd ();
-   int ret;
-   int version;
-   hdr_t hdr = { 0, 0, sizeof(hdr), API_CONTROL, API_CONTROL_CONNECT_CLIENT, 0 };
-
-   g_print ("connect_client\n");
-
-   do {
-      ret = write(fd, (unsigned char *) &hdr, sizeof(hdr_t));
-   } while (ret == -1 && errno == EINTR);
-
-   gael_params[0].iov_base = &hdr;
-   gael_params[0].iov_len = sizeof(hdr_t);
-   gael_params[1].iov_base = &version;
-   gael_params[1].iov_len = sizeof(int);
-
-   ret = recv_all(fd, gael_params, 2);
-   assert(hdr.opcode == OPCODE_REPLY); // && hdr.client_id != 0);
-
-   client_id = hdr.client_id;
-
-   printf("Connected client (id=%i)\n", client_id);
-}
-
 int
 gael_get_client_id (void)
 {

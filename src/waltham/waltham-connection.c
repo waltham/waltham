@@ -67,7 +67,6 @@ wth_connect_to_server(const char *host, const char *port)
     {
       conn = wth_connection_from_fd(fd, WTH_CONNECTION_SIDE_CLIENT);
       gael_set_fd(fd);
-      gael_connect_client();
     }
 
   return conn;
