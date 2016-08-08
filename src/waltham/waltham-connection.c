@@ -140,6 +140,8 @@ wth_connection_flush(struct wth_connection *conn)
   reader_flush(conn->reader);
 
   // FIXME return value?
+
+  return 0;
 }
 
 int
@@ -180,4 +182,5 @@ int
 wth_roundtrip(struct wth_connection *conn)
 {
   // FIXME
+  return -1;
 }
