@@ -64,10 +64,7 @@ wth_connect_to_server(const char *host, const char *port)
   fd = connect_to_host(host, port);
 
   if (fd >= 0)
-    {
-      conn = wth_connection_from_fd(fd, WTH_CONNECTION_SIDE_CLIENT);
-      gael_set_fd(fd);
-    }
+    conn = wth_connection_from_fd(fd, WTH_CONNECTION_SIDE_CLIENT);
 
   return conn;
 }
@@ -108,6 +105,9 @@ wth_connection_from_fd(int fd, enum wth_connection_side side)
       free(conn);
       conn = NULL;
     }
+
+  /* XXX: get rid of this and use the wth_connection.fd instead. */
+  gael_set_fd(fd);
 
   return conn;
 }
