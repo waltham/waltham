@@ -146,7 +146,10 @@ wth_connection_flush(struct wth_connection *conn)
 int
 wth_connection_read(struct wth_connection *conn)
 {
-  return reader_pull_new_messages(conn->reader, conn->fd, TRUE);
+  if (!reader_pull_new_messages(conn->reader, conn->fd, TRUE))
+    return -1;
+  else
+    return 0;
 }
 
 static void
