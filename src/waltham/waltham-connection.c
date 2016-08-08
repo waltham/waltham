@@ -98,7 +98,8 @@ wth_connection_from_fd(int fd, enum wth_connection_side side)
 
   conn->reader = new_reader (0);
 
-  conn->display = wth_object_new ();
+  /* The display is always id 1. */
+  conn->display = (struct wth_display *) wth_object_new_with_id (1);
 
   if (conn->display == NULL)
     {
