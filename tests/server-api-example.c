@@ -33,7 +33,7 @@
 #include <string.h>
 
 #include <waltham-object.h>
-//#include <waltham-server.h> /* XXX: misses include guards */
+#include <waltham-server.h>
 #include <waltham-connection.h>
 //#include <waltham-server-protocol.h>
 
@@ -104,6 +104,35 @@ client_destroy(struct client *c)
 }
 
 static void
+display_client_version(struct wth_display * wth_display, uint32_t client_version)
+{
+	fprintf(stderr, "server unimplemented: %s\n", __func__);
+}
+
+static void
+display_sync(struct wth_display * wth_display, struct wthp_callback * callback)
+{
+	struct client *c = wth_object_get_user_data((struct wth_object *)wth_display);
+
+	fprintf(stderr, "Client %p requested wth_display.sync\n", c);
+	wthp_callback_send_done(callback, 0);
+
+	/* XXX: wthp_callback_XXX_destroy(callback); */
+}
+
+static void
+display_get_registry(struct wth_display * wth_display, struct wthp_registry * registry)
+{
+	fprintf(stderr, "server unimplemented: %s\n", __func__);
+}
+
+static const struct wth_display_interface display_implementation = {
+	display_client_version,
+	display_sync,
+	display_get_registry
+};
+
+static void
 connection_handle_data(struct watch *w, uint32_t events)
 {
 	struct client *c = container_of(w, struct client, conn_watch);
@@ -158,6 +187,7 @@ static struct client *
 client_create(struct server *srv, struct wth_connection *conn)
 {
 	struct client *c;
+	struct wth_display *disp;
 
 	c = zalloc(sizeof *c);
 	if (!c)
@@ -177,6 +207,10 @@ client_create(struct server *srv, struct wth_connection *conn)
 	fprintf(stderr, "Client %p connected.\n", c);
 
 	wl_list_insert(&srv->client_list, &c->link);
+
+	/* XXX: this should be inside Waltham */
+	disp = wth_connection_get_display(c->connection);
+	wth_display_set_interface(disp, &display_implementation, c);
 
 	return c;
 }
