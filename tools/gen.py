@@ -533,7 +533,7 @@ def header_generator(funcdef, type_):
             header_structs += "};\n\n"
             # wthp_foo_set_listener func
             header_structs += "static inline void\n"
-            header_structs += "{0}_set_{1}(struct {0} *self, struct {0}_{1} *funcs, void *user_data)\n".format(header_interface, "listener" if mode == "client" else "interface")
+            header_structs += "{0}_set_{1}(struct {0} *self, const struct {0}_{1} *funcs, void *user_data)\n".format(header_interface, "listener" if mode == "client" else "interface")
             header_structs += "{\n"
             header_structs += "  wth_object_set_listener((struct wth_object *)self, (void (**)(void)) funcs, user_data);\n"
             header_structs += "}\n\n"
