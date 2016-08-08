@@ -31,7 +31,6 @@
 #ifndef WAYLAND_UTIL_H
 #define WAYLAND_UTIL_H
 
-#include <math.h>
 #include <stddef.h>
 #include <inttypes.h>
 #include <stdarg.h>
@@ -60,21 +59,6 @@ extern "C" {
 #else
 #define WL_PRINTF(x, y)
 #endif
-
-struct wl_message {
-	const char *name;
-	const char *signature;
-	const struct wl_interface **types;
-};
-
-struct wl_interface {
-	const char *name;
-	int version;
-	int method_count;
-	const struct wl_message *methods;
-	int event_count;
-	const struct wl_message *events;
-};
 
 /** \class wl_list
  *
@@ -268,48 +252,6 @@ wl_fixed_from_int(int i)
 {
 	return i * 256;
 }
-
-/**
- * \brief A union representing all of the basic data types that can be passed
- * along the wayland wire format.
- *
- * This union represents all of the basic data types that can be passed in the
- * wayland wire format.  It is used by dispatchers and runtime-friendly
- * versions of the event and request marshaling functions.
- */
-union wl_argument {
-	int32_t i; /**< signed integer */
-	uint32_t u; /**< unsigned integer */
-	wl_fixed_t f; /**< fixed point */
-	const char *s; /**< string */
-	struct wl_object *o; /**< object */
-	uint32_t n; /**< new_id */
-	struct wl_array *a; /**< array */
-	int32_t h; /**< file descriptor */
-};
-
-/**
- * \brief A function pointer type for a dispatcher.
- *
- * A dispatcher is a function that handles the emitting of callbacks in client
- * code.  For programs directly using the C library, this is done by using
- * libffi to call function pointers.  When binding to languages other than C,
- * dispatchers provide a way to abstract the function calling process to be
- * friendlier to other function calling systems.
- *
- * A dispatcher takes five arguments:  The first is the dispatcher-specific
- * implementation data associated with the target object.  The second is the
- * object on which the callback is being invoked (either wl_proxy or
- * wl_resource).  The third and fourth arguments are the opcode the wl_message
- * structure corresponding to the callback being emitted.  The final argument
- * is an array of arguments received from the other process via the wire
- * protocol.
- */
-typedef int (*wl_dispatcher_func_t)(const void *, void *, uint32_t,
-				    const struct wl_message *,
-				    union wl_argument *);
-
-typedef void (*wl_log_func_t)(const char *, va_list) WL_PRINTF(1, 0);
 
 #ifdef  __cplusplus
 }
