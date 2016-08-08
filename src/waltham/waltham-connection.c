@@ -129,7 +129,7 @@ wth_connection_destroy(struct wth_connection *conn)
 {
   close(conn->fd);
 
-  free(conn->display);
+  wth_object_delete((struct wth_object *) conn->display);
   free(conn);
 }
 
