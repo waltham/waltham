@@ -65,6 +65,8 @@ struct display {
 	int epoll_fd;
 
 	struct wthp_registry *registry;
+
+	struct wthp_callback *bling;
 };
 
 static int
@@ -165,6 +167,19 @@ mainloop(struct display *dpy)
 	}
 }
 
+static void
+bling_done(struct wthp_callback *cb, uint32_t arg)
+{
+	struct display *dpy = wth_object_get_user_data((struct wth_object *)cb);
+
+	fprintf(stderr, "...sync done.\n");
+	dpy->running = false;
+}
+
+static const struct wthp_callback_listener bling_listener = {
+	bling_done
+};
+
 int
 main(int arcg, char *argv[])
 {
@@ -177,7 +192,7 @@ main(int arcg, char *argv[])
 		exit(1);
 	}
 
-	dpy.connection = wth_connect_to_server("localhost", "12300");
+	dpy.connection = wth_connect_to_server("localhost", "34400");
 	if (!dpy.connection) {
 		perror("Error connecting");
 		exit(1);
@@ -196,11 +211,15 @@ main(int arcg, char *argv[])
 	  * all the events are just control messaging.
 	  */
 
-	dpy.registry = wth_display_get_registry(dpy.display);
+	/* dpy.registry = wth_display_get_registry(dpy.display); */
 	/* wthp_registry_set_listener() */
 
 	/* Roundtrip ensures all global ads have been received. */
-	wth_roundtrip(dpy.connection);
+	/*wth_roundtrip(dpy.connection);*/
+
+	fprintf(stderr, "sending wth_display.sync...\n");
+	dpy.bling = wth_display_sync(dpy.display);
+	wthp_callback_set_listener(dpy.bling, &bling_listener, &dpy);
 
 	/* Create surfaces, draw initial content, etc. if you want. */
 
