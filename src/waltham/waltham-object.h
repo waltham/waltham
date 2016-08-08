@@ -49,6 +49,9 @@ struct wth_object *
 wth_object_new (void) APICALL;
 
 void
+wth_object_delete (struct wth_object *object) APICALL;
+
+void
 wth_object_set_listener(struct wth_object *obj,
 			void (**listener)(void), void *user_data) APICALL;
 

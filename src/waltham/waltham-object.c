@@ -59,6 +59,14 @@ wth_object_new (void)
 }
 
 void
+wth_object_delete (struct wth_object *object)
+{
+	g_hash_table_remove (hash, GUINT_TO_POINTER (object->id));
+
+	free (object);
+}
+
+void
 wth_object_set_listener(struct wth_object *obj,
 			void (**listener)(void), void *user_data)
 {
