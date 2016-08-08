@@ -99,7 +99,7 @@ gboolean reader_forward_all_messages (ClientReader *reader, int fd) API_CALL;
 void reader_flush (ClientReader *reader) API_CALL;
 
 /** Network helpers */
-int connect_to_host (char *host, char *port) API_CALL;
+int connect_to_host (const char *host, const char *port) API_CALL;
 int connect_to_unix_socket (const char *path) API_CALL;
 
 /* Trivial epoll based loop implementation, fds can only be added once! */

@@ -471,7 +471,7 @@ connect_to_unix_socket (const char *path)
 }
 
 int
-connect_to_host (char *host, char *port)
+connect_to_host (const char *host, const char *port)
 {
   int flag = 1;
   int fd;
