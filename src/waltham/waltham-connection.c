@@ -101,7 +101,7 @@ wth_connection_from_fd(int fd, enum wth_connection_side side)
 
   conn->reader = new_reader (0);
 
-  conn->display = calloc(1, sizeof *conn->display);
+  conn->display = wth_object_new ();
 
   if (conn->display == NULL)
     {
