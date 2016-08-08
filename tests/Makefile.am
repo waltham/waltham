@@ -1,4 +1,4 @@
-noinst_PROGRAMS = client server capiex
+noinst_PROGRAMS = client server capiex sapiex
 
 capiex_LDADD = \
 	@GLIB_LIBS@ \
@@ -12,6 +12,21 @@ capiex_CFLAGS = \
 	-I$(top_srcdir)/include/ \
 	-I$(top_srcdir)/src/
 capiex_SOURCES = client-api-example.c
+
+sapiex_LDADD = \
+	@GLIB_LIBS@ \
+	$(top_builddir)/src/util/libwalthamutil.la \
+	$(top_builddir)/src/grayley/libgrayley.la \
+	$(top_builddir)/src/waltham/libwalthamserver.la
+sapiex_CFLAGS = \
+	@GLIB_CFLAGS@ \
+	-I$(top_srcdir)/src/grayley/ \
+	-I$(top_srcdir)/src/waltham/ \
+	-I$(top_srcdir)/include/ \
+	-I$(top_srcdir)/src/util/ \
+	-I$(top_srcdir)/src/
+sapiex_SOURCES = server-api-example.c \
+	w-util.c
 
 client_LDADD = \
 	@GLIB_LIBS@ \
