@@ -22,10 +22,10 @@ $ ./autogen.sh
 $ make
 
 To test, first start the server:
-$ ./tests/sapiex
+$ ./tests/server
 
 Then in another terminal, run the client:
-$ ./tests/capiex
+$ ./tests/client
 
 The client does a wth_display.sync, waits for the answer, and exits.
 
