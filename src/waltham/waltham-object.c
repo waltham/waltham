@@ -28,7 +28,7 @@
 
 #include "waltham-object.h"
 
-static uint32_t global_id = 0;
+static uint32_t global_id = 2;
 
 GHashTable *hash;
 
