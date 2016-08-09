@@ -1,0 +1,35 @@
+Waltham
+=======
+
+Waltham is a network IPC library designed to resemble Wayland both
+protocol and protocol-API wise.
+
+Waltham does not (yet) support any kind of encryption, so usage in
+untrusted networks is not advised.
+
+Protocol is described in XML files. The generator translates XML into C
+code.
+
+
+Building and testing
+====================
+
+Waltham depends on glib and wayland, but these dependencies are to be
+removed.
+
+To build:
+$ ./autogen.sh
+$ make
+
+To test, first start the server:
+$ ./tests/sapiex
+
+Then in another terminal, run the client:
+$ ./tests/capiex
+
+The client does a wth_display.sync, waits for the answer, and exits.
+
+The server can be stopped with ctrl+c.
+
+The client can be run repeatedly, but currently running several clients
+at the same time is not supported. See TODO for more unfinished items.
