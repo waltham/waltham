@@ -1,14 +1,31 @@
 general:
-- implement wth_display_*
+- implement wth_display protocol
+- Write documentation and use Doxygen to format it
+- code clean-up: style unification, dead code removal, name changes (replace
+  gael, grayley, etc. with more obvious terms)
+- drop dependency to libwayland
+- drop dependency to glib
+- stop using global data (support multiple connections)
+- wthp_registry implementation?
+- the fate of wth_display, hide it completely in wth_connection and rename?
+- implement object id re-use
+- implement server-side object allocation
+- implement protocol version negotiation
+- add listening socket API (usefulness?)
 
 generator:
 - data type: autogenerate the foo_sz arg
+- rewrite the generator to become more readable and maintainable
 
 serialiser:
-- generate headers
+- implement send-buffering (non-blocking sending)
+- support custom protocol extensions
 
 deserialiser:
-- per-object listener structs
+- support custom protocol extensions
 
-tests:
+tests/examples:
 - fix server read error when client disconnects
+- make the examples use more protocol and document better
+- write a test suite
+
