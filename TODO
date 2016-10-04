@@ -1,8 +1,7 @@
 general:
 - implement wth_display protocol
 - Write documentation and use Doxygen to format it
-- code clean-up: style unification, dead code removal, name changes (replace
-  gael, grayley, etc. with more obvious terms)
+- code clean-up: style unification, dead code removal
 - drop dependency to libwayland
 - drop dependency to glib
 - stop using global data (support multiple connections)
