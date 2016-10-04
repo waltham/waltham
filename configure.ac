@@ -43,7 +43,6 @@ AC_CONFIG_FILES([Makefile
 		 include/Makefile
 		 src/Makefile
 		 src/marshaller/Makefile
-		 src/grayley/Makefile
 		 src/util/Makefile
 		 src/waltham/Makefile
 		 tools/Makefile

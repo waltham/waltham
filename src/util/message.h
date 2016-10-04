@@ -48,6 +48,10 @@ copy_msg (msg_t *msg) API_CALL;
 void
 free_msg (msg_t *msg) API_CALL;
 
+gboolean
+msg_dispatch (msg_t *msg,
+    hdr_t *header_reply, char *body_reply, data_t *data_reply) API_CALL;
+
 /**** Ringbuffer based network reader & handler */
 typedef struct {
   guint8 *start;

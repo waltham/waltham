@@ -38,7 +38,6 @@
 
 #include "util/message.h"
 #include "marshaller.h"
-#include "grayley.h"
 
 // FIXME
 struct wth_display {
@@ -161,7 +160,7 @@ dispatch_msg (msg_t *msg)
   g_debug ("Message received: client %d (%d, %d) %d bytes",
            msg->hdr->client_id, msg->hdr->api, msg->hdr->opcode, msg->hdr->sz);
 
-  ret = grayley_dispatch (msg, NULL, NULL, NULL);
+  ret = msg_dispatch (msg, NULL, NULL, NULL);
 }
 
 int

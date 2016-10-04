@@ -441,6 +441,39 @@ free_msg (msg_t *msg)
   g_slice_free (msg_t, msg);
 }
 
+gboolean
+msg_dispatch (msg_t *msg,
+              hdr_t *header_reply, char *body_reply, data_t *data_reply)
+{
+   gboolean ret;
+
+   switch (msg->hdr->api) {
+      case API_CONTROL:
+         if (msg->hdr->opcode == API_CONTROL_DISCONNECT_CLIENT) {
+         } else {
+            g_warning ("Invalid control message (opcode=%d), discard message",
+                       msg->hdr->opcode);
+         }
+         return TRUE;
+      case API_WAYLAND:
+         if (msg->hdr->opcode > grayley_max_opcode
+             || grayley_functions[msg->hdr->opcode] == NULL) {
+            g_warning ("Invalid wayland opcode %d, discard message", msg->hdr->opcode);
+            return TRUE;
+         }
+         ret = grayley_functions[msg->hdr->opcode](msg->hdr, msg->body,
+                   header_reply, body_reply);
+         if (!ret)
+            return TRUE;
+         break;
+      default:
+         g_warning ("Invalid api %d, discard message", msg->hdr->api);
+         return TRUE;
+   }
+
+   return FALSE;
+}
+
 /* Network helpers */
 int
 connect_to_unix_socket (const char *path)

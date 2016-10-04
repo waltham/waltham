@@ -36,8 +36,7 @@
 
 #include "waltham-message.h"
 #include "util/log.h"
-
-#include "grayley.h"
+#include "util/util.h"
 
 //#define ENABLE_PROFILING 1
 

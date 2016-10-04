@@ -21,13 +21,24 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <glib.h>
+#include <gio/gio.h>
+
+#include "waltham-message.h"
+
 #ifndef __UTIL_H__
 #define __UTIL_H__
 
 extern const int util_max_opcode;
+extern const int grayley_max_opcode;
 
 extern const char * util_function_names[];
 
 extern const char function_expects_reply[];
+
+typedef gboolean (*grayley_helper_function_t)(const hdr_t *header,
+        const char *body, hdr_t *header_reply, char *body_reply);
+
+extern const grayley_helper_function_t grayley_functions[];
 
 #endif

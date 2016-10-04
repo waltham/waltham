@@ -14,7 +14,6 @@ AM_CFLAGS = \
 	@GCC_CFLAGS@ @GLIB_CFLAGS@ \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/src/marshaller \
-	-I$(top_srcdir)/src/grayley \
 	-I$(top_srcdir)/src \
 	$(NULL)
 
@@ -22,11 +21,13 @@ lib_LTLIBRARIES = libwalthamclient.la libwalthamserver.la
 
 libwalthamclient_la_LDFLAGS = -version-info 0:0:0 -no-undefined
 libwalthamclient_la_LIBADD = \
-	$(top_builddir)/src/marshaller/libmarshaller.la
+	$(top_builddir)/src/marshaller/libmarshaller.la \
+	$(top_builddir)/src/util/libwalthamutil.la
 
 libwalthamserver_la_LDFLAGS = -version-info 0:0:0 -no-undefined
 libwalthamserver_la_LIBADD = \
-	$(top_builddir)/src/marshaller/libmarshaller.la
+	$(top_builddir)/src/marshaller/libmarshaller.la \
+	$(top_builddir)/src/util/libwalthamutil.la
 
 common_src = \
 	waltham-connection.c \
