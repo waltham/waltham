@@ -96,14 +96,6 @@ type_formats = {
 # where width and height are other params in the function.
 variable_size_attributes = dict()
 
-# dictionary for variable-size output params
-# the key format is 'funcname:paramname'
-# the value is the code to determine the size of the required buffer.
-# It must set the integer pointed by $(param)_sz,
-# e.g. "*buffer_sz = *n * sizeof (uint32_t);", for a `buffer' parameter
-# where n is another param in the function.
-output_variable_size_attributes = dict()
-
 
 def marshaller_generator(funcdef, opcode):
    # func return type
@@ -256,10 +248,7 @@ def marshaller_generator(funcdef, opcode):
 
             param_size = 'sizeof(' + dereferenced_type + ')'
 
-            if funcname + ':' + params.get('val') in output_variable_size_attributes:
-               receive_reply += '   DESERIALIZE_DATA( (void *)' + params['val'] + ');\n'
-            else:
-               receive_reply += '   DESERIALIZE_OPTIONAL_PARAM( (void *)' + params['val'] + ', ' + param_size + ' );\n'
+            receive_reply += '   DESERIALIZE_OPTIONAL_PARAM( (void *)' + params['val'] + ', ' + param_size + ' );\n'
 
          paramitr += 1
       else:
@@ -362,8 +351,7 @@ def demarshaller_generator(funcdef, opcode):
            fmt_string += '%u'
            fmt_params += ', ((wth_object *)' + params.get('val') + ')->id'
 
-         elif ('output' not in funcdef.get(searchstr)) and \
-           var_id not in output_variable_size_attributes:
+         elif 'output' not in funcdef.get(searchstr):
            # input parameters: local variable initialized to point to the
            # right offset in the received message
            type_ = params.get('type')
@@ -386,25 +374,12 @@ def demarshaller_generator(funcdef, opcode):
              "Type '" + params.get('type') + "' must end with a '*'"
 
            fmt_string += '[unprintable output type ' + params.get('type') + ']'
-           if var_id in output_variable_size_attributes:
-             # variable-size out parameter
-             # define a param_sz variable in the reply output...
-             code += '  int *' + params.get('val') + '_sz = (void*)(body_reply' + size_output + ');\n'
-             # ...and initialize it to the actual size of the out param
-             code += output_variable_size_attributes.get(var_id)
-             size_output += ' + sizeof (int)'
-             # now define the output buffer
-             code += '  ' + params.get('type') + ' ' + params.get('val') + \
-                     ' = (void*)(body_reply' + size_output + ');\n'
-             size_output += ' + PADDED (*' + params.get('val') + '_sz)'
-             params_call += params.get('val')
-           else:
-             # fixed-size out parameter
-             dereferenced_type = params.get('type')[:-1].strip()
-             code += '  ' + dereferenced_type + ' *' + params.get('val') + \
-                     ' = (void*)(body_reply' + size_output + ');\n'
-             size_output += ' + PADDED (sizeof (' + dereferenced_type + '))'
-             params_call += params.get('val')
+           # fixed-size out parameter
+           dereferenced_type = params.get('type')[:-1].strip()
+           code += '  ' + dereferenced_type + ' *' + params.get('val') + \
+                   ' = (void*)(body_reply' + size_output + ');\n'
+           size_output += ' + PADDED (sizeof (' + dereferenced_type + '))'
+           params_call += params.get('val')
 
          paramitr += 1
       else:
