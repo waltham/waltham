@@ -98,16 +98,13 @@ wth_connection_from_fd(int fd, enum wth_connection_side side)
   conn->reader = new_reader (0);
 
   /* The display is always id 1. */
-  conn->display = (struct wth_display *) wth_object_new_with_id (1);
+  conn->display = (struct wth_display *) wth_object_new_with_id (conn, 1);
 
   if (conn->display == NULL)
     {
       free(conn);
       conn = NULL;
     }
-
-  /* XXX: get rid of this and use the wth_connection.fd instead. */
-  marshaller_set_fd(fd);
 
   return conn;
 }

@@ -142,7 +142,7 @@ def marshaller_generator(funcdef, opcode):
    #declare ret var, if we have one
    fmt_ret = '""'
    if 'rettype' in funcdef:
-      outstr += '   ' + funcdef.get('rettype') + ' ret = (' + funcdef.get('rettype') + ') wth_object_new ();\n'
+      outstr += '   ' + funcdef.get('rettype') + ' ret = (' + funcdef.get('rettype') + ') wth_object_new (((struct wth_object *)' + funcdef.get('param0').get('val') + ')->connection);\n'
       if funcdef.get('rettype') in type_formats:
          fmt_ret = '"' + type_formats.get(funcdef.get('rettype')) + ' ", ret'
 
@@ -224,7 +224,7 @@ def marshaller_generator(funcdef, opcode):
       else:
          break
 
-   outstr += '   END_MESSAGE();\n'
+   outstr += '   END_MESSAGE(((struct wth_object *){})->connection);\n'.format(funcdef.get('param0').get('val'))
 
    if var_attr_size != "":
       outstr = outstr.replace('VAR_ATTR_SIZE', var_attr_size + '\n')
@@ -333,7 +333,7 @@ def demarshaller_generator(funcdef, opcode):
            type_ = params.get('type')
            objtype = params.get('objtype')
 
-           code += '  ' + objtype + params.get('val') + ' = (' + objtype + ') wth_object_new_with_id (*(uint32_t *)(body' + offset_string + '));\n'
+           code += '  ' + objtype + params.get('val') + ' = (' + objtype + ') wth_object_new_with_id (((struct wth_object *)' + funcdef.get('param0').get('val') + ')->connection, *(uint32_t *)(body' + offset_string + '));\n'
            offset_string += ' + PADDED (sizeof (' + type_ + '))'
            params_call += params.get('val')
 

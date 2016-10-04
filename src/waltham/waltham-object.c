@@ -33,7 +33,7 @@ static uint32_t global_id = 2;
 GHashTable *hash;
 
 struct wth_object *
-wth_object_new_with_id (uint32_t id)
+wth_object_new_with_id (struct wth_connection *connection, uint32_t id)
 {
 	struct wth_object *proxy = NULL;
 
@@ -48,14 +48,15 @@ wth_object_new_with_id (uint32_t id)
 
 	g_hash_table_insert (hash, GUINT_TO_POINTER (id), proxy);
 	proxy->id = id;
+	proxy->connection = connection;
 
 	return proxy;
 }
 
 struct wth_object *
-wth_object_new (void)
+wth_object_new (struct wth_connection *connection)
 {
-	return wth_object_new_with_id (global_id++);
+	return wth_object_new_with_id (connection, global_id++);
 }
 
 void

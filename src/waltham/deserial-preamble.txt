@@ -28,6 +28,8 @@
 #include <stdio.h>
 
 #include "waltham-object.h"
+#include "waltham-connection.h"
+
 #ifdef WALTHAM_CLIENT
 #include "waltham-client.h"
 #else

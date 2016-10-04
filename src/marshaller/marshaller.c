@@ -37,8 +37,6 @@ int timing_level __attribute__ ((visibility ("default"))) = 0;
 int request_id = 0;
 int client_id = 0;
 
-static int marshaller_fd = -1;
-
 int
 marshaller_get_client_id (void)
 {
@@ -55,16 +53,4 @@ int
 marshaller_get_request_id (void)
 {
    return request_id;
-}
-
-void
-marshaller_set_fd (int fd)
-{
-   marshaller_fd = fd;
-}
-
-int
-marshaller_get_fd (void)
-{
-   return marshaller_fd;
 }

@@ -33,6 +33,7 @@
 /* FIXME: move to waltham-private.h ? */
 struct wth_object {
 	struct wth_display *display;
+	struct wth_connection *connection;
 	uint32_t id;
 
 	void (**vfunc)(void);
@@ -43,10 +44,10 @@ struct wth_object {
 extern GHashTable *hash;
 
 struct wth_object *
-wth_object_new_with_id (uint32_t id) APICALL;
+wth_object_new_with_id (struct wth_connection *connection, uint32_t id) APICALL;
 
 struct wth_object *
-wth_object_new (void) APICALL;
+wth_object_new (struct wth_connection *connection) APICALL;
 
 void
 wth_object_delete (struct wth_object *object) APICALL;

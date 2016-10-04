@@ -49,8 +49,6 @@ extern pthread_mutex_t marshaller_mutex;
 int marshaller_get_client_id (void) __attribute__ ((visibility ("default")));
 int marshaller_get_request_id (void) __attribute__ ((visibility ("default")));
 int marshaller_get_new_request_id (void) __attribute__ ((visibility ("default")));
-int marshaller_get_fd (void) __attribute__ ((visibility ("default")));
-void marshaller_set_fd (int fd) __attribute__ ((visibility ("default")));
 
 static inline int send_all (int sock, const struct iovec *iov, int iovcnt)
 {
@@ -117,8 +115,8 @@ static inline int recv_all (int sock, struct iovec *iov, int iovcnt)
    DEBUG_STAMP (); \
    STREAM_DEBUG ((unsigned char *) &hdr, sizeof (hdr), "header -> ");
 
-#define END_MESSAGE() \
-   send_ret = send_all (marshaller_get_fd (), marshaller_params, marshaller_paramid); \
+#define END_MESSAGE(conn) \
+   send_ret = send_all (wth_connection_get_fd(conn), marshaller_params, marshaller_paramid); \
    if (send_ret == -1) \
       exit (errno); \
    DEBUG_TYPE(msg_name);
