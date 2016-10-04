@@ -26,9 +26,6 @@
 import sys, getopt
 import xml.parsers.expat
 
-from varsize import variable_size_attributes
-from varsize import output_variable_size_attributes
-
 infunc = 0
 infuncelementname = 0
 interface = ''
@@ -90,6 +87,22 @@ type_formats = {
   "uint32_t":          "%u",
   "char *":            "%s",
 }
+
+# dictionary for variable-size params, e.g. strings
+# the key format is 'funcname:paramname'
+# the value is the code to determine the size of the data to send, and
+# can reference other params. It must declare 'int $(param)_sz;',
+# e.g. "int pixels_sz = width * height * 4;", for a `pixels' parameter
+# where width and height are other params in the function.
+variable_size_attributes = dict()
+
+# dictionary for variable-size output params
+# the key format is 'funcname:paramname'
+# the value is the code to determine the size of the required buffer.
+# It must set the integer pointed by $(param)_sz,
+# e.g. "*buffer_sz = *n * sizeof (uint32_t);", for a `buffer' parameter
+# where n is another param in the function.
+output_variable_size_attributes = dict()
 
 
 def marshaller_generator(funcdef, opcode):

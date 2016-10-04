@@ -37,8 +37,7 @@ common_src = \
 	$(NULL)
 
 tools = \
-	$(top_srcdir)/tools/gen.py			\
-	$(top_srcdir)/tools/varsize.py
+	$(top_srcdir)/tools/gen.py
 
 core_interface = \
 	$(top_srcdir)/data/command.xml

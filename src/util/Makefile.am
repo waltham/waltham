@@ -6,8 +6,7 @@ BUILT_SOURCES = util_generated.c
 CLEANFILES = $(BUILT_SOURCES)
 
 tools = \
-	$(top_srcdir)/tools/gen.py			\
-	$(top_srcdir)/tools/varsize.py
+	$(top_srcdir)/tools/gen.py
 
 extensions = \
 	$(top_srcdir)/data/command.xml
