@@ -34,7 +34,6 @@
 
 /* functions */
 
-extern void grayley_init (struct grayley_loop_t *loop) API_CALL;
 extern void grayley_bind_wl_display (struct wl_display *display) API_CALL;
 extern void grayley_notify_disconnect (void) API_CALL;
 
@@ -42,8 +41,6 @@ extern gboolean grayley_dispatch (msg_t *msg,
                                   hdr_t *header_reply, 
                                   char *body_reply, data_t *data_reply) API_CALL;
 extern gboolean grayley_client_is_compositor (unsigned short client_id) API_CALL;
-
-void grayley_sync_upstream(void) API_CALL;
 
 /* variables */
 

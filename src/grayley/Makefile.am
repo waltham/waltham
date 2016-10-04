@@ -12,13 +12,9 @@ common_src +=				\
 	grayley.c			\
 	grayley_loop.h			\
 	grayley_loop.c			\
-	grayley_platform.h		\
 	$(NULL)
 
 libgrayley_la_SOURCES = $(common_src)
-
-libgrayley_la_SOURCES += \
-	grayley_platform_dummy.c
 
 nodist_libgrayley_la_SOURCES = \
 	$(top_srcdir)/src/util/message.c \
@@ -34,7 +30,6 @@ libgrayley_la_HEADERS = \
 	$(top_srcdir)/include/waltham-message.h \
 	$(top_srcdir)/src/grayley/grayley.h \
 	$(top_srcdir)/src/grayley/grayley_loop.h \
-	$(top_srcdir)/src/grayley/grayley_platform.h \
 	$(top_srcdir)/src/util/message.h \
 	$(top_srcdir)/src/util/log.h \
 	$(top_srcdir)/src/util/profiling.h \

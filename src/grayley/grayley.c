@@ -33,7 +33,6 @@
 #include "util/log.h"
 
 #include "grayley.h"
-#include "grayley_platform.h"
 
 //#define ENABLE_PROFILING 1
 
@@ -52,25 +51,6 @@
 
 #define PADDED(sz) \
    (((sz) + 3) & ~3)
-
-void
-grayley_init (struct grayley_loop_t *loop)
-{
-   if (getenv("COLLABORA_TEST") == NULL) {
-      if (!grayley_platform_init(loop)) {
-          g_critical("Grayley platform init failed");
-          exit(1);
-      }
-   }
-
-   grayley_platform_init_complete();
-}
-
-void
-grayley_sync_upstream (void)
-{
-    grayley_platform_sync();
-}
 
 gboolean
 grayley_dispatch (msg_t *msg,
