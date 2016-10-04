@@ -37,7 +37,6 @@ typedef struct __attribute__((__packed__)) hdr_t {
    unsigned short sz;
    unsigned short api;
    unsigned short opcode;
-   unsigned short reserved;
 } hdr_t;
 #define MESSAGE_MAX_SIZE (0xffff - sizeof (hdr_t))
 

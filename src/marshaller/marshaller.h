@@ -104,7 +104,7 @@ static inline int recv_all (int sock, struct iovec *iov, int iovcnt)
 
 #define START_MESSAGE(name, sz, api, opcode) \
    const char *msg_name __attribute__((unused)) = name; \
-   hdr_t hdr = { marshaller_get_new_request_id(), sz, api, opcode, 0 }; \
+   hdr_t hdr = { marshaller_get_new_request_id(), sz, api, opcode }; \
    int send_ret; \
    struct iovec marshaller_params[16]; \
    int marshaller_paramid = 1; \
