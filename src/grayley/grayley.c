@@ -34,24 +34,6 @@
 
 #include "grayley.h"
 
-//#define ENABLE_PROFILING 1
-
-#ifdef ENABLE_PROFILING
-#define START_TIMING() \
-  gdouble msec; \
-  GTimer *timer = g_timer_new ();
-#define END_TIMING(label) \
-  msec = g_timer_elapsed (timer, NULL) * 1000; \
-  g_timer_destroy (timer); \
-  log_debug ("%s (%f ms)", label, msec);
-#else
-#define START_TIMING()
-#define END_TIMING(a)
-#endif
-
-#define PADDED(sz) \
-   (((sz) + 3) & ~3)
-
 gboolean
 grayley_dispatch (msg_t *msg,
                   hdr_t *header_reply, char *body_reply, data_t *data_reply)
