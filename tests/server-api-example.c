@@ -104,6 +104,30 @@ client_destroy(struct client *c)
 }
 
 static void
+registry_destroy(struct wthp_registry *registry)
+{
+	struct client *c = wth_object_get_user_data((struct wth_object *)registry);
+
+	fprintf(stderr, "Client %p wthp_registry.destroy\n", c);
+
+	/* XXX: wthp_registry_free(registry); */
+	wth_object_delete((struct wth_object *)registry);
+}
+
+static void
+registry_bind(struct wthp_registry *wthp_registry,
+	     uint32_t name,
+	     struct wth_object *id)
+{
+	fprintf(stderr, "server unimplemented: %s\n", __func__);
+}
+
+const struct wthp_registry_interface registry_implementation = {
+	registry_destroy,
+	registry_bind
+};
+
+static void
 display_client_version(struct wth_display * wth_display, uint32_t client_version)
 {
 	fprintf(stderr, "server unimplemented: %s\n", __func__);
@@ -121,9 +145,15 @@ display_sync(struct wth_display * wth_display, struct wthp_callback * callback)
 }
 
 static void
-display_get_registry(struct wth_display * wth_display, struct wthp_registry * registry)
+display_get_registry(struct wth_display *wth_display,
+		     struct wthp_registry *registry)
 {
-	fprintf(stderr, "server unimplemented: %s\n", __func__);
+	struct client *c = wth_object_get_user_data((struct wth_object *)wth_display);
+
+	wthp_registry_set_interface(registry, &registry_implementation, c);
+
+	/* XXX: advertise our globals */
+	wthp_registry_send_global(registry, 1, "dummy", 2);
 }
 
 static const struct wth_display_interface display_implementation = {
