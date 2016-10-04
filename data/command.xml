@@ -154,6 +154,12 @@
       the object.
     </description>
 
+    <request name="destroy" type="destructor">
+      <description summary="destroy registry interface">
+        No more events will be sent through this registry object.
+      </description>
+    </request>
+
     <request name="bind">
       <description summary="bind an object to the display">
 	Binds a new, client-created object to the server using the
