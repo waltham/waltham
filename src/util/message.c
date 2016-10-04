@@ -53,10 +53,9 @@ is_valid_command (unsigned short api, unsigned short opcode)
 }
 
 ClientReader *
-new_reader (guint8 client_id)
+new_reader (void)
 {
   ClientReader *r = g_malloc0(sizeof(ClientReader));
-  r->client_id = client_id;
 
   r->ringsize = (MESSAGE_MAX_SIZE + sizeof(hdr_t)) * 2 + 1;
   r->ringbuffer = g_malloc (r->ringsize);
@@ -121,7 +120,7 @@ get_uint16 (ClientReader *reader, guint8 *rp, int offset)
 }
 
 static gboolean
-get_one_message (ClientReader *reader, int update_id)
+get_one_message (ClientReader *reader)
 {
   gsize size;
   gsize left = bytes_left (reader, reader->rp);
@@ -144,29 +143,19 @@ get_one_message (ClientReader *reader, int update_id)
   reader->messages[reader->m_complete].length = size;
 
 
-  if (G_UNLIKELY (reader->rp + (5 * sizeof (guint16)) >
+  if (G_UNLIKELY (reader->rp + (4 * sizeof (guint16)) >
       reader->ringbuffer + reader->ringsize))
     {
       gsize left = reader->ringsize + reader->ringbuffer - reader->rp;
-      guint8 *base = (guint8*)&reader->messages[reader->m_complete].cid;
+      guint8 *base = (guint8*)&reader->messages[reader->m_complete].id;
 
       memcpy (base, reader->rp, left);
-      memcpy (base + left, reader->ringbuffer, (5 * sizeof (guint16)) - left);
-
-      if (update_id)
-        {
-          * (move_forward (reader, reader->rp, M_OFFSET_CLIENT_ID))
-            = reader->client_id & 0xff;
-          * (move_forward (reader, reader->rp, M_OFFSET_CLIENT_ID + 1))
-            = (reader->client_id >> 8) & 0xff;
-        }
+      memcpy (base + left, reader->ringbuffer, (4 * sizeof (guint16)) - left);
     }
   else
     {
-      if (update_id)
-        * ((guint16 *)reader->rp + M_OFFSET_CLIENT_ID) = reader->client_id;
-      memcpy (&reader->messages[reader->m_complete].cid,
-        reader->rp, 5 * sizeof (guint16));
+      memcpy (&reader->messages[reader->m_complete].id,
+        reader->rp, 4 * sizeof (guint16));
     }
 
   reader->m_complete++;
@@ -229,15 +218,14 @@ reader_pull_new_messages (ClientReader *reader, int fd, gboolean from_client)
     return FALSE;
 
   /* Setup message headers */
-  while (get_one_message (reader, from_client && reader->client_id))
+  while (get_one_message (reader))
     {
       if (reader->m_complete == reader->m_total)
         {
           reader->messages = g_realloc (reader->messages,
             reader->m_total * 2 * sizeof(ReaderMessage));
           reader->m_total *= 2;
-          g_debug ("Updated client %d to %d messages",
-             reader->client_id, reader->m_total);
+          g_debug ("Updated client to %d messages", reader->m_total);
         }
     }
   return TRUE;

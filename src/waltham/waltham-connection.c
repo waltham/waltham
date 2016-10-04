@@ -95,7 +95,7 @@ wth_connection_from_fd(int fd, enum wth_connection_side side)
   conn->fd = fd;
   conn->side = side;
 
-  conn->reader = new_reader (0);
+  conn->reader = new_reader ();
 
   /* The display is always id 1. */
   conn->display = (struct wth_display *) wth_object_new_with_id (conn, 1);
@@ -154,8 +154,8 @@ dispatch_msg (msg_t *msg)
 {
   gboolean ret;
 
-  g_debug ("Message received: client %d (%d, %d) %d bytes",
-           msg->hdr->client_id, msg->hdr->api, msg->hdr->opcode, msg->hdr->sz);
+  g_debug ("Message received: (%d, %d) %d bytes",
+           msg->hdr->api, msg->hdr->opcode, msg->hdr->sz);
 
   ret = msg_dispatch (msg, NULL, NULL, NULL);
 }

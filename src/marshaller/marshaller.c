@@ -35,13 +35,6 @@ pthread_mutex_t marshaller_mutex __attribute__ ((visibility ("default"))) = PTHR
 int timing_level __attribute__ ((visibility ("default"))) = 0;
 
 int request_id = 0;
-int client_id = 0;
-
-int
-marshaller_get_client_id (void)
-{
-   return client_id;
-}
 
 int
 marshaller_get_new_request_id (void)

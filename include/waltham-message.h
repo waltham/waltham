@@ -27,14 +27,12 @@
 #include <glib.h>
 #include <stdint.h>
 
-#define M_OFFSET_CLIENT_ID 0
-#define M_OFFSET_MSG_ID 2
-#define M_OFFSET_SIZE 4
-#define M_OFFSET_API 6
-#define M_OFFSET_OPCODE 8
+#define M_OFFSET_MSG_ID 0
+#define M_OFFSET_SIZE 2
+#define M_OFFSET_API 4
+#define M_OFFSET_OPCODE 6
 
 typedef struct __attribute__((__packed__)) hdr_t {
-   unsigned short client_id;
    unsigned short id;
    unsigned short sz;
    unsigned short api;

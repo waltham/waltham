@@ -31,9 +31,9 @@
 
 #define API_CALL __attribute__ ((visibility ("default")))
 
-#define MSG_FORMAT "client_id: %hu, id: %hu, sz: %hu, api: %hu, opcode: %hu"
-#define MSG_MEM(msg) msg->hdr->client_id, msg->hdr->id, msg->hdr->sz, msg->hdr->api, msg->hdr->opcode
-#define MSG_MEMS(msg) msg->header.client_id, msg->header.id, msg->header.sz, msg->header.api, msg->header.opcode
+#define MSG_FORMAT "id: %hu, sz: %hu, api: %hu, opcode: %hu"
+#define MSG_MEM(msg) msg->hdr->id, msg->hdr->sz, msg->hdr->api, msg->hdr->opcode
+#define MSG_MEMS(msg) msg->header.id, msg->header.sz, msg->header.api, msg->header.opcode
 
 
 gboolean
@@ -56,7 +56,6 @@ msg_dispatch (msg_t *msg,
 typedef struct {
   guint8 *start;
   gssize length;
-  guint16 cid;
   guint16 id;
   guint16 sz;
   guint16 api;
@@ -64,7 +63,6 @@ typedef struct {
 } ReaderMessage;
 
 typedef struct {
-  guint8 client_id;
   guint8 *ringbuffer;
   gssize ringsize;
   guint8 *rp; /* read pointer */
@@ -87,7 +85,7 @@ typedef struct {
 
 } ClientReader;
 
-ClientReader *new_reader (guint8 client_id) API_CALL;
+ClientReader *new_reader (void) API_CALL;
 void free_reader (ClientReader *reader) API_CALL;
 
 gboolean reader_pull_new_messages (ClientReader *reader, int fd,
