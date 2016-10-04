@@ -30,15 +30,15 @@
 #define __UTIL_H__
 
 extern const int util_max_opcode;
-extern const int grayley_max_opcode;
+extern const int demarshaller_max_opcode;
 
 extern const char * util_function_names[];
 
 extern const char function_expects_reply[];
 
-typedef gboolean (*grayley_helper_function_t)(const hdr_t *header,
+typedef gboolean (*demarshaller_helper_function_t)(const hdr_t *header,
         const char *body, hdr_t *header_reply, char *body_reply);
 
-extern const grayley_helper_function_t grayley_functions[];
+extern const demarshaller_helper_function_t demarshaller_functions[];
 
 #endif

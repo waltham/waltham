@@ -65,7 +65,7 @@ client-deserialice.c: $(core_interface) $(tools) $(srcdir)/deserial-preamble.txt
 		-i $(top_srcdir)/data/command.xml \
 		-o $@ \
 		-m client \
-		-t grayley
+		-t demarshaller
 
 libwalthamclient_la_SOURCES = \
 	$(common_src)
@@ -98,7 +98,7 @@ server-deserialice.c: $(core_interface) $(tools) $(srcdir)/deserial-preamble.txt
 		-i $(top_srcdir)/data/command.xml \
 		-o $@ \
 		-m server \
-		-t grayley
+		-t demarshaller
 
 libwalthamserver_la_SOURCES = \
 	$(common_src)

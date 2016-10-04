@@ -44,7 +44,7 @@ target = ''
 prefix = ''
 opcode = '0'
 
-grayley_generated_funcs = dict()
+demarshaller_generated_funcs = dict()
 
 util_funcs = dict()
 generated_funcs = dict()
@@ -65,7 +65,7 @@ ignorelist = dict({
   "marshaller":
     {
     },
-  "grayley":
+  "demarshaller":
     {
     },
   "util":
@@ -269,12 +269,12 @@ def marshaller_generator(funcdef, opcode):
    return outstr
 
 
-def grayley_generator(funcdef, opcode):
-   global grayley_generated_funcs
+def demarshaller_generator(funcdef, opcode):
+   global demarshaller_generated_funcs
 
    apifuncname = funcdef.get('name')
    funcname = 'function_' + opcode
-   grayley_generated_funcs[int(opcode)] = funcdef.get('name')
+   demarshaller_generated_funcs[int(opcode)] = funcdef.get('name')
 
    code = "/* Function: " + apifuncname + "\n"
    code += " * Opcode " + str(opcode) + \
@@ -529,12 +529,12 @@ def generate_func(funcdef, elemtype):
    if mode == "client":
       if typegen == "marshaller" and elemtype == "event":
          return False
-      elif typegen == "grayley" and elemtype == "request":
+      elif typegen == "demarshaller" and elemtype == "request":
          return False
    elif mode == "server":
       if typegen == "marshaller" and elemtype == "request":
          return False
-      elif typegen == "grayley" and elemtype == "event":
+      elif typegen == "demarshaller" and elemtype == "event":
          return False
 
    return True
@@ -597,7 +597,7 @@ def start_element(elementname, attrs):
           funcdef['name'] = interface + '_' + attrs.get('name')
       funcdef['origname'] = attrs.get('name')
       opcode = str(int(opcode) + 1)
-      if typegen == 'grayley' or typegen == 'marshaller':
+      if typegen == 'demarshaller' or typegen == 'marshaller':
          while (int(opcode) in handwritten_funcs) and funcdef['name'] != handwritten_funcs[int(opcode)][0]:
             opcode = str(int(opcode) + 1)
       if (int(opcode) > max_opcode):
@@ -662,8 +662,8 @@ def end_element(elementname):
       if generate_func(funcdef, elementname):
          if typegen == "marshaller":
             outstr = marshaller_generator(funcdef, opcode)
-         elif typegen == "grayley":
-            outstr = grayley_generator(funcdef, opcode)
+         elif typegen == "demarshaller":
+            outstr = demarshaller_generator(funcdef, opcode)
          elif typegen == "util":
             outstr = util_generator(funcdef, opcode)
          elif typegen == "header":
@@ -715,7 +715,7 @@ for x in input_files:
    p1.ParseFile(inputfile)
    inputfile.close()
 
-if typegen == 'grayley':
+if typegen == 'demarshaller':
    # check the max opcode of handwritten functions
    if handwritten_funcs:
       max_handwritten_opcode = max(handwritten_funcs.keys())
@@ -723,16 +723,16 @@ if typegen == 'grayley':
          max_opcode = max_handwritten_opcode
 
    # add constants
-   out.write("const int grayley_max_opcode __attribute__ ((visibility (\"default\"))) = " \
+   out.write("const int demarshaller_max_opcode __attribute__ ((visibility (\"default\"))) = " \
              + str(max_opcode) + ";\n")
 
    # add array of function pointers
-   out.write("const grayley_helper_function_t grayley_functions" + \
+   out.write("const demarshaller_helper_function_t demarshaller_functions" + \
              "[" + str(max_opcode + 1) + "] \n")
    out.write("__attribute__ ((visibility (\"default\"))) = {\n")
    for x in range(0, max_opcode + 1):
       funcname = 'function_' + str(x)
-      if x in grayley_generated_funcs or x in handwritten_funcs:
+      if x in demarshaller_generated_funcs or x in handwritten_funcs:
          out.write("  " + funcname + ",\n")
       else:
          out.write("  NULL,\n")

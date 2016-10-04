@@ -456,12 +456,12 @@ msg_dispatch (msg_t *msg,
          }
          return TRUE;
       case API_WAYLAND:
-         if (msg->hdr->opcode > grayley_max_opcode
-             || grayley_functions[msg->hdr->opcode] == NULL) {
+         if (msg->hdr->opcode > demarshaller_max_opcode
+             || demarshaller_functions[msg->hdr->opcode] == NULL) {
             g_warning ("Invalid wayland opcode %d, discard message", msg->hdr->opcode);
             return TRUE;
          }
-         ret = grayley_functions[msg->hdr->opcode](msg->hdr, msg->body,
+         ret = demarshaller_functions[msg->hdr->opcode](msg->hdr, msg->body,
                    header_reply, body_reply);
          if (!ret)
             return TRUE;
