@@ -10,8 +10,6 @@ common_src = grayley.h
 
 common_src +=				\
 	grayley.c			\
-	grayley_loop.h			\
-	grayley_loop.c			\
 	$(NULL)
 
 libgrayley_la_SOURCES = $(common_src)
@@ -29,7 +27,6 @@ libgrayley_includedir = $(includedir)/grayley/
 libgrayley_la_HEADERS = \
 	$(top_srcdir)/include/waltham-message.h \
 	$(top_srcdir)/src/grayley/grayley.h \
-	$(top_srcdir)/src/grayley/grayley_loop.h \
 	$(top_srcdir)/src/util/message.h \
 	$(top_srcdir)/src/util/log.h \
 	$(top_srcdir)/src/util/profiling.h \

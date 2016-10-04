@@ -28,13 +28,11 @@
 #include <gio/gio.h>
 
 #include "waltham-message.h"
-#include "grayley_loop.h"
 
 #define API_CALL __attribute__ ((visibility ("default")))
 
 /* functions */
 
-extern void grayley_bind_wl_display (struct wl_display *display) API_CALL;
 extern void grayley_notify_disconnect (void) API_CALL;
 
 extern gboolean grayley_dispatch (msg_t *msg, 
