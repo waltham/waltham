@@ -149,6 +149,16 @@ wth_connection_get_fd(struct wth_connection *conn) APICALL;
 struct wth_display *
 wth_connection_get_display(struct wth_connection *conn) APICALL;
 
+/** Get an id to use in a message
+ *
+ * \param conn The Waltham connection.
+ * \return The next message id.
+ *
+ * Return the next id, to use in a new message.
+ */
+int
+wth_connection_get_next_message_id(struct wth_connection *conn) APICALL;
+
 /** Disconnect
  *
  * \param conn The Waltham connection.

@@ -51,6 +51,8 @@ struct wth_connection {
   ClientReader *reader;
 
   struct wth_display *display;
+
+  int next_message_id;
 };
 
 
@@ -119,6 +121,12 @@ struct wth_display *
 wth_connection_get_display(struct wth_connection *conn)
 {
   return conn->display;
+}
+
+int
+wth_connection_get_next_message_id(struct wth_connection *conn)
+{
+  return conn->next_message_id++;
 }
 
 void

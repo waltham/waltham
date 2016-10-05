@@ -177,7 +177,8 @@ def marshaller_generator(funcdef, opcode):
    outstr += '   LOCK();\n'
 
    #serialize message header
-   outstr += '   START_MESSAGE( "' + funcname + '", sz, '
+   outstr += '   START_MESSAGE( "' + funcname
+   outstr += '", wth_connection_get_next_message_id(((struct wth_object *)' + funcdef.get('param0').get('val') + ')->connection), sz, '
    outstr += 'API_WAYLAND'
    outstr += ', ' + str(opcode) + ' );\n'
 
