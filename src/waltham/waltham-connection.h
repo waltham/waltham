@@ -159,6 +159,16 @@ wth_connection_get_display(struct wth_connection *conn) APICALL;
 int
 wth_connection_get_next_message_id(struct wth_connection *conn) APICALL;
 
+/** Get an id to use in an object
+ *
+ * \param conn The Waltham connection.
+ * \return The next object id.
+ *
+ * Return a free object id, to use in a new object.
+ */
+int
+wth_connection_get_next_object_id(struct wth_connection *conn) APICALL;
+
 /** Disconnect
  *
  * \param conn The Waltham connection.

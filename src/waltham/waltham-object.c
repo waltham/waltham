@@ -26,9 +26,9 @@
 #include <string.h>
 #include <glib.h>
 
-#include "waltham-object.h"
+#include "waltham-connection.h"
 
-static uint32_t global_id = 2;
+#include "waltham-object.h"
 
 GHashTable *hash;
 
@@ -56,7 +56,9 @@ wth_object_new_with_id (struct wth_connection *connection, uint32_t id)
 struct wth_object *
 wth_object_new (struct wth_connection *connection)
 {
-	return wth_object_new_with_id (connection, global_id++);
+	int id = wth_connection_get_next_object_id (connection);
+
+	return wth_object_new_with_id (connection, id);
 }
 
 void

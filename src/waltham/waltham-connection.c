@@ -53,6 +53,7 @@ struct wth_connection {
   struct wth_display *display;
 
   int next_message_id;
+  int next_object_id;
 };
 
 
@@ -99,8 +100,8 @@ wth_connection_from_fd(int fd, enum wth_connection_side side)
 
   conn->reader = new_reader ();
 
-  /* The display is always id 1. */
-  conn->display = (struct wth_display *) wth_object_new_with_id (conn, 1);
+  /* Since this is a new connection, the display will always have id 1. */
+  conn->display = (struct wth_display *) wth_object_new (conn);
 
   if (conn->display == NULL)
     {
@@ -127,6 +128,12 @@ int
 wth_connection_get_next_message_id(struct wth_connection *conn)
 {
   return conn->next_message_id++;
+}
+
+int
+wth_connection_get_next_object_id(struct wth_connection *conn)
+{
+  return ++conn->next_object_id;
 }
 
 void
