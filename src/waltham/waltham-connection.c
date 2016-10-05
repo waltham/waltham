@@ -175,17 +175,6 @@ wth_connection_read(struct wth_connection *conn)
     return 0;
 }
 
-static void
-dispatch_msg (struct wth_connection *conn, msg_t *msg)
-{
-  gboolean ret;
-
-  g_debug ("Message received: (%d, %d) %d bytes",
-           msg->hdr->api, msg->hdr->opcode, msg->hdr->sz);
-
-  ret = msg_dispatch (conn, msg, NULL, NULL, NULL);
-}
-
 int
 wth_connection_dispatch(struct wth_connection *conn)
 {
@@ -196,7 +185,9 @@ wth_connection_dispatch(struct wth_connection *conn)
       msg_t msg;
 
       reader_map_message (conn->reader, i, &msg);
-      dispatch_msg (conn, &msg);
+      g_debug ("Message received on conn %p: (%d, %d) %d bytes",
+               conn, msg.hdr->api, msg.hdr->opcode, msg.hdr->sz);
+      msg_dispatch (conn, &msg, NULL, NULL, NULL);
       reader_unmap_message (conn->reader, i, &msg);
     }
 
