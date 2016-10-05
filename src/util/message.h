@@ -62,6 +62,9 @@ typedef struct {
   guint16 opcode;
 } ReaderMessage;
 
+/* number of guint16 fields, starting from id, in ReaderMessage */
+#define READER_MESSAGE_FIELDS 4
+
 typedef struct {
   guint8 *ringbuffer;
   gssize ringsize;

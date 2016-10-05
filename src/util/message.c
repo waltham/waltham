@@ -143,19 +143,20 @@ get_one_message (ClientReader *reader)
   reader->messages[reader->m_complete].length = size;
 
 
-  if (G_UNLIKELY (reader->rp + (4 * sizeof (guint16)) >
+  if (G_UNLIKELY (reader->rp + (READER_MESSAGE_FIELDS * sizeof (guint16)) >
       reader->ringbuffer + reader->ringsize))
     {
       gsize left = reader->ringsize + reader->ringbuffer - reader->rp;
       guint8 *base = (guint8*)&reader->messages[reader->m_complete].id;
 
       memcpy (base, reader->rp, left);
-      memcpy (base + left, reader->ringbuffer, (4 * sizeof (guint16)) - left);
+      memcpy (base + left, reader->ringbuffer,
+              (READER_MESSAGE_FIELDS * sizeof (guint16)) - left);
     }
   else
     {
       memcpy (&reader->messages[reader->m_complete].id,
-        reader->rp, 4 * sizeof (guint16));
+        reader->rp, READER_MESSAGE_FIELDS * sizeof (guint16));
     }
 
   reader->m_complete++;
