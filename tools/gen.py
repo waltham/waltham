@@ -77,7 +77,7 @@ native_types = {
   "int":      "int32_t",
   "uint":     "uint32_t",
   "fixed":    "wl_fixed_t",
-  "string":   "char *",
+  "string":   "const char *",
   "array":    "struct wl_array *",
   "data":     "void *",
 }
@@ -85,7 +85,7 @@ native_types = {
 type_formats = {
   "int32_t":           "%d",
   "uint32_t":          "%u",
-  "char *":            "%s",
+  "const char *":      "%s",
 }
 
 # dictionary for variable-size params, e.g. strings
@@ -554,7 +554,7 @@ def sanitize_params(funcdef):
          param['is_data'] = True
       if param.get('is_data') and param.get('type').count('*') == 2:
          param['is_2d_data'] = True
-      if param.get('type') == "char *":
+      if param.get('type') == "const char *":
          param['is_string'] = True
       if param.get('is_string') and param.get('output'):
          param['is_out_string'] = True
