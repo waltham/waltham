@@ -40,9 +40,6 @@ struct wth_object {
 	void *user_data;
 };
 
-/* FIXME: move to waltham-object.c and add a wth_object_lookup func */
-extern GHashTable *hash;
-
 struct wth_object *
 wth_object_new_with_id (struct wth_connection *connection, uint32_t id) APICALL;
 

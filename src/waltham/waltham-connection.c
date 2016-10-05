@@ -52,6 +52,8 @@ struct wth_connection {
 
   struct wth_display *display;
 
+  GHashTable *hash;
+
   int next_message_id;
   int next_object_id;
 };
@@ -99,6 +101,7 @@ wth_connection_from_fd(int fd, enum wth_connection_side side)
   conn->side = side;
 
   conn->reader = new_reader ();
+  conn->hash = g_hash_table_new (g_direct_hash, g_direct_equal);
 
   /* Since this is a new connection, the display will always have id 1. */
   conn->display = (struct wth_display *) wth_object_new (conn);
@@ -136,12 +139,20 @@ wth_connection_get_next_object_id(struct wth_connection *conn)
   return ++conn->next_object_id;
 }
 
+GHashTable *
+wth_connection_get_hash(struct wth_connection *conn)
+{
+  return conn->hash;
+}
+
 void
 wth_connection_destroy(struct wth_connection *conn)
 {
   close(conn->fd);
 
   wth_object_delete((struct wth_object *) conn->display);
+  g_hash_table_destroy(conn->hash);
+
   free(conn);
 }
 
@@ -165,14 +176,14 @@ wth_connection_read(struct wth_connection *conn)
 }
 
 static void
-dispatch_msg (msg_t *msg)
+dispatch_msg (struct wth_connection *conn, msg_t *msg)
 {
   gboolean ret;
 
   g_debug ("Message received: (%d, %d) %d bytes",
            msg->hdr->api, msg->hdr->opcode, msg->hdr->sz);
 
-  ret = msg_dispatch (msg, NULL, NULL, NULL);
+  ret = msg_dispatch (conn, msg, NULL, NULL, NULL);
 }
 
 int
@@ -185,7 +196,7 @@ wth_connection_dispatch(struct wth_connection *conn)
       msg_t msg;
 
       reader_map_message (conn->reader, i, &msg);
-      dispatch_msg (&msg);
+      dispatch_msg (conn, &msg);
       reader_unmap_message (conn->reader, i, &msg);
     }
 

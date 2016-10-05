@@ -24,21 +24,15 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <glib.h>
 
 #include "waltham-connection.h"
 
 #include "waltham-object.h"
 
-GHashTable *hash;
-
 struct wth_object *
 wth_object_new_with_id (struct wth_connection *connection, uint32_t id)
 {
 	struct wth_object *proxy = NULL;
-
-	if (hash == NULL)
-		hash = g_hash_table_new (g_direct_hash, g_direct_equal);
 
 	proxy = malloc(sizeof *proxy);
 	memset (proxy, 0, sizeof *proxy);
@@ -46,7 +40,8 @@ wth_object_new_with_id (struct wth_connection *connection, uint32_t id)
 	if (proxy == NULL)
 		return NULL;
 
-	g_hash_table_insert (hash, GUINT_TO_POINTER (id), proxy);
+	g_hash_table_insert (wth_connection_get_hash (connection),
+			     GUINT_TO_POINTER (id), proxy);
 	proxy->id = id;
 	proxy->connection = connection;
 
@@ -64,7 +59,8 @@ wth_object_new (struct wth_connection *connection)
 void
 wth_object_delete (struct wth_object *object)
 {
-	g_hash_table_remove (hash, GUINT_TO_POINTER (object->id));
+	g_hash_table_remove (wth_connection_get_hash (object->connection),
+			     GUINT_TO_POINTER (object->id));
 
 	free (object);
 }

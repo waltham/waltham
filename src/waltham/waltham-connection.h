@@ -26,6 +26,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <glib.h>
 
 #include <waltham-object.h>
 #include <waltham-client.h>
@@ -168,6 +169,9 @@ wth_connection_get_next_message_id(struct wth_connection *conn) APICALL;
  */
 int
 wth_connection_get_next_object_id(struct wth_connection *conn) APICALL;
+
+GHashTable *
+wth_connection_get_hash(struct wth_connection *conn) APICALL;
 
 /** Disconnect
  *

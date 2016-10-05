@@ -431,7 +431,7 @@ free_msg (msg_t *msg)
 }
 
 gboolean
-msg_dispatch (msg_t *msg,
+msg_dispatch (struct wth_connection *conn, msg_t *msg,
               hdr_t *header_reply, char *body_reply, data_t *data_reply)
 {
    gboolean ret;
@@ -450,7 +450,7 @@ msg_dispatch (msg_t *msg,
             g_warning ("Invalid wayland opcode %d, discard message", msg->hdr->opcode);
             return TRUE;
          }
-         ret = demarshaller_functions[msg->hdr->opcode](msg->hdr, msg->body,
+         ret = demarshaller_functions[msg->hdr->opcode](conn, msg->hdr, msg->body,
                    header_reply, body_reply);
          if (!ret)
             return TRUE;

@@ -283,7 +283,7 @@ def demarshaller_generator(funcdef, opcode):
    code += " * Opcode " + str(opcode) + \
            " (hexadecimal: " + hex(int(opcode)) + ")\n"
    code += " */\n"
-   code += "static gboolean " + funcname + "(const hdr_t *header, \n" + \
+   code += "static gboolean " + funcname + "(struct wth_connection *conn, const hdr_t *header,\n" + \
            "        const char *body, hdr_t *header_reply, char *body_reply)\n"
    code += "{\n"
 
@@ -345,7 +345,7 @@ def demarshaller_generator(funcdef, opcode):
            type_ = 'uint32_t'
            objtype = params.get('type')
 
-           code += '  ' + objtype + params.get('val') + ' = g_hash_table_lookup (hash, GUINT_TO_POINTER (*(uint32_t *)(body' + offset_string + ')));\n'
+           code += '  ' + objtype + params.get('val') + ' = g_hash_table_lookup (wth_connection_get_hash (conn), GUINT_TO_POINTER (*(uint32_t *)(body' + offset_string + ')));\n'
            offset_string += ' + PADDED (sizeof (' + type_ + '))'
            params_call += params.get('val')
 
