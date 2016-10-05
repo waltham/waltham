@@ -208,6 +208,10 @@ bling_done(struct wthp_callback *cb, uint32_t arg)
 
 	fprintf(stderr, "...sync done.\n");
 	dpy->running = false;
+
+	/* This needs to be safe! */
+	/* XXX: wthp_callback_free(cb); */
+	wth_object_delete((struct wth_object *)cb);
 }
 
 static const struct wthp_callback_listener bling_listener = {
