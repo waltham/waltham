@@ -159,9 +159,9 @@ wth_connection_destroy(struct wth_connection *conn)
 int
 wth_connection_flush(struct wth_connection *conn)
 {
-  reader_flush(conn->reader);
-
-  // FIXME return value?
+  /* FIXME currently we don't use the ringbuffer to send messages,
+   * they are just written to the fd in write_all() in
+   * src/marshaller/marshaller.h. */
 
   return 0;
 }
@@ -178,7 +178,7 @@ wth_connection_read(struct wth_connection *conn)
 int
 wth_connection_dispatch(struct wth_connection *conn)
 {
-  int i;
+  int i, complete;
 
   for (i = 0 ; i < conn->reader->m_complete; i++)
     {
@@ -191,7 +191,12 @@ wth_connection_dispatch(struct wth_connection *conn)
       reader_unmap_message (conn->reader, i, &msg);
     }
 
-  return conn->reader->m_complete;
+  complete = conn->reader->m_complete;
+
+  /* Remove processed messages */
+  reader_flush (conn->reader);
+
+  return complete;
 }
 
 int
