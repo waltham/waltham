@@ -27,7 +27,6 @@
 #include "waltham-message.h"
 
 #include <glib.h>
-//#include <gio/gio.h>
 
 #define API_CALL __attribute__ ((visibility ("default")))
 
@@ -36,9 +35,6 @@
 #define MSG_MEMS(msg) msg->header.id, msg->header.sz, msg->header.api, msg->header.opcode
 
 struct wth_connection;
-
-gboolean
-is_valid_command (unsigned short api, unsigned short opcode) API_CALL;
 
 gboolean
 forward_raw_msg (int out, msg_t *msg) API_CALL;

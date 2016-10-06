@@ -43,15 +43,6 @@
 #include "log.h"
 #include "util.h"
 
-static const int max_control_opcode = 5;
-
-gboolean
-is_valid_command (unsigned short api, unsigned short opcode)
-{
-  return ((api == API_WAYLAND && opcode <= util_max_opcode) ||
-          (api == API_CONTROL && opcode <= max_control_opcode));
-}
-
 ClientReader *
 new_reader (void)
 {
