@@ -104,6 +104,26 @@ client_destroy(struct client *c)
 }
 
 static void
+compositor_create_surface(struct wthp_compositor *compositor,
+			  struct wthp_surface *id)
+{
+	fprintf(stderr, "server unimplemented: %s\n", __func__);
+}
+
+static void
+compositor_create_region(struct wthp_compositor *compositor,
+			 struct wthp_region *id)
+{
+	fprintf(stderr, "server unimplemented: %s\n", __func__);
+}
+
+static const struct wthp_compositor_interface compositor_implementation = {
+	compositor_create_surface,
+	compositor_create_region
+	/* XXX: protocol is missing destructor */
+};
+
+static void
 registry_destroy(struct wthp_registry *registry)
 {
 	struct client *c = wth_object_get_user_data((struct wth_object *)registry);
@@ -115,11 +135,25 @@ registry_destroy(struct wthp_registry *registry)
 }
 
 static void
-registry_bind(struct wthp_registry *wthp_registry,
+registry_bind(struct wthp_registry *registry,
 	     uint32_t name,
 	     struct wth_object *id)
 {
-	fprintf(stderr, "server unimplemented: %s\n", __func__);
+	struct client *c = wth_object_get_user_data((struct wth_object *)registry);
+
+	/* XXX: we could use a database of globals instead of hardcoding them */
+
+	switch (name) {
+	case 1:
+		wthp_compositor_set_interface(
+			(struct wthp_compositor *)id,
+			&compositor_implementation, c);
+		fprintf(stderr, "client %p bound %s version %d\n",
+			c, "(wthp_compositor?)", -1);
+		break;
+	default:
+		fprintf(stderr, "%s: unknown name %d\n", __func__, name);
+	}
 }
 
 const struct wthp_registry_interface registry_implementation = {
@@ -153,7 +187,7 @@ display_get_registry(struct wth_display *wth_display,
 	wthp_registry_set_interface(registry, &registry_implementation, c);
 
 	/* XXX: advertise our globals */
-	wthp_registry_send_global(registry, 1, "dummy", 2);
+	wthp_registry_send_global(registry, 1, "wthp_compositor", 4);
 }
 
 static const struct wth_display_interface display_implementation = {
