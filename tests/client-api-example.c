@@ -78,6 +78,20 @@ struct display {
 	struct wthp_compositor *compositor;
 };
 
+static void
+fiddle_with_region(struct display *dpy)
+{
+	struct wthp_region *region;
+
+	region = wthp_compositor_create_region(dpy->compositor);
+
+	wthp_region_add(region, 2, 2, 10, 10);
+	wthp_region_add(region, 12, 2, 100, 50);
+	wthp_region_subtract(region, 50, 50, 5, 5);
+
+	wthp_region_destroy(region);
+}
+
 /* The server advertises a global interface.
  * We can store the ad for later and/or bind to it immediately
  * if we want to.
@@ -337,6 +351,33 @@ static const struct wthp_callback_listener bling_listener = {
 	bling_done
 };
 
+/* XXX: these three handlers should not be here */
+
+static void
+not_here_error(struct wth_display *d, struct wth_object *obj,
+	       uint32_t code, const char *msg)
+{
+	fprintf(stderr, "fatal protocol error %d: %s\n", code, msg);
+}
+
+static void
+not_here_delete_id(struct wth_display *d, uint32_t id)
+{
+	fprintf(stderr, "wth_display.delete_id(%d)\n", id);
+}
+
+static void
+not_here_server_version(struct wth_display *d, uint32_t ver)
+{
+	fprintf(stderr, "wth_display.server_version(%d)\n", ver);
+}
+
+static const struct wth_display_listener not_here_listener = {
+	not_here_error,
+	not_here_delete_id,
+	not_here_server_version
+};
+
 int
 main(int arcg, char *argv[])
 {
@@ -368,6 +409,11 @@ main(int arcg, char *argv[])
 	  * all the events are just control messaging.
 	  */
 
+	/* ..except Waltham does not yet, so let's plug in something
+	 * to print out stuff at least.
+	 */
+	wth_display_set_listener(dpy.display, &not_here_listener, NULL);
+
 	/* Create a registry so that we will get advertisements of the
 	 * interfaces implemented by the server.
 	 */
@@ -384,6 +430,8 @@ main(int arcg, char *argv[])
 		fprintf(stderr, "Did not find wthp_compositor, quitting.\n");
 		exit(1);
 	}
+
+	fiddle_with_region(&dpy);
 
 	fprintf(stderr, "sending wth_display.sync...\n");
 	dpy.bling = wth_display_sync(dpy.display);
