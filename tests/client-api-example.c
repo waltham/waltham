@@ -180,7 +180,7 @@ roundtrip(struct display *dpy)
 			break;
 		}
 
-		if (pfd.revents & POLLERR) {
+		if (pfd.revents & (POLLERR | POLLNVAL)) {
 			fprintf(stderr,
 				"Roundtrip connection errored out.\n");
 			break;
