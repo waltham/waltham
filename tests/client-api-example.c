@@ -21,16 +21,17 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <assert.h>
+#include <errno.h>
+#include <poll.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
-#include <unistd.h>
-#include <poll.h>
+#include <string.h>
 #include <sys/epoll.h>
-#include <errno.h>
-#include <sys/types.h>
 #include <sys/socket.h>
-#include <assert.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <waltham-object.h>
 //#include <waltham-client.h> /* XXX: misses include guards */
@@ -46,6 +47,10 @@
 #define container_of(ptr, type, member) ({                              \
 	const __typeof__( ((type *)0)->member ) *__mptr = (ptr);        \
 	(type *)( (char *)__mptr - offsetof(type,member) );})
+#endif
+
+#ifndef MIN
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
 #define MAX_EPOLL_WATCHES 2
@@ -69,6 +74,50 @@ struct display {
 	struct wthp_registry *registry;
 
 	struct wthp_callback *bling;
+
+	struct wthp_compositor *compositor;
+};
+
+/* The server advertises a global interface.
+ * We can store the ad for later and/or bind to it immediately
+ * if we want to.
+ * We also need to keep track of the globals we bind to, so that
+ * global_remove can be handled properly.
+ */
+static void
+registry_handle_global(struct wthp_registry *registry,
+		       uint32_t name,
+		       const char *interface,
+		       uint32_t version)
+{
+	struct display *dpy = wth_object_get_user_data((struct wth_object *)registry);
+
+	printf("got global %d: '%s' version '%d'\n",
+	       name, interface, version);
+
+	if (strcmp(interface, "wthp_compositor") == 0) {
+		assert(!dpy->compositor);
+		dpy->compositor = (struct wthp_compositor *)wthp_registry_bind(registry, name);
+		/* has no events to handle */
+	}
+}
+
+/* The server removed a global.
+ * We should destroy everything we created through that global,
+ * and destroy the objects we created by binding to it.
+ * The identification happens by global's name, so we need to keep
+ * track what names we bound.
+ */
+static void
+registry_handle_global_remove(struct wthp_registry *wthp_registry,
+			      uint32_t name)
+{
+	printf("global %d removed\n", name);
+}
+
+static const struct wthp_registry_listener registry_listener = {
+	registry_handle_global,
+	registry_handle_global_remove
 };
 
 static int
@@ -271,40 +320,6 @@ mainloop(struct display *dpy)
 	}
 }
 
-/* The server advertises a global interface.
- * We can store the ad for later and/or bind to it immediately
- * if we want to.
- * We also need to keep track of the globals we bind to, so that
- * global_remove can be handled properly.
- */
-static void
-registry_handle_global(struct wthp_registry *wthp_registry,
-		       uint32_t name,
-		       const char *interface,
-		       uint32_t version)
-{
-	printf("got global %d: '%s' version '%d'\n",
-	       name, interface, version);
-}
-
-/* The server removed a global.
- * We should destroy everything we created through that global,
- * and destroy the objects we created by binding to it.
- * The identification happens by global's name, so we need to keep
- * track what names we bound.
- */
-static void
-registry_handle_global_remove(struct wthp_registry *wthp_registry,
-			      uint32_t name)
-{
-	printf("global %d removed\n", name);
-}
-
-static const struct wthp_registry_listener registry_listener = {
-	registry_handle_global,
-	registry_handle_global_remove
-};
-
 static void
 bling_done(struct wthp_callback *cb, uint32_t arg)
 {
@@ -362,6 +377,11 @@ main(int arcg, char *argv[])
 	/* Roundtrip ensures all globals' ads have been received. */
 	if (roundtrip(&dpy) < 0) {
 		fprintf(stderr, "Roundtrip failed.\n");
+		exit(1);
+	}
+
+	if (!dpy.compositor) {
+		fprintf(stderr, "Did not find wthp_compositor, quitting.\n");
 		exit(1);
 	}
 
