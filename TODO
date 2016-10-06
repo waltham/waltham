@@ -11,6 +11,8 @@ general:
 - implement server-side object allocation
 - implement protocol version negotiation
 - add listening socket API (usefulness?)
+- error delivery: see the comments in object_post_error() in
+  tests/server-api-example.c
 
 generator:
 - data type: autogenerate the foo_sz arg

@@ -104,17 +104,63 @@ client_destroy(struct client *c)
 }
 
 static void
+object_post_error(struct wth_object *obj,
+		  uint32_t code,
+		  const char *fmt, ...)
+{
+	struct client *c;
+	struct wth_connection *conn;
+	struct wth_display *disp;
+	char str[256];
+	va_list ap;
+
+	va_start(ap, fmt);
+	vsnprintf(str, sizeof str, fmt, ap);
+	va_end(ap);
+
+	conn = obj->connection; /* XXX: use a getter? */
+	disp = wth_connection_get_display(conn);
+	wth_display_send_error(disp, obj, code, str);
+
+	c = wth_object_get_user_data((struct wth_object *)disp);
+	fprintf(stderr, "client %p: sending fatal error '%s'\n", c, str);
+
+	/* XXX: AARGH!
+	 * However, getting the error message actually transmitted
+	 * while we want to close the connection without blocking
+	 * on it is a pretty nasty problem.
+	 */
+	sleep(1);
+
+	/* XXX: if we are in the middle of dispatching, which is very
+	 * likely, we should mark the wth_connection as errored.
+	 * Destroying it here means we probably crash.
+	 */
+	client_destroy(c);
+
+	/* XXX: http://stackoverflow.com/questions/3757289/tcp-option-so-linger-zero-when-its-required
+	 * So we should design this so that the client will be closing
+	 * the connection on a protocol error. Fair enough, so we should
+	 * just mark the connection as failed but not close it.
+	 * While it is failed, we should just ignore all incoming
+	 * messages and wait for it to close. We might also need a
+	 * timer to trigger a forced close if the client never closes it.
+	 * Would the TCP stack have anything to do that automatically?
+	 */
+}
+
+static void
 compositor_create_surface(struct wthp_compositor *compositor,
 			  struct wthp_surface *id)
 {
-	fprintf(stderr, "server unimplemented: %s\n", __func__);
+	object_post_error((struct wth_object *)compositor, 0, "unimplemented: %s", __func__);
 }
 
 static void
 compositor_create_region(struct wthp_compositor *compositor,
 			 struct wthp_region *id)
 {
-	fprintf(stderr, "server unimplemented: %s\n", __func__);
+	object_post_error((struct wth_object *)compositor, 0, "unimplemented: %s", __func__);
 }
 
 static const struct wthp_compositor_interface compositor_implementation = {
@@ -152,7 +198,7 @@ registry_bind(struct wthp_registry *registry,
 			c, "(wthp_compositor?)", -1);
 		break;
 	default:
-		fprintf(stderr, "%s: unknown name %d\n", __func__, name);
+		object_post_error((struct wth_object *)registry, 0, "%s: unknown name %u", __func__, name);
 	}
 }
 
@@ -164,7 +210,7 @@ const struct wthp_registry_interface registry_implementation = {
 static void
 display_client_version(struct wth_display * wth_display, uint32_t client_version)
 {
-	fprintf(stderr, "server unimplemented: %s\n", __func__);
+	object_post_error((struct wth_object *)wth_display, 0, "unimplemented: %s", __func__);
 }
 
 static void
