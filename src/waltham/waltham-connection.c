@@ -151,6 +151,7 @@ wth_connection_destroy(struct wth_connection *conn)
 
   wth_object_delete((struct wth_object *) conn->display);
   g_hash_table_destroy(conn->hash);
+  free_reader(conn->reader);
 
   free(conn);
 }
