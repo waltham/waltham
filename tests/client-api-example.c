@@ -94,13 +94,6 @@ connection_handle_data(struct watch *w, uint32_t events)
 		return;
 	}
 
-	if (events & EPOLLHUP) {
-		fprintf(stderr, "Connection hung up.\n");
-		dpy->running = false;
-
-		return;
-	}
-
 	if (events & EPOLLOUT) {
 		ret = wth_connection_flush(dpy->connection);
 		if (ret == 0)
@@ -117,6 +110,13 @@ connection_handle_data(struct watch *w, uint32_t events)
 
 			return;
 		}
+	}
+
+	if (events & EPOLLHUP) {
+		fprintf(stderr, "Connection hung up.\n");
+		dpy->running = false;
+
+		return;
 	}
 }
 
