@@ -30,6 +30,7 @@
 #include <string.h>
 #include <sys/epoll.h>
 #include <sys/socket.h>
+#include <sys/timerfd.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -38,6 +39,7 @@
 #include <waltham-connection.h>
 //#include <waltham-client-protocol.h>
 
+#include "util/zalloc.h"
 
 #ifndef ARRAY_LENGTH
 #define ARRAY_LENGTH(a) (sizeof (a) / sizeof (a)[0])
@@ -76,6 +78,13 @@ struct display {
 	struct wthp_callback *bling;
 
 	struct wthp_compositor *compositor;
+	struct wtimer *fiddle_timer;
+};
+
+struct wtimer {
+	struct watch watch;
+	void (*func)(struct wtimer *, void *);
+	void *data;
 };
 
 static void
@@ -142,6 +151,83 @@ watch_ctl(struct watch *w, int op, uint32_t events)
 	ee.events = events;
 	ee.data.ptr = w;
 	return epoll_ctl(w->display->epoll_fd, op, w->fd, &ee);
+}
+
+static void
+wtimer_handle_data(struct watch *w, uint32_t events)
+{
+	struct wtimer *t = container_of(w, struct wtimer, watch);
+	uint64_t expires;
+	int len;
+
+	assert(events & EPOLLIN);
+
+	len = read(t->watch.fd, &expires, sizeof expires);
+	if (!(len == -1 && errno == EAGAIN) && len != sizeof expires) {
+		perror("timer read");
+		exit(1);
+	}
+
+	return t->func(t, t->data);
+}
+
+static struct wtimer *
+wtimer_create(struct display *dpy, int clock_id,
+	      void (*func)(struct wtimer *, void *), void *data)
+{
+	struct wtimer *t;
+
+	t = zalloc(sizeof *t);
+	if (!t)
+		return NULL;
+
+	t->watch.display = dpy;
+	t->watch.fd = timerfd_create(clock_id, TFD_CLOEXEC);
+	t->watch.cb = wtimer_handle_data;
+	t->func = func;
+	t->data = data;
+
+	if (t->watch.fd == -1) {
+		perror("wtimer_create: timerfd_create");
+		goto out_free;
+	}
+
+	if (watch_ctl(&t->watch, EPOLL_CTL_ADD, EPOLLIN) < 0) {
+		perror("adding timer watch");
+		goto out_close;
+	}
+
+	return t;
+
+out_close:
+	close(t->watch.fd);
+
+out_free:
+	free(t);
+	return NULL;
+}
+
+static void
+wtimer_destroy(struct wtimer *t)
+{
+	watch_ctl(&t->watch, EPOLL_CTL_DEL, 0);
+	close(t->watch.fd);
+	free(t);
+}
+
+static void
+wtimer_arm_once(struct wtimer *t, int ms_delay)
+{
+	struct itimerspec its;
+
+	its.it_interval.tv_sec = 0;
+	its.it_interval.tv_nsec = 0;
+	its.it_value.tv_sec = ms_delay / 1000;
+	its.it_value.tv_nsec = (ms_delay % 1000) * 1000 * 1000;
+	if (timerfd_settime(t->watch.fd, 0, &its, NULL) < 0) {
+		perror("arming timer");
+		exit(1);
+	}
 }
 
 static void
@@ -340,7 +426,6 @@ bling_done(struct wthp_callback *cb, uint32_t arg)
 	struct display *dpy = wth_object_get_user_data((struct wth_object *)cb);
 
 	fprintf(stderr, "...sync done.\n");
-	dpy->running = false;
 
 	/* This needs to be safe! */
 	/* XXX: wthp_callback_free(cb); */
@@ -350,6 +435,21 @@ bling_done(struct wthp_callback *cb, uint32_t arg)
 static const struct wthp_callback_listener bling_listener = {
 	bling_done
 };
+
+static void
+fiddle_timer_cb(struct wtimer *t, void *data)
+{
+	struct display *dpy = data;
+	static int count;
+
+	fiddle_with_region(dpy);
+
+	count++;
+	if (count > 4)
+		dpy->running = false;
+	else
+		wtimer_arm_once(t, 1000);
+}
 
 /* XXX: these three handlers should not be here */
 
@@ -387,6 +487,13 @@ main(int arcg, char *argv[])
 	dpy.epoll_fd = epoll_create1(EPOLL_CLOEXEC);
 	if (dpy.epoll_fd == -1) {
 		perror("Error on epoll_create1");
+		exit(1);
+	}
+
+	dpy.fiddle_timer = wtimer_create(&dpy, CLOCK_MONOTONIC,
+					 fiddle_timer_cb, &dpy);
+	if (!dpy.fiddle_timer) {
+		perror("creating fiddle_timer");
 		exit(1);
 	}
 
@@ -438,10 +545,12 @@ main(int arcg, char *argv[])
 	wthp_callback_set_listener(dpy.bling, &bling_listener, &dpy);
 
 	/* Create surfaces, draw initial content, etc. if you want. */
+	wtimer_arm_once(dpy.fiddle_timer, 1000);
 
 	mainloop(&dpy);
 
 	/* destroy all things */
+	wtimer_destroy(dpy.fiddle_timer);
 
 	/* If no destructor protocol, there would be an auto-generated
 	 * wthp_registry_free() to just free() the wth_object.

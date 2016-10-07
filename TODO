@@ -30,3 +30,6 @@ tests/examples:
 - fix server read error when client disconnects
 - make the examples use more protocol and document better
 - write a test suite
+
+build:
+- check for timerfd in configure
