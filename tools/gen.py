@@ -33,7 +33,8 @@ interface = ''
 outstr = ''
 header_structs = ''
 header_funcs = ''
-header_interface = ''
+listener_interface = ''
+freefunc_interface = ''
 
 funcdef = dict()
 paramcnt = 0
@@ -485,23 +486,34 @@ def get_func_prototype(funcdef):
 def header_generator(funcdef, type_):
    global header_structs
    global header_funcs
-   global header_interface
+   global listener_interface
+   global freefunc_interface
    global interface
+
+   if interface != freefunc_interface:
+      # wthp_foo_free func
+      header_funcs += "static inline void\n"
+      header_funcs += "{0}_free(struct {0} *self)\n".format(interface)
+      header_funcs += "{\n"
+      header_funcs += "  wth_object_delete((struct wth_object *)self);\n"
+      header_funcs += "}\n\n"
+
+      freefunc_interface = interface
 
    if (mode == "client" and type_ == "event") \
       or (mode == "server" and type_ == "request"):
-      if interface != header_interface:
-         if header_interface != "":
+      if interface != listener_interface:
+         if listener_interface != "":
             header_structs += "};\n\n"
             # wthp_foo_set_listener func
             header_structs += "static inline void\n"
-            header_structs += "{0}_set_{1}(struct {0} *self, const struct {0}_{1} *funcs, void *user_data)\n".format(header_interface, "listener" if mode == "client" else "interface")
+            header_structs += "{0}_set_{1}(struct {0} *self, const struct {0}_{1} *funcs, void *user_data)\n".format(listener_interface, "listener" if mode == "client" else "interface")
             header_structs += "{\n"
             header_structs += "  wth_object_set_listener((struct wth_object *)self, (void (**)(void)) funcs, user_data);\n"
             header_structs += "}\n\n"
 
          # new interface. declare the struct
-         header_interface = interface
+         listener_interface = interface
          header_structs += "struct {}_{} {{\n".format(interface, "listener" if mode == "client" else "interface")
 
       header_structs += "  void (*" + funcdef.get('origname') + ") " + get_func_params(funcdef) + ";\n"
