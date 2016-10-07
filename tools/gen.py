@@ -521,8 +521,6 @@ def header_generator(funcdef, type_):
 
       header_structs += "  void (*" + funcdef.get('origname') + ") " + get_func_params(funcdef) + ";\n"
       return ""
-   elif mode == "server" and type_ == "request":
-      return ""
 
    header_funcs += get_func_prototype (funcdef) + ' APICALL;\n\n'
    return ""
