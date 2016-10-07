@@ -104,29 +104,4 @@ void reader_flush (ClientReader *reader) API_CALL;
 int connect_to_host (const char *host, const char *port) API_CALL;
 int connect_to_unix_socket (const char *path) API_CALL;
 
-/* Trivial epoll based loop implementation, fds can only be added once! */
-typedef struct _EPollLoop EPollLoop;
-
-struct _EPollLoop {
-  int epoll_fd;
-  int n_clients;
-  int n_events;
-  struct epoll_event *events;
-  GHashTable *callbacks;
-  int priority_fd;
-};
-
-
-typedef gboolean (*epoll_callback) (EPollLoop *loop, int fd,
-    GIOCondition cond, gpointer data);
-
-void epoll_loop_init (EPollLoop *loop) API_CALL;
-void epoll_loop_deinit (EPollLoop *loop) API_CALL;
-void epoll_loop_iterate (EPollLoop *loop) API_CALL;
-void epoll_loop_add_fd (EPollLoop *loop, int fd,
-  GIOCondition cond, epoll_callback cb, gpointer data) API_CALL;
-void epoll_loop_remove_fd (EPollLoop *loop, int fd) API_CALL;
-void epoll_loop_set_priority(EPollLoop *loop, int fd) API_CALL;
-
-
 #endif

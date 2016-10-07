@@ -22,13 +22,10 @@
  */
 
 #include <errno.h>
-#include <gio/gio.h>
-#include <gio/gfiledescriptorbased.h>
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <string.h>
-#include <poll.h>
 #include <sys/uio.h>
 #include <inttypes.h>
 
@@ -37,7 +34,8 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <netdb.h>
-#include <sys/epoll.h>
+
+#include <glib.h>
 
 #include "message.h"
 #include "log.h"
@@ -523,139 +521,4 @@ connect_to_host (const char *host, const char *port)
     setsockopt (fd, IPPROTO_TCP, TCP_NODELAY, (char *) &flag, sizeof(int));
 
   return fd;
-}
-
-/* epoll loop */
-typedef struct {
-  epoll_callback callback;
-  gpointer data;
-} EPollEntry;
-
-static EPollEntry *
-new_epoll_entry (epoll_callback callback, gpointer data)
-{
-  EPollEntry *e = g_slice_new (EPollEntry);
-  e->callback = callback;
-  e->data = data;
-
-  return e;
-}
-
-static void
-free_epoll_entry (gpointer data)
-{
-  g_slice_free (EPollEntry, data);
-}
-
-void
-epoll_loop_init (EPollLoop *loop)
-{
-  loop->epoll_fd = epoll_create1 (0);
-  loop->n_clients = 0;
-  loop->n_events = 8;
-  loop->events = g_malloc (loop->n_events * sizeof(struct epoll_event));
-  loop->callbacks = g_hash_table_new_full (g_direct_hash, g_direct_equal,
-                      NULL, free_epoll_entry);
-  loop->priority_fd = -1;
-}
-
-void
-epoll_loop_deinit (EPollLoop *loop)
-{
-  close (loop->epoll_fd);
-  g_free (loop->events);
-  g_hash_table_destroy (loop->callbacks);
-}
-
-static void
-epoll_loop_dispatch (EPollLoop *loop, struct epoll_event *event)
-{
-  EPollEntry *entry = g_hash_table_lookup (loop->callbacks,
-    GUINT_TO_POINTER (event->data.fd));
-  GIOCondition cond = 0;
-
-  if (entry == NULL)
-    {
-      g_debug ("Skipping removed fd %d", event->data.fd);
-      return;
-    }
-
-  if (event->events & EPOLLIN)
-    cond |= G_IO_IN;
-
-  if (event->events & EPOLLOUT)
-    cond |= G_IO_OUT;
-
-  if (!entry->callback (loop, event->data.fd, cond, entry->data))
-    epoll_loop_remove_fd (loop, event->data.fd);
-}
-
-void
-epoll_loop_iterate (EPollLoop *loop)
-{
-  int n, nfds;
-  nfds = epoll_wait (loop->epoll_fd, loop->events, loop->n_events, -1);
-
-  if (loop->priority_fd)
-    for (n = 0; n < nfds; n++)
-       if (loop->events[n].data.fd == loop->priority_fd)
-         epoll_loop_dispatch (loop, &loop->events[n]);
-
-  for (n = 0; n < nfds; n++)
-    if (loop->events[n].data.fd != loop->priority_fd)
-         epoll_loop_dispatch (loop, &loop->events[n]);
-}
-
-void
-epoll_loop_add_fd (EPollLoop *loop, int fd,
-  GIOCondition cond, epoll_callback cb, gpointer data)
-{
-  struct epoll_event ev = {0, };
-
-  g_debug ("Adding fd %d", fd);
-
-  /* Only one entry per fd */
-  g_assert (g_hash_table_lookup (loop->callbacks,
-    GUINT_TO_POINTER (fd)) == NULL);
-
-  ev.data.fd = fd;
-  if (cond & G_IO_IN)
-    ev.events |= EPOLLIN;
-  if (cond & G_IO_OUT)
-    ev.events |= EPOLLOUT;
-
-  if (epoll_ctl (loop->epoll_fd, EPOLL_CTL_ADD, fd, &ev) < 0)
-    g_critical ("Failed to add fd to the epoll events");
-
-  loop->n_clients++;
-  if (loop->n_clients > loop->n_events)
-    {
-          loop->n_events *= 2;
-          loop->events = g_realloc (loop->events,
-            loop->n_events * sizeof (struct epoll_event));
-    }
-
-  g_hash_table_insert (loop->callbacks, GUINT_TO_POINTER (fd),
-    new_epoll_entry (cb, data));
-}
-
-void
-epoll_loop_remove_fd (EPollLoop *loop, int fd)
-{
-
-  /* fd could already have been removed */
-  if (g_hash_table_lookup (loop->callbacks, GUINT_TO_POINTER (fd)) == NULL)
-    return;
-
-  loop->n_clients--;
-  g_hash_table_remove (loop->callbacks, GUINT_TO_POINTER (fd));
-
-  if (epoll_ctl (loop->epoll_fd, EPOLL_CTL_DEL, fd, NULL) < 0)
-    g_debug ("Failed to remove fd %d from the epoll events (already closed?)", fd);
-}
-
-void
-epoll_loop_set_priority(EPollLoop *loop, int fd)
-{
-  loop->priority_fd = fd;
 }
