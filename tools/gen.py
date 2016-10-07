@@ -259,6 +259,9 @@ def marshaller_generator(funcdef, opcode):
       param_size = 'sizeof(' + funcdef.get('rettype') + ')'
       receive_reply = (receive_reply + '   DESERIALIZE_PARAM( (void *)&ret, ' + param_size + ' );\n')
 
+   if 'destructor' in funcdef:
+      outstr += '   {0}_free({0});\n'.format(interface)
+
    outstr += '   UNLOCK();\n'
 
    outstr += '   END_TIMING(' + fmt_ret + ');\n'
@@ -597,6 +600,8 @@ def start_element(elementname, attrs):
       else:
           funcdef['name'] = interface + '_' + attrs.get('name')
       funcdef['origname'] = attrs.get('name')
+      if attrs.get('type') == 'destructor':
+         funcdef['destructor'] = True
       opcode = str(int(opcode) + 1)
       if typegen == 'demarshaller' or typegen == 'marshaller':
          while (int(opcode) in handwritten_funcs) and funcdef['name'] != handwritten_funcs[int(opcode)][0]:
