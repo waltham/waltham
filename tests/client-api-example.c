@@ -34,7 +34,7 @@
 #include <unistd.h>
 
 #include <waltham-object.h>
-//#include <waltham-client.h> /* XXX: misses include guards */
+#include <waltham-client.h>
 #include <waltham-connection.h>
 //#include <waltham-client-protocol.h>
 
