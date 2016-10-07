@@ -22,11 +22,11 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <stdint.h>
-#include <glib.h>
-
 #ifndef __WTH_OBJECT__
 #define __WTH_OBJECT__
+
+#include <stdint.h>
+#include <glib.h>
 
 #define APICALL __attribute__ ((visibility ("default")))
 

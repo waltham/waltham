@@ -21,6 +21,9 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef __WALTHAM_CONNECTION_H__
+#define __WALTHAM_CONNECTION_H__
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -31,9 +34,6 @@
 #include <waltham-object.h>
 #include <waltham-client.h>
 //#include <waltham-client-protocol.h>
-
-#ifndef __WALTHAM_CONNECTION_H__
-#define __WALTHAM_CONNECTION_H__
 
 #define APICALL __attribute__ ((visibility ("default")))
 
