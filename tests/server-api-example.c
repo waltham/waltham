@@ -150,6 +150,35 @@ object_post_error(struct wth_object *obj,
 }
 
 static void
+region_destroy(struct wthp_region *wthp_region)
+{
+	fprintf(stderr, "region %p destroy\n", wthp_region);
+	wth_object_delete((struct wth_object *)wthp_region);
+}
+
+static void
+region_add(struct wthp_region *wthp_region,
+	   int32_t x, int32_t y, int32_t width, int32_t height)
+{
+	fprintf(stderr, "region %p add(%d, %d, %d, %d)\n",
+		wthp_region, x, y, width, height);
+}
+
+static void
+region_subtract(struct wthp_region *wthp_region,
+		int32_t x, int32_t y, int32_t width, int32_t height)
+{
+	fprintf(stderr, "region %p subtract(%d, %d, %d, %d)\n",
+		wthp_region, x, y, width, height);
+}
+
+static const struct wthp_region_interface region_implementation = {
+	region_destroy,
+	region_add,
+	region_subtract
+};
+
+static void
 compositor_create_surface(struct wthp_compositor *compositor,
 			  struct wthp_surface *id)
 {
@@ -160,7 +189,10 @@ static void
 compositor_create_region(struct wthp_compositor *compositor,
 			 struct wthp_region *id)
 {
-	object_post_error((struct wth_object *)compositor, 0, "unimplemented: %s", __func__);
+	struct client *c = wth_object_get_user_data((struct wth_object *)compositor);
+
+	fprintf(stderr, "client %p create region %p\n", c, id);
+	wthp_region_set_interface(id, &region_implementation, NULL);
 }
 
 static const struct wthp_compositor_interface compositor_implementation = {
