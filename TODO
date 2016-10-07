@@ -33,3 +33,4 @@ tests/examples:
 
 build:
 - check for timerfd in configure
+- build just one libwaltham, no need for separate server and client libs
