@@ -153,7 +153,7 @@ static void
 region_destroy(struct wthp_region *wthp_region)
 {
 	fprintf(stderr, "region %p destroy\n", wthp_region);
-	wth_object_delete((struct wth_object *)wthp_region);
+	wthp_region_free(wthp_region);
 }
 
 static void
@@ -208,8 +208,7 @@ registry_destroy(struct wthp_registry *registry)
 
 	fprintf(stderr, "Client %p wthp_registry.destroy\n", c);
 
-	/* XXX: wthp_registry_free(registry); */
-	wth_object_delete((struct wth_object *)registry);
+	wthp_registry_free(registry);
 }
 
 static void
@@ -252,8 +251,7 @@ display_sync(struct wth_display * wth_display, struct wthp_callback * callback)
 
 	fprintf(stderr, "Client %p requested wth_display.sync\n", c);
 	wthp_callback_send_done(callback, 0);
-
-	/* XXX: wthp_callback_XXX_destroy(callback); */
+	wthp_callback_free(callback);
 }
 
 static void

@@ -364,8 +364,7 @@ roundtrip(struct display *dpy)
 		}
 	}
 
-	/* XXX: wthp_callback_free(cb); */
-	wth_object_delete((struct wth_object *)cb);
+	wthp_callback_free(cb);
 
 	return flag ? 0 : -1;
 }
@@ -428,8 +427,7 @@ bling_done(struct wthp_callback *cb, uint32_t arg)
 	fprintf(stderr, "...sync done.\n");
 
 	/* This needs to be safe! */
-	/* XXX: wthp_callback_free(cb); */
-	wth_object_delete((struct wth_object *)cb);
+	wthp_callback_free(cb);
 }
 
 static const struct wthp_callback_listener bling_listener = {
@@ -552,9 +550,7 @@ main(int arcg, char *argv[])
 	/* destroy all things */
 	wtimer_destroy(dpy.fiddle_timer);
 
-	/* If no destructor protocol, there would be an auto-generated
-	 * wthp_registry_free() to just free() the wth_object.
-	 */
+	/* This sends the request, unlike wthp_registry_free() */
 	wthp_registry_destroy(dpy.registry);
 
 	/* Disconnect, automatically destroys wth_display, free
