@@ -4,7 +4,6 @@ general:
 - code clean-up: style unification, dead code removal
 - drop dependency to libwayland
 - drop dependency to glib
-- stop using global data (support multiple connections)
 - wthp_registry implementation?
 - the fate of wth_display, hide it completely in wth_connection and rename?
 - implement object id re-use
@@ -13,6 +12,8 @@ general:
 - add listening socket API (usefulness?)
 - error delivery: see the comments in object_post_error() in
   tests/server-api-example.c
+- fix build with -DDEBUGGING
+- remove hdr_t.api field
 
 generator:
 - data type: autogenerate the foo_sz arg
@@ -29,4 +30,3 @@ tests/examples:
 - fix server read error when client disconnects
 - make the examples use more protocol and document better
 - write a test suite
-
