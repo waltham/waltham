@@ -32,8 +32,6 @@
 #include <glib.h>
 
 #include <waltham-object.h>
-#include <waltham-client.h>
-//#include <waltham-client-protocol.h>
 
 #define APICALL __attribute__ ((visibility ("default")))
 
