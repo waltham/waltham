@@ -42,7 +42,6 @@ opcode = '0'
 demarshaller_generated_funcs = dict()
 
 generated_funcs = dict()
-handwritten_funcs = dict()
 
 max_opcode = 0
 
@@ -526,9 +525,6 @@ def start_element(elementname, attrs):
       if attrs.get('type') == 'destructor':
          funcdef['destructor'] = True
       opcode = str(int(opcode) + 1)
-      if typegen == 'demarshaller' or typegen == 'marshaller':
-         while (int(opcode) in handwritten_funcs) and funcdef['name'] != handwritten_funcs[int(opcode)][0]:
-            opcode = str(int(opcode) + 1)
       if (int(opcode) > max_opcode):
          max_opcode = int(opcode)
 
@@ -613,12 +609,6 @@ for x in input_files:
    inputfile.close()
 
 if typegen == 'demarshaller':
-   # check the max opcode of handwritten functions
-   if handwritten_funcs:
-      max_handwritten_opcode = max(handwritten_funcs.keys())
-      if max_handwritten_opcode > max_opcode:
-         max_opcode = max_handwritten_opcode
-
    # add constants
    out.write("const int demarshaller_max_opcode __attribute__ ((visibility (\"default\"))) = " \
              + str(max_opcode) + ";\n")
@@ -629,7 +619,7 @@ if typegen == 'demarshaller':
    out.write("__attribute__ ((visibility (\"default\"))) = {\n")
    for x in range(0, max_opcode + 1):
       funcname = 'function_' + str(x)
-      if x in demarshaller_generated_funcs or x in handwritten_funcs:
+      if x in demarshaller_generated_funcs:
          out.write("  " + funcname + ",\n")
       else:
          out.write("  NULL,\n")
