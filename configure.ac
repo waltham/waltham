@@ -20,7 +20,7 @@ AC_PROG_CC_STDC
 AC_CHECK_PROGS([PYTHON2], [python2 python])
 PKG_PROG_PKG_CONFIG()
 
-PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.30, gobject-2.0 >= 2.30, gio-2.0, gio-unix-2.0])
+PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.30])
 PKG_CHECK_MODULES([WAYLAND], [wayland-client wayland-server])
 
 AC_ARG_ENABLE(gprof,

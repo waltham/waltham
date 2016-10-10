@@ -22,12 +22,9 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <errno.h>
-#include <fcntl.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <sys/mman.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #include "marshaller.h"
 

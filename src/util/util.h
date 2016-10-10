@@ -22,7 +22,6 @@
  */
 
 #include <glib.h>
-#include <gio/gio.h>
 
 #include "waltham-message.h"
 

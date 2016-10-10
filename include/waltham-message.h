@@ -24,7 +24,6 @@
 #ifndef __WALTHAM_MESSAGE_H__
 #define __WALTHAM_MESSAGE_H__
 
-#include <glib.h>
 #include <stdint.h>
 
 #define M_OFFSET_MSG_ID 0
@@ -42,7 +41,7 @@ typedef struct __attribute__((__packed__)) hdr_t {
 
 typedef struct data_t {
    unsigned int sz;
-   gpointer data;
+   void *data;
 } data_t;
 
 typedef struct {

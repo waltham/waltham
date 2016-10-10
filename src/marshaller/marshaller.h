@@ -33,8 +33,7 @@
 #include <sys/un.h>
 #include <errno.h>
 #include <assert.h>
-#include <dlfcn.h>
-#include <poll.h>
+#include <pthread.h>
 
 #include "waltham-message.h"
 #include "marshaller_log.h"
