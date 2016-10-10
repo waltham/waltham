@@ -37,7 +37,6 @@ listener_interface = ''
 freefunc_interface = ''
 
 funcdef = dict()
-paramcnt = 0
 opcode = '0'
 
 demarshaller_generated_funcs = dict()
@@ -546,13 +545,39 @@ def sanitize_params(funcdef):
 
    funcdef["params"] = params
 
+def add_new_argument(funcdef, attrs, new_param):
+   paramcnt = funcdef['paramcnt']
+   entry = "param{}".format(paramcnt)
+   funcdef['paramcnt'] = paramcnt + 1
+
+   funcdef[entry] = new_param
+
+   if attrs.get('output') == 'true':
+      funcdef[entry]['output'] = True
+   if attrs.get('counter') == 'true':
+      funcdef[entry]['is_counter'] = True
+   if attrs.get('type') in native_types:
+      funcdef[entry]['type'] = native_types[attrs.get('type')]
+   if attrs.get('type') == "object":
+      funcdef[entry]['object'] = True
+      if attrs.get('interface'):
+         funcdef[entry]['type'] = 'struct ' + attrs.get('interface') + ' *'
+      else:
+         funcdef[entry]['type'] = 'struct wth_object *'
+   if attrs.get('type') == "new_id":
+      funcdef[entry]['type'] = 'uint32_t'
+      funcdef[entry]['new_id'] = True
+      if attrs.get('interface'):
+         funcdef['rettype'] = 'struct ' + attrs.get('interface') + ' *'
+      else:
+         funcdef['rettype'] = 'struct wth_object *'
+      funcdef[entry]['objtype'] = funcdef['rettype']
 
 def start_element(elementname, attrs):
    global infunc
    global infuncelementname
    global interface
    global funcdef
-   global paramcnt
    global api
    global opcode
    global typegen
@@ -568,6 +593,7 @@ def start_element(elementname, attrs):
       else:
           funcdef['name'] = interface + '_' + attrs.get('name')
       funcdef['origname'] = attrs.get('name')
+      funcdef['paramcnt'] = 0
       if attrs.get('type') == 'destructor':
          funcdef['destructor'] = True
       opcode = str(int(opcode) + 1)
@@ -579,33 +605,10 @@ def start_element(elementname, attrs):
 
    # arguments
    if infunc == 1 and (elementname == "arg" or elementname == "request" or elementname == "event"):
-      paramentry = 'param' + str(paramcnt)
       if elementname == "request" or elementname == "event":
-         funcdef[paramentry] = dict([('type', 'struct ' + interface + ' *'), ('val', interface), ('object', True)])
+         add_new_argument(funcdef, attrs, dict([('type', 'struct ' + interface + ' *'), ('val', interface), ('object', True)]))
       else:
-         funcdef[paramentry] = dict([('type', attrs.get('type')), ('val', attrs.get('name'))])
-      if attrs.get('output') == 'true':
-         funcdef[paramentry]['output'] = True
-      if attrs.get('counter') == 'true':
-         funcdef[paramentry]['is_counter'] = True
-      if attrs.get('type') in native_types:
-         funcdef[paramentry]['type'] = native_types[attrs.get('type')]
-      if attrs.get('type') == "object":
-         funcdef[paramentry]['object'] = True
-         if attrs.get('interface'):
-            funcdef[paramentry]['type'] = 'struct ' + attrs.get('interface') + ' *'
-         else:
-            funcdef[paramentry]['type'] = 'struct wth_object *'
-      if attrs.get('type') == "new_id":
-         funcdef[paramentry]['type'] = 'uint32_t'
-         funcdef[paramentry]['new_id'] = True
-         if attrs.get('interface'):
-            funcdef['rettype'] = 'struct ' + attrs.get('interface') + ' *'
-         else:
-            funcdef['rettype'] = 'struct wth_object *'
-         funcdef[paramentry]['objtype'] = funcdef['rettype']
-
-      paramcnt += 1
+         add_new_argument(funcdef, attrs, dict([('type', attrs.get('type')), ('val', attrs.get('name'))]))
 
    if elementname == "interface":
       interface = attrs.get('name')
@@ -615,7 +618,6 @@ def end_element(elementname):
    global infuncelementname
    global outstr
    global funcdef
-   global paramcnt
    global api
    global opcode
    global typegen
@@ -623,7 +625,6 @@ def end_element(elementname):
    if infunc == 1 and elementname == infuncelementname:
       #print(funcdef)
       infunc = 0
-      paramcnt = 0
 
       sanitize_params(funcdef)
 
