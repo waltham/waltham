@@ -289,7 +289,7 @@ def demarshaller_generator(funcdef, opcode):
            params_call += params.get('val')
 
            fmt_string += '%u'
-           fmt_params += ', ((wth_object *)' + params.get('val') + ')->id'
+           fmt_params += ', ((struct wth_object *)' + params.get('val') + ')->id'
 
          elif params.get('object'):
            type_ = 'uint32_t'
@@ -300,7 +300,7 @@ def demarshaller_generator(funcdef, opcode):
            params_call += params.get('val')
 
            fmt_string += '%u'
-           fmt_params += ', ((wth_object *)' + params.get('val') + ')->id'
+           fmt_params += ', ((struct wth_object *)' + params.get('val') + ')->id'
 
          else:
            # input parameters: local variable initialized to point to the

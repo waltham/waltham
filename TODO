@@ -12,7 +12,6 @@ general:
 - add listening socket API (usefulness?)
 - error delivery: see the comments in object_post_error() in
   tests/server-api-example.c
-- fix build with -DDEBUGGING
 - remove hdr_t.api field
 
 generator:
