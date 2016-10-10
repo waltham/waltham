@@ -38,7 +38,6 @@ freefunc_interface = ''
 
 funcdef = dict()
 paramcnt = 0
-target = ''
 opcode = '0'
 
 demarshaller_generated_funcs = dict()
@@ -54,8 +53,6 @@ input_files = []
 output_file = "-"
 typegen = "marshaller"
 mode = "client"
-
-accepted_enums = dict()
 
 native_types = {
   "int":      "int32_t",
@@ -525,7 +522,6 @@ def generate_func(funcdef, elemtype):
    return True
 
 def sanitize_params(funcdef):
-   global accepted_enums
    global function_definitions
 
    func_name = funcdef.get("name")
@@ -569,7 +565,6 @@ def start_element(elementname, attrs):
    global typegen
    global max_opcode
    global parameter_size
-   global accepted_enums
 
    if elementname == "request" or elementname == "event":
       #infunc indicates we are inside an xml block for a request/event
