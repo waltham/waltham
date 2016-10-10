@@ -39,7 +39,6 @@ freefunc_interface = ''
 funcdef = dict()
 paramcnt = 0
 target = ''
-prefix = ''
 opcode = '0'
 
 demarshaller_generated_funcs = dict()
@@ -108,7 +107,7 @@ def marshaller_generator(funcdef, opcode):
    funcname = funcdef.get('name')
 
    # func name
-   outstr += prefix + funcname + ' ('
+   outstr += funcname + ' ('
 
    # func params, retains param order from parsing
    haveparams = 1
@@ -680,14 +679,14 @@ def end_element(elementname):
 
 
 try:
-   opts, args = getopt.getopt(sys.argv[1:],"hp:i:o:t:m:x:",
-                              ["preamble=","input=","output=","type=","mode=","prefix="])
+   opts, args = getopt.getopt(sys.argv[1:],"hp:i:o:t:m:",
+                              ["preamble=","input=","output=","type=","mode="])
 except getopt.GetoptError:
-   print 'gen.py -p <preamblefile> -i <inputfile> -o <outputfile> -t <type> -m <mode> [-x <prefix>]'
+   print 'gen.py -p <preamblefile> -i <inputfile> -o <outputfile> -t <type> -m <mode>'
    sys.exit(2)
 for opt, arg in opts:
    if opt == '-h':
-      print 'gen.py -p <preamblefile> -i <inputfile> -o <outputfile> -t <type> -m <mode> [-x <prefix>]'
+      print 'gen.py -p <preamblefile> -i <inputfile> -o <outputfile> -t <type> -m <mode>'
       sys.exit()
    elif opt in ("-p", "--preamble"):
       preamble_files.append(arg)
@@ -699,8 +698,6 @@ for opt, arg in opts:
       typegen = arg
    elif opt in ("-m", "--mode"):
       mode = arg
-   elif opt in ("-x", "--prefix") and arg:
-      prefix = arg + '_'
 
 out = open( output_file, 'w' )
 
