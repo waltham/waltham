@@ -42,8 +42,7 @@ void
 free_msg (msg_t *msg) API_CALL;
 
 gboolean
-msg_dispatch (struct wth_connection *conn, msg_t *msg,
-    hdr_t *header_reply, char *body_reply, data_t *data_reply) API_CALL;
+msg_dispatch (struct wth_connection *conn, msg_t *msg) API_CALL;
 
 /**** Ringbuffer based network reader & handler */
 typedef struct {

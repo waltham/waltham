@@ -421,8 +421,7 @@ free_msg (msg_t *msg)
 }
 
 gboolean
-msg_dispatch (struct wth_connection *conn, msg_t *msg,
-              hdr_t *header_reply, char *body_reply, data_t *data_reply)
+msg_dispatch (struct wth_connection *conn, msg_t *msg)
 {
    gboolean ret;
 
@@ -431,8 +430,7 @@ msg_dispatch (struct wth_connection *conn, msg_t *msg,
       g_warning ("Invalid opcode %d, discard message", msg->hdr->opcode);
       return TRUE;
    }
-   ret = demarshaller_functions[msg->hdr->opcode](conn, msg->hdr, msg->body,
-             header_reply, body_reply);
+   ret = demarshaller_functions[msg->hdr->opcode](conn, msg->hdr, msg->body);
    if (!ret)
       return TRUE;
 

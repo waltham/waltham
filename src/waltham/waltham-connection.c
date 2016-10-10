@@ -201,7 +201,7 @@ wth_connection_dispatch(struct wth_connection *conn)
       reader_map_message (conn->reader, i, &msg);
       g_debug ("Message received on conn %p: (%d) %d bytes",
                conn, msg.hdr->opcode, msg.hdr->sz);
-      msg_dispatch (conn, &msg, NULL, NULL, NULL);
+      msg_dispatch (conn, &msg);
       reader_unmap_message (conn->reader, i, &msg);
     }
 

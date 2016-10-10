@@ -233,8 +233,8 @@ def demarshaller_generator(funcdef, opcode):
    code += " * Opcode " + str(opcode) + \
            " (hexadecimal: " + hex(int(opcode)) + ")\n"
    code += " */\n"
-   code += "static gboolean " + funcname + "(struct wth_connection *conn, const hdr_t *header,\n" + \
-           "        const char *body, hdr_t *header_reply, char *body_reply)\n"
+   code += "static gboolean " + funcname + "(struct wth_connection *conn,\n"
+   code += "    const hdr_t *header, const char *body)\n"
    code += "{\n"
 
    haveparams = 1
