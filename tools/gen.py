@@ -41,7 +41,6 @@ opcode = '0'
 
 demarshaller_generated_funcs = dict()
 
-util_funcs = dict()
 generated_funcs = dict()
 handwritten_funcs = dict()
 
@@ -107,7 +106,7 @@ def marshaller_generator(funcdef, opcode):
          comma = ', '
          if not fmt_string == '':
             fmt_string += ', '
-         if ('output' not in funcdef.get(searchstr)) and not (funcname + ':' + params.get('val') in variable_size_attributes) and (params.get('type') in type_formats):
+         if not funcname + ':' + params.get('val') in variable_size_attributes and params.get('type') in type_formats:
             fmt = type_formats.get(params.get('type'))
             if fmt == '%b':
                fmt = '0x%x'
@@ -135,8 +134,7 @@ def marshaller_generator(funcdef, opcode):
       haveparams = searchstr in funcdef
       if haveparams:
          params = funcdef.get(searchstr)
-         if ('output' not in params) \
-           and funcname + ':' + params.get('val') not in variable_size_attributes:
+         if funcname + ':' + params.get('val') not in variable_size_attributes:
             if params.get('object') or params.get('new_id'):
                outstr += ' + PADDED(sizeof(uint32_t))'
             elif params.get('is_string'):
@@ -178,9 +176,6 @@ def marshaller_generator(funcdef, opcode):
 
          if funcname + ':' + params.get('val') in variable_size_attributes or params.get('is_data'):
             # param with a variable size, we have custom code to determine it
-            assert 'output' not in params, \
-               "variable-size params not compatible with output params"
-
             if funcname + ':' + params.get('val') in variable_size_attributes:
                var_attr_size += variable_size_attributes.get(funcname + ':' + params.get('val'))
                var_attr_size += '   sz += sizeof (unsigned int) + PADDED(' + params.get('val') + '_sz);\n'
@@ -188,7 +183,7 @@ def marshaller_generator(funcdef, opcode):
             # we use SERIALIZE_DATA instead of SERIALIZE_PARAM for variable-size params
             outstr += '   SERIALIZE_DATA( (void *)' + params.get('val') + ', ' + params.get('val') + '_sz);\n'
 
-         elif ('output' not in funcdef.get(searchstr)):
+         else:
             if params.get('is_array'):
                outstr += '   SERIALIZE_ARRAY( ' + params.get('val') + ' );\n'
             else:
@@ -211,32 +206,6 @@ def marshaller_generator(funcdef, opcode):
       outstr = outstr.replace('VAR_ATTR_SIZE', var_attr_size + '\n')
    else:
       outstr = outstr.replace('VAR_ATTR_SIZE', '')
-
-   #wait for outputs, if applicable
-   receive_reply = ""
-   haveparams = 1
-   paramitr = 0
-   while haveparams:
-      searchstr = ('param' + str(paramitr))
-      haveparams = searchstr in funcdef
-      if haveparams:
-         if ('output' in funcdef.get(searchstr)):
-            params = funcdef.get(searchstr)
-
-            assert params['type'][-1:] == '*', \
-              "Type '" + params['type'] + "' must end with a '*'"
-            dereferenced_type = params['type'][:-1].strip()
-
-            param_size = 'sizeof(' + dereferenced_type + ')'
-
-            receive_reply += '   DESERIALIZE_OPTIONAL_PARAM( (void *)' + params['val'] + ', ' + param_size + ' );\n'
-
-         paramitr += 1
-      else:
-         break
-   if 'rettype' in funcdef:
-      param_size = 'sizeof(' + funcdef.get('rettype') + ')'
-      receive_reply = (receive_reply + '   DESERIALIZE_PARAM( (void *)&ret, ' + param_size + ' );\n')
 
    if 'destructor' in funcdef:
       outstr += '   {0}_free({0});\n'.format(interface)
@@ -273,7 +242,6 @@ def demarshaller_generator(funcdef, opcode):
    haveparams = 1
    paramitr = 0
    offset_string = ''
-   size_output = ''
    params_call = ''
    fmt_string = ''
    fmt_params = ''
@@ -335,7 +303,7 @@ def demarshaller_generator(funcdef, opcode):
            fmt_string += '%u'
            fmt_params += ', ((wth_object *)' + params.get('val') + ')->id'
 
-         elif 'output' not in funcdef.get(searchstr):
+         else:
            # input parameters: local variable initialized to point to the
            # right offset in the received message
            type_ = params.get('type')
@@ -351,19 +319,6 @@ def demarshaller_generator(funcdef, opcode):
               fmt_params += ', *' + params.get('val')
            else:
               fmt_string += '[unprintable type ' + type_ + ']'
-         else:
-           # output parameters: local variable initialized to point to the
-           # right offset in the reply message
-           assert params.get('type')[-1:] == '*', \
-             "Type '" + params.get('type') + "' must end with a '*'"
-
-           fmt_string += '[unprintable output type ' + params.get('type') + ']'
-           # fixed-size out parameter
-           dereferenced_type = params.get('type')[:-1].strip()
-           code += '  ' + dereferenced_type + ' *' + params.get('val') + \
-                   ' = (void*)(body_reply' + size_output + ');\n'
-           size_output += ' + PADDED (sizeof (' + dereferenced_type + '))'
-           params_call += params.get('val')
 
          paramitr += 1
       else:
@@ -383,16 +338,8 @@ def demarshaller_generator(funcdef, opcode):
    code += '  ((' + listener + ')(((struct wth_object *)' + objname + ')->vfunc))->' + vfunc + '\n'
    code += '    (' + params_call + ');\n'
    code += '  END_TIMING("' + apifuncname +'");\n'
-
-   if size_output != '':
-      code += "\n"
-      code += "  header_reply->sz = sizeof (*header)" + size_output + ";\n"
-      code += "\n"
-      code += "  return TRUE;\n"
-   else:
-      code += "\n"
-      code += "  return FALSE;\n"
-
+   code += "\n"
+   code += "  return FALSE;\n"
    code += "}\n"
    code += "\n"
 
@@ -400,26 +347,8 @@ def demarshaller_generator(funcdef, opcode):
 
 def util_generator(funcdef, opcode):
    global generated_funcs
-   global util_funcs
-
-   expect_reply = 0
-
-   if 'rettype' in funcdef:
-      expect_reply = 1
-
-   haveparams = 1
-   paramitr = 0
-   while haveparams:
-      searchstr = ('param' + str(paramitr))
-      haveparams = searchstr in funcdef
-      if haveparams:
-         if ('output' in funcdef.get(searchstr)):
-            expect_reply = 1
-         paramitr += 1
 
    generated_funcs[int(opcode)] = funcdef.get('name')
-   util_funcs[int(opcode)] = expect_reply
-
    return ""
 
 def get_func_params(funcdef):
@@ -552,8 +481,6 @@ def add_new_argument(funcdef, attrs, new_param):
 
    funcdef[entry] = new_param
 
-   if attrs.get('output') == 'true':
-      funcdef[entry]['output'] = True
    if attrs.get('counter') == 'true':
       funcdef[entry]['is_counter'] = True
    if funcdef[entry]['type'] in native_types:
@@ -739,20 +666,6 @@ if typegen == 'util':
          out.write('  "' + generated_funcs.get(x) + '",\n')
       else:
          out.write("  NULL,\n")
-   out.write("};\n")
-
-   # add array of functions expecting a reply
-   out.write("const char function_expects_reply" + \
-             "[" + str(max_opcode + 1) + "] =\n")
-   out.write("{\n")
-   for x in range(0, max_opcode + 1):
-      funcname = 'function_' + str(x)
-      if x in generated_funcs:
-         out.write("  " + str(util_funcs.get(x)) + ",\n")
-      elif x in handwritten_funcs:
-         out.write("  " + str(handwritten_funcs[x][1]) + ",\n")
-      else:
-         out.write("  0,\n")
    out.write("};\n")
 
 out.close()
