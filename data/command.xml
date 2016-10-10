@@ -339,7 +339,6 @@
       </description>
 
       <arg name="buffer" type="new_id" interface="wthp_buffer"/>
-      <arg name="data_sz" type="uint" summary="size of data in bytes" counter="true"/>
       <arg name="data" type="data" summary="raw pixel data"/>
       <arg name="width" type="int" summary="image width in pixels"/>
       <arg name="height" type="int" summary="image height in pixels"/>
@@ -1248,7 +1247,6 @@
 	memory-mapped to provide a keyboard mapping description.
       </description>
       <arg name="format" type="uint" enum="keymap_format"/>
-      <arg name="keymap_sz" type="uint" summary="size of keymap in bytes" counter="true"/>
       <arg name="keymap" type="data"/>
     </event>
 

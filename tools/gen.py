@@ -480,8 +480,6 @@ def add_new_argument(funcdef, attrs, new_param):
 
    funcdef[entry] = new_param
 
-   if attrs.get('counter') == 'true':
-      funcdef[entry]['is_counter'] = True
    if funcdef[entry]['type'] in native_types:
       funcdef[entry]['type'] = native_types[funcdef[entry]['type']]
    if attrs.get('type') == "object":
@@ -533,6 +531,10 @@ def start_element(elementname, attrs):
       if elementname == "request" or elementname == "event":
          add_new_argument(funcdef, attrs, dict([('type', 'struct ' + interface + ' *'), ('val', interface), ('object', True)]))
       else:
+         if attrs.get('type') == "data":
+            # data type argument. autogenerate a _sz argument
+            add_new_argument(funcdef, {}, dict([('type', 'uint'), ('val', '{}_sz'.format(attrs.get('name'))), ('is_counter', True)]))
+
          add_new_argument(funcdef, attrs, dict([('type', attrs.get('type')), ('val', attrs.get('name'))]))
 
    if elementname == "interface":
