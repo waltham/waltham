@@ -537,19 +537,12 @@ def sanitize_params(funcdef):
       paramitr += 1
       param = funcdef.get(searchstr)
       params.append(param)
-      param['clean_type'] = param['type'].replace("*", "").replace("const", "").replace(" ", "")
-      if param.get('count') == "1":
-         param['is_out_var'] = True
-      elif param.get('type') == "struct wl_array *":
+      if param.get('type') == "struct wl_array *":
          param['is_array'] = True
-      if "void *" in param.get('type'):
+      if param.get('type') == "void *":
          param['is_data'] = True
-      if param.get('is_data') and param.get('type').count('*') == 2:
-         param['is_2d_data'] = True
       if param.get('type') == "const char *":
          param['is_string'] = True
-      if param.get('is_string') and param.get('output'):
-         param['is_out_string'] = True
 
    funcdef["params"] = params
 
@@ -591,15 +584,10 @@ def start_element(elementname, attrs):
          funcdef[paramentry] = dict([('type', 'struct ' + interface + ' *'), ('val', interface), ('object', True)])
       else:
          funcdef[paramentry] = dict([('type', attrs.get('type')), ('val', attrs.get('name'))])
-      # FIXME we can probably get rid of some of these options
       if attrs.get('output') == 'true':
          funcdef[paramentry]['output'] = True
-      if attrs.get('count') is not None:
-         funcdef[paramentry]['count'] = attrs.get('count')
       if attrs.get('counter') == 'true':
          funcdef[paramentry]['is_counter'] = True
-      if attrs.get('pairs') == 'true':
-         funcdef[paramentry]['pairs'] = True
       if attrs.get('type') in native_types:
          funcdef[paramentry]['type'] = native_types[attrs.get('type')]
       if attrs.get('type') == "object":
