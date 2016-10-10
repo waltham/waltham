@@ -57,22 +57,6 @@ mode = "client"
 
 accepted_enums = dict()
 
-
-ignorelist = dict({
-  "marshaller":
-    {
-    },
-  "demarshaller":
-    {
-    },
-  "util":
-    {
-    },
-  "header":
-    {
-    },
-})
-
 native_types = {
   "int":      "int32_t",
   "uint":     "uint32_t",
@@ -582,13 +566,12 @@ def start_element(elementname, attrs):
    global paramcnt
    global api
    global opcode
-   global ignorelist
    global typegen
    global max_opcode
    global parameter_size
    global accepted_enums
 
-   if (elementname == "request" or elementname == "event") and attrs.get('name') not in ignorelist[typegen]:
+   if elementname == "request" or elementname == "event":
       #infunc indicates we are inside an xml block for a request/event
       infunc = 1
       infuncelementname = elementname
