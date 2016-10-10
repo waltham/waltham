@@ -420,21 +420,16 @@ free_msg (msg_t *msg)
   g_slice_free (msg_t, msg);
 }
 
-gboolean
+void
 msg_dispatch (struct wth_connection *conn, msg_t *msg)
 {
-   gboolean ret;
-
    if (msg->hdr->opcode > demarshaller_max_opcode
        || demarshaller_functions[msg->hdr->opcode] == NULL) {
-      g_warning ("Invalid opcode %d, discard message", msg->hdr->opcode);
-      return TRUE;
+     g_warning ("Invalid opcode %d, discard message", msg->hdr->opcode);
+     return;
    }
-   ret = demarshaller_functions[msg->hdr->opcode](conn, msg->hdr, msg->body);
-   if (!ret)
-      return TRUE;
 
-   return FALSE;
+   demarshaller_functions[msg->hdr->opcode](conn, msg->hdr, msg->body);
 }
 
 /* Network helpers */

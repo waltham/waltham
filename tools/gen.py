@@ -233,7 +233,7 @@ def demarshaller_generator(funcdef, opcode):
    code += " * Opcode " + str(opcode) + \
            " (hexadecimal: " + hex(int(opcode)) + ")\n"
    code += " */\n"
-   code += "static gboolean " + funcname + "(struct wth_connection *conn,\n"
+   code += "static void " + funcname + "(struct wth_connection *conn,\n"
    code += "    const hdr_t *header, const char *body)\n"
    code += "{\n"
 
@@ -336,8 +336,6 @@ def demarshaller_generator(funcdef, opcode):
    code += '  ((' + listener + ')(((struct wth_object *)' + objname + ')->vfunc))->' + vfunc + '\n'
    code += '    (' + params_call + ');\n'
    code += '  END_TIMING("' + apifuncname +'");\n'
-   code += "\n"
-   code += "  return FALSE;\n"
    code += "}\n"
    code += "\n"
 

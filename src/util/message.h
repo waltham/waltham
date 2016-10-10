@@ -41,7 +41,7 @@ copy_msg (msg_t *msg) API_CALL;
 void
 free_msg (msg_t *msg) API_CALL;
 
-gboolean
+void
 msg_dispatch (struct wth_connection *conn, msg_t *msg) API_CALL;
 
 /**** Ringbuffer based network reader & handler */
