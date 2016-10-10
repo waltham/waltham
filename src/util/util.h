@@ -33,8 +33,6 @@ extern const int demarshaller_max_opcode;
 
 extern const char * util_function_names[];
 
-extern const char function_expects_reply[];
-
 typedef gboolean (*demarshaller_helper_function_t)(struct wth_connection *conn,
         const hdr_t *header, const char *body,
         hdr_t *header_reply, char *body_reply);
