@@ -214,21 +214,21 @@ registry_destroy(struct wthp_registry *registry)
 static void
 registry_bind(struct wthp_registry *registry,
 	     uint32_t name,
-	     struct wth_object *id)
+	     struct wth_object *id,
+	     const char *interface,
+	     uint32_t version)
 {
 	struct client *c = wth_object_get_user_data((struct wth_object *)registry);
 
 	/* XXX: we could use a database of globals instead of hardcoding them */
 
-	switch (name) {
-	case 1:
+	if (strcmp(interface, "wthp_compositor") == 0) {
 		wthp_compositor_set_interface(
 			(struct wthp_compositor *)id,
 			&compositor_implementation, c);
 		fprintf(stderr, "client %p bound %s version %d\n",
-			c, "(wthp_compositor?)", -1);
-		break;
-	default:
+			c, interface, version);
+	} else {
 		object_post_error((struct wth_object *)registry, 0, "%s: unknown name %u", __func__, name);
 	}
 }

@@ -556,8 +556,8 @@ def add_new_argument(funcdef, attrs, new_param):
       funcdef[entry]['output'] = True
    if attrs.get('counter') == 'true':
       funcdef[entry]['is_counter'] = True
-   if attrs.get('type') in native_types:
-      funcdef[entry]['type'] = native_types[attrs.get('type')]
+   if funcdef[entry]['type'] in native_types:
+      funcdef[entry]['type'] = native_types[funcdef[entry]['type']]
    if attrs.get('type') == "object":
       funcdef[entry]['object'] = True
       if attrs.get('interface'):
@@ -571,6 +571,8 @@ def add_new_argument(funcdef, attrs, new_param):
          funcdef['rettype'] = 'struct ' + attrs.get('interface') + ' *'
       else:
          funcdef['rettype'] = 'struct wth_object *'
+         add_new_argument(funcdef, {}, dict([('type', 'string'), ('val', 'interface')]))
+         add_new_argument(funcdef, {}, dict([('type', 'uint'), ('val', 'version')]))
       funcdef[entry]['objtype'] = funcdef['rettype']
 
 def start_element(elementname, attrs):

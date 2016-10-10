@@ -120,7 +120,7 @@ registry_handle_global(struct wthp_registry *registry,
 
 	if (strcmp(interface, "wthp_compositor") == 0) {
 		assert(!dpy->compositor);
-		dpy->compositor = (struct wthp_compositor *)wthp_registry_bind(registry, name);
+		dpy->compositor = (struct wthp_compositor *)wthp_registry_bind(registry, name, interface, 1);
 		/* has no events to handle */
 	}
 }
