@@ -49,22 +49,10 @@ log_message (TransportMsg *msg)
   gchar buffer[2 * MESSAGE_MAX_SIZE + 100];
   unsigned int i;
   gchar *p;
-  const gchar *api = NULL;
   const gchar *name = NULL;
 
   if (!logging_enabled)
     return;
-
-  switch (msg->header.api) {
-    case API_CONTROL:
-      api = "control";
-      break;
-    case API_TRANSFERS:
-      api = "transfers";
-      break;
-    default:
-      api = NULL;
-  }
 
   p = buffer;
 
@@ -79,8 +67,8 @@ log_message (TransportMsg *msg)
   for (i = 0; i < msg->header.sz - sizeof (hdr_t); i++)
     p += sprintf (p, "%02hhx", msg->body[i]);
 
-  if (api && name) {
-    p += sprintf (p, " %s%s\n", api, name);
+  if (name) {
+    p += sprintf (p, " %s\n", name);
   }
 
   p[0] = '\n';

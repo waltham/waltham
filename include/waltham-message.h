@@ -28,14 +28,13 @@
 
 #define M_OFFSET_MSG_ID 0
 #define M_OFFSET_SIZE 2
-#define M_OFFSET_API 4
-#define M_OFFSET_OPCODE 6
+#define M_OFFSET_OPCODE 4
 
 typedef struct __attribute__((__packed__)) hdr_t {
    unsigned short id;
    unsigned short sz;
-   unsigned short api;
    unsigned short opcode;
+   unsigned short pad;
 } hdr_t;
 #define MESSAGE_MAX_SIZE (0xffff - sizeof (hdr_t))
 
@@ -54,15 +53,5 @@ typedef struct {
 } msg_t;
 
 #define OPCODE_REPLY 0xffff
-
-enum api_e {
-   API_CONTROL, //(Internal state-tracking)
-   API_WAYLAND // Wayland Driver
-}api_e;
-
-enum api_control_e {
-   API_CONTROL_CONNECT_CLIENT,
-   API_CONTROL_DISCONNECT_CLIENT,
-} api_control_e;
 
 #endif /* __WALTHAM_MESSAGE_H__ */

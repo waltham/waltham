@@ -199,8 +199,8 @@ wth_connection_dispatch(struct wth_connection *conn)
       msg_t msg;
 
       reader_map_message (conn->reader, i, &msg);
-      g_debug ("Message received on conn %p: (%d, %d) %d bytes",
-               conn, msg.hdr->api, msg.hdr->opcode, msg.hdr->sz);
+      g_debug ("Message received on conn %p: (%d) %d bytes",
+               conn, msg.hdr->opcode, msg.hdr->sz);
       msg_dispatch (conn, &msg, NULL, NULL, NULL);
       reader_unmap_message (conn->reader, i, &msg);
     }

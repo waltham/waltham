@@ -156,8 +156,7 @@ def marshaller_generator(funcdef, opcode):
    #serialize message header
    outstr += '   START_MESSAGE( "' + funcname
    outstr += '", wth_connection_get_next_message_id(((struct wth_object *)' + funcdef.get('param0').get('val') + ')->connection), sz, '
-   outstr += 'API_WAYLAND'
-   outstr += ', ' + str(opcode) + ' );\n'
+   outstr += str(opcode) + ' );\n'
 
    #serialize params
    haveparams = 1
@@ -504,7 +503,6 @@ def start_element(elementname, attrs):
    global infuncelementname
    global interface
    global funcdef
-   global api
    global opcode
    global typegen
    global max_opcode
@@ -545,7 +543,6 @@ def end_element(elementname):
    global infuncelementname
    global outstr
    global funcdef
-   global api
    global opcode
    global typegen
 

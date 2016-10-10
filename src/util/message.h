@@ -30,10 +30,6 @@
 
 #define API_CALL __attribute__ ((visibility ("default")))
 
-#define MSG_FORMAT "id: %hu, sz: %hu, api: %hu, opcode: %hu"
-#define MSG_MEM(msg) msg->hdr->id, msg->hdr->sz, msg->hdr->api, msg->hdr->opcode
-#define MSG_MEMS(msg) msg->header.id, msg->header.sz, msg->header.api, msg->header.opcode
-
 struct wth_connection;
 
 gboolean
@@ -55,8 +51,8 @@ typedef struct {
   gssize length;
   guint16 id;
   guint16 sz;
-  guint16 api;
   guint16 opcode;
+  guint16 pad;
 } ReaderMessage;
 
 /* number of guint16 fields, starting from id, in ReaderMessage */

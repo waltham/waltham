@@ -97,9 +97,9 @@ static inline int recv_all (int sock, struct iovec *iov, int iovcnt)
 #define PADDED(sz) \
    (((sz) + 3) & ~3)
 
-#define START_MESSAGE(name, id, sz, api, opcode) \
+#define START_MESSAGE(name, id, sz, opcode) \
    const char *msg_name __attribute__((unused)) = name; \
-   hdr_t hdr = { id, sz, api, opcode }; \
+   hdr_t hdr = { id, sz, opcode, 0 }; \
    int send_ret; \
    struct iovec marshaller_params[16]; \
    int marshaller_paramid = 1; \
@@ -185,8 +185,8 @@ static inline int recv_all (int sock, struct iovec *iov, int iovcnt)
    STREAM_DEBUG ((unsigned char *) &hdr, sizeof (hdr), "header <- "); \
    if (hdr.opcode != OPCODE_REPLY) { \
       printf ("\nInvalid message received in %s:\n", msg_name); \
-      printf ("id=%d sz=%d (incl. header %zu) api=%d opcode=%d\n", \
-              hdr.id, hdr.sz, sizeof (hdr), hdr.api, hdr.opcode); \
+      printf ("id=%d sz=%d (incl. header %zu) opcode=%d\n", \
+              hdr.id, hdr.sz, sizeof (hdr), hdr.opcode); \
    } \
    assert(hdr.opcode == OPCODE_REPLY); \
    DEBUG_TYPE(type);
