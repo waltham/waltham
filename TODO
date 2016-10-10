@@ -14,7 +14,6 @@ general:
   tests/server-api-example.c
 
 generator:
-- data type: autogenerate the foo_sz arg
 - rewrite the generator to become more readable and maintainable
 
 serialiser:
