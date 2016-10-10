@@ -295,7 +295,7 @@ def demarshaller_generator(funcdef, opcode):
            type_ = 'uint32_t'
            objtype = params.get('type')
 
-           code += '  ' + objtype + params.get('val') + ' = g_hash_table_lookup (wth_connection_get_hash (conn), GUINT_TO_POINTER (*(uint32_t *)(body' + offset_string + ')));\n'
+           code += '  ' + objtype + params.get('val') + ' = (void *) wth_connection_get_object (conn, *(uint32_t *)(body' + offset_string + '));\n'
            offset_string += ' + PADDED (sizeof (' + type_ + '))'
            params_call += params.get('val')
 

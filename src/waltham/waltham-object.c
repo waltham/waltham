@@ -40,10 +40,10 @@ wth_object_new_with_id (struct wth_connection *connection, uint32_t id)
 	if (proxy == NULL)
 		return NULL;
 
-	g_hash_table_insert (wth_connection_get_hash (connection),
-			     GUINT_TO_POINTER (id), proxy);
 	proxy->id = id;
 	proxy->connection = connection;
+
+	wth_connection_insert_object(connection, proxy);
 
 	return proxy;
 }
@@ -59,8 +59,7 @@ wth_object_new (struct wth_connection *connection)
 void
 wth_object_delete (struct wth_object *object)
 {
-	g_hash_table_remove (wth_connection_get_hash (object->connection),
-			     GUINT_TO_POINTER (object->id));
+	wth_connection_remove_object (object->connection, object);
 
 	free (object);
 }
@@ -70,7 +69,7 @@ wth_object_set_listener(struct wth_object *obj,
 			void (**listener)(void), void *user_data)
 {
 	if (obj->vfunc)
-		g_warning ("vfunc table already set!");
+		fprintf (stderr, "vfunc table already set!");
 
 	obj->vfunc = listener;
 	obj->user_data = user_data;

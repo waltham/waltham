@@ -29,7 +29,6 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <glib.h>
 
 #include <waltham-object.h>
 
@@ -168,8 +167,16 @@ wth_connection_get_next_message_id(struct wth_connection *conn) APICALL;
 int
 wth_connection_get_next_object_id(struct wth_connection *conn) APICALL;
 
-GHashTable *
-wth_connection_get_hash(struct wth_connection *conn) APICALL;
+void
+wth_connection_insert_object(struct wth_connection *conn,
+    struct wth_object *obj) APICALL;
+
+void
+wth_connection_remove_object(struct wth_connection *conn,
+    struct wth_object *obj) APICALL;
+
+struct wth_object *
+wth_connection_get_object(struct wth_connection *conn, uint32_t id) APICALL;
 
 /** Disconnect
  *
