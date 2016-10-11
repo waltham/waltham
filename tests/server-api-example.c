@@ -59,6 +59,7 @@
 #define MAX_EPOLL_WATCHES 2
 
 struct server;
+struct client;
 
 struct watch {
 	struct server *server;
@@ -72,6 +73,18 @@ struct region {
 	struct wl_list link; /* struct client::region_list */
 };
 
+struct compositor {
+	struct wthp_compositor *obj;
+	struct client *client;
+	struct wl_list link; /* struct client::compositor_list */
+};
+
+struct registry {
+	struct wthp_registry *obj;
+	struct client *client;
+	struct wl_list link; /* struct client::registry_list */
+};
+
 struct client {
 	struct wl_list link; /* struct server::client_list */
 	struct server *server;
@@ -79,6 +92,8 @@ struct client {
 	struct watch conn_watch;
 
 	/* client object lists */
+	struct wl_list registry_list;
+	struct wl_list compositor_list;
 	struct wl_list region_list;
 };
 
@@ -113,9 +128,31 @@ region_destroy(struct region *region)
 }
 
 static void
+compositor_destroy(struct compositor *comp)
+{
+	fprintf(stderr, "%s: %p\n", __func__, comp->obj);
+
+	wthp_compositor_free(comp->obj);
+	wl_list_remove(&comp->link);
+	free(comp);
+}
+
+static void
+registry_destroy(struct registry *reg)
+{
+	fprintf(stderr, "%s: %p\n", __func__, reg->obj);
+
+	wthp_registry_free(reg->obj);
+	wl_list_remove(&reg->link);
+	free(reg);
+}
+
+static void
 client_destroy(struct client *c)
 {
 	struct region *region;
+	struct compositor *comp;
+	struct registry *reg;
 
 	fprintf(stderr, "Client %p disconnected.\n", c);
 
@@ -124,6 +161,12 @@ client_destroy(struct client *c)
 	 */
 	wl_list_last_until_empty(region, &c->region_list, link)
 		region_destroy(region);
+
+	wl_list_last_until_empty(comp, &c->compositor_list, link)
+		compositor_destroy(comp);
+
+	wl_list_last_until_empty(reg, &c->registry_list, link)
+		registry_destroy(reg);
 
 	wth_connection_flush(c->connection);
 	wl_list_remove(&c->link);
@@ -224,17 +267,18 @@ static void
 compositor_handle_create_region(struct wthp_compositor *compositor,
 				struct wthp_region *id)
 {
-	struct client *c = wth_object_get_user_data((struct wth_object *)compositor);
+	struct compositor *comp = wth_object_get_user_data((struct wth_object *)compositor);
 	struct region *region;
 
-	fprintf(stderr, "client %p create region %p\n", c, id);
+	fprintf(stderr, "client %p create region %p\n",
+		comp->client, id);
 
 	region = zalloc(sizeof *region);
 	if (!region)
 		exit(1); /* XXX: send OOM error */
 
 	region->obj = id;
-	wl_list_insert(&c->region_list, &region->link);
+	wl_list_insert(&comp->client->region_list, &region->link);
 
 	wthp_region_set_interface(id, &region_implementation, region);
 }
@@ -248,11 +292,27 @@ static const struct wthp_compositor_interface compositor_implementation = {
 static void
 registry_handle_destroy(struct wthp_registry *registry)
 {
-	struct client *c = wth_object_get_user_data((struct wth_object *)registry);
+	struct registry *reg = wth_object_get_user_data((struct wth_object *)registry);
 
-	fprintf(stderr, "Client %p wthp_registry.destroy\n", c);
+	registry_destroy(reg);
+}
 
-	wthp_registry_free(registry);
+static void
+client_bind_compositor(struct client *c, struct wthp_compositor *obj)
+{
+	struct compositor *comp;
+
+	comp = zalloc(sizeof *comp);
+	if (!comp)
+		exit(1); /* XXX: send OOM error */
+
+	comp->obj = obj;
+	comp->client = c;
+	wl_list_insert(&c->compositor_list, &comp->link);
+
+	wthp_compositor_set_interface(obj, &compositor_implementation,
+				      comp);
+	fprintf(stderr, "client %p bound wthp_compositor\n", c);
 }
 
 static void
@@ -262,18 +322,17 @@ registry_handle_bind(struct wthp_registry *registry,
 		     const char *interface,
 		     uint32_t version)
 {
-	struct client *c = wth_object_get_user_data((struct wth_object *)registry);
+	struct registry *reg = wth_object_get_user_data((struct wth_object *)registry);
 
 	/* XXX: we could use a database of globals instead of hardcoding them */
 
 	if (strcmp(interface, "wthp_compositor") == 0) {
-		wthp_compositor_set_interface(
-			(struct wthp_compositor *)id,
-			&compositor_implementation, c);
-		fprintf(stderr, "client %p bound %s version %d\n",
-			c, interface, version);
+		/* XXX: check version against limits */
+		/* XXX: check that name and interface match */
+		client_bind_compositor(reg->client, (struct wthp_compositor *)id);
 	} else {
 		object_post_error((struct wth_object *)registry, 0, "%s: unknown name %u", __func__, name);
+		wth_object_delete(id);
 	}
 }
 
@@ -303,8 +362,17 @@ display_handle_get_registry(struct wth_display *wth_display,
 			    struct wthp_registry *registry)
 {
 	struct client *c = wth_object_get_user_data((struct wth_object *)wth_display);
+	struct registry *reg;
 
-	wthp_registry_set_interface(registry, &registry_implementation, c);
+	reg = zalloc(sizeof *reg);
+	if (!reg)
+		exit(1); /* XXX: send OOM error */
+
+	reg->obj = registry;
+	reg->client = c;
+	wl_list_insert(&c->registry_list, &reg->link);
+	wthp_registry_set_interface(registry,
+				    &registry_implementation, reg);
 
 	/* XXX: advertise our globals */
 	wthp_registry_send_global(registry, 1, "wthp_compositor", 4);
@@ -392,6 +460,8 @@ client_create(struct server *srv, struct wth_connection *conn)
 
 	wl_list_insert(&srv->client_list, &c->link);
 
+	wl_list_init(&c->registry_list);
+	wl_list_init(&c->compositor_list);
 	wl_list_init(&c->region_list);
 
 	/* XXX: this should be inside Waltham */
