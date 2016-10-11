@@ -12,9 +12,16 @@ general:
 - add listening socket API (usefulness?)
 - error delivery: see the comments in object_post_error() in
   tests/server-api-example.c
+- add a function for sending OOM errors (server -> client)
+- in wth_connection_destroy, print warnings for every item remaining in
+  the hash table
+- implement object version inheritance
+- wth_connection needs user_data with getter and setter
 
 generator:
 - rewrite the generator to become more readable and maintainable
+- generate <object type>_get_user_data()
+- generate <object type>_get_version()
 
 serialiser:
 - implement send-buffering (non-blocking sending)
