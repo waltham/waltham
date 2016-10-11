@@ -1,4 +1,4 @@
-AM_CFLAGS = @GCC_CFLAGS@ @GLIB_CFLAGS@ \
+AM_CFLAGS = @GCC_CFLAGS@ \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/src/waltham \
 	$(NULL)
