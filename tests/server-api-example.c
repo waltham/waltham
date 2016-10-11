@@ -150,44 +150,45 @@ object_post_error(struct wth_object *obj,
 }
 
 static void
-region_destroy(struct wthp_region *wthp_region)
+region_handle_destroy(struct wthp_region *wthp_region)
 {
 	fprintf(stderr, "region %p destroy\n", wthp_region);
 	wthp_region_free(wthp_region);
 }
 
 static void
-region_add(struct wthp_region *wthp_region,
-	   int32_t x, int32_t y, int32_t width, int32_t height)
+region_handle_add(struct wthp_region *wthp_region,
+		  int32_t x, int32_t y, int32_t width, int32_t height)
 {
 	fprintf(stderr, "region %p add(%d, %d, %d, %d)\n",
 		wthp_region, x, y, width, height);
 }
 
 static void
-region_subtract(struct wthp_region *wthp_region,
-		int32_t x, int32_t y, int32_t width, int32_t height)
+region_handle_subtract(struct wthp_region *wthp_region,
+		       int32_t x, int32_t y,
+		       int32_t width, int32_t height)
 {
 	fprintf(stderr, "region %p subtract(%d, %d, %d, %d)\n",
 		wthp_region, x, y, width, height);
 }
 
 static const struct wthp_region_interface region_implementation = {
-	region_destroy,
-	region_add,
-	region_subtract
+	region_handle_destroy,
+	region_handle_add,
+	region_handle_subtract
 };
 
 static void
-compositor_create_surface(struct wthp_compositor *compositor,
-			  struct wthp_surface *id)
+compositor_handle_create_surface(struct wthp_compositor *compositor,
+				 struct wthp_surface *id)
 {
 	object_post_error((struct wth_object *)compositor, 0, "unimplemented: %s", __func__);
 }
 
 static void
-compositor_create_region(struct wthp_compositor *compositor,
-			 struct wthp_region *id)
+compositor_handle_create_region(struct wthp_compositor *compositor,
+				struct wthp_region *id)
 {
 	struct client *c = wth_object_get_user_data((struct wth_object *)compositor);
 
@@ -196,13 +197,13 @@ compositor_create_region(struct wthp_compositor *compositor,
 }
 
 static const struct wthp_compositor_interface compositor_implementation = {
-	compositor_create_surface,
-	compositor_create_region
+	compositor_handle_create_surface,
+	compositor_handle_create_region
 	/* XXX: protocol is missing destructor */
 };
 
 static void
-registry_destroy(struct wthp_registry *registry)
+registry_handle_destroy(struct wthp_registry *registry)
 {
 	struct client *c = wth_object_get_user_data((struct wth_object *)registry);
 
@@ -212,11 +213,11 @@ registry_destroy(struct wthp_registry *registry)
 }
 
 static void
-registry_bind(struct wthp_registry *registry,
-	     uint32_t name,
-	     struct wth_object *id,
-	     const char *interface,
-	     uint32_t version)
+registry_handle_bind(struct wthp_registry *registry,
+		     uint32_t name,
+		     struct wth_object *id,
+		     const char *interface,
+		     uint32_t version)
 {
 	struct client *c = wth_object_get_user_data((struct wth_object *)registry);
 
@@ -234,18 +235,18 @@ registry_bind(struct wthp_registry *registry,
 }
 
 const struct wthp_registry_interface registry_implementation = {
-	registry_destroy,
-	registry_bind
+	registry_handle_destroy,
+	registry_handle_bind
 };
 
 static void
-display_client_version(struct wth_display * wth_display, uint32_t client_version)
+display_handle_client_version(struct wth_display * wth_display, uint32_t client_version)
 {
 	object_post_error((struct wth_object *)wth_display, 0, "unimplemented: %s", __func__);
 }
 
 static void
-display_sync(struct wth_display * wth_display, struct wthp_callback * callback)
+display_handle_sync(struct wth_display * wth_display, struct wthp_callback * callback)
 {
 	struct client *c = wth_object_get_user_data((struct wth_object *)wth_display);
 
@@ -255,8 +256,8 @@ display_sync(struct wth_display * wth_display, struct wthp_callback * callback)
 }
 
 static void
-display_get_registry(struct wth_display *wth_display,
-		     struct wthp_registry *registry)
+display_handle_get_registry(struct wth_display *wth_display,
+			    struct wthp_registry *registry)
 {
 	struct client *c = wth_object_get_user_data((struct wth_object *)wth_display);
 
@@ -267,9 +268,9 @@ display_get_registry(struct wth_display *wth_display,
 }
 
 static const struct wth_display_interface display_implementation = {
-	display_client_version,
-	display_sync,
-	display_get_registry
+	display_handle_client_version,
+	display_handle_sync,
+	display_handle_get_registry
 };
 
 static void
