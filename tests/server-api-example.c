@@ -31,6 +31,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <string.h>
+#include <assert.h>
 
 #include <waltham-object.h>
 #include <waltham-server.h>
@@ -39,6 +40,11 @@
 
 #include "zalloc.h"
 #include "w-util.h"
+
+/* XXX: this should come from w-util.h */
+#define wl_list_last_until_empty(pos, head, member)			\
+	while (!wl_list_empty(head) &&					\
+		(pos = wl_container_of((head)->prev, pos, member), 1))
 
 #ifndef ARRAY_LENGTH
 #define ARRAY_LENGTH(a) (sizeof (a) / sizeof (a)[0])
@@ -60,13 +66,20 @@ struct watch {
 	void (*cb)(struct watch *w, uint32_t events);
 };
 
+struct region {
+	struct wthp_region *obj;
+	/* pixman_region32_t region; */
+	struct wl_list link; /* struct client::region_list */
+};
+
 struct client {
 	struct wl_list link; /* struct server::client_list */
 	struct server *server;
 	struct wth_connection *connection;
 	struct watch conn_watch;
 
-	/* TODO: a list of client objects, for clean-up */
+	/* client object lists */
+	struct wl_list region_list;
 };
 
 struct server {
@@ -90,9 +103,27 @@ watch_ctl(struct watch *w, int op, uint32_t events)
 }
 
 static void
+region_destroy(struct region *region)
+{
+	fprintf(stderr, "region %p destroy\n", region->obj);
+
+	wthp_region_free(region->obj);
+	wl_list_remove(&region->link);
+	free(region);
+}
+
+static void
 client_destroy(struct client *c)
 {
+	struct region *region;
+
 	fprintf(stderr, "Client %p disconnected.\n", c);
+
+	/* clean up remaining client resources in case the client
+	 * did not.
+	 */
+	wl_list_last_until_empty(region, &c->region_list, link)
+		region_destroy(region);
 
 	wth_connection_flush(c->connection);
 	wl_list_remove(&c->link);
@@ -152,8 +183,11 @@ object_post_error(struct wth_object *obj,
 static void
 region_handle_destroy(struct wthp_region *wthp_region)
 {
-	fprintf(stderr, "region %p destroy\n", wthp_region);
-	wthp_region_free(wthp_region);
+	struct region *region = wth_object_get_user_data((struct wth_object *)wthp_region);
+
+	assert(wthp_region == region->obj);
+
+	region_destroy(region);
 }
 
 static void
@@ -191,9 +225,18 @@ compositor_handle_create_region(struct wthp_compositor *compositor,
 				struct wthp_region *id)
 {
 	struct client *c = wth_object_get_user_data((struct wth_object *)compositor);
+	struct region *region;
 
 	fprintf(stderr, "client %p create region %p\n", c, id);
-	wthp_region_set_interface(id, &region_implementation, NULL);
+
+	region = zalloc(sizeof *region);
+	if (!region)
+		exit(1); /* XXX: send OOM error */
+
+	region->obj = id;
+	wl_list_insert(&c->region_list, &region->link);
+
+	wthp_region_set_interface(id, &region_implementation, region);
 }
 
 static const struct wthp_compositor_interface compositor_implementation = {
@@ -348,6 +391,8 @@ client_create(struct server *srv, struct wth_connection *conn)
 	fprintf(stderr, "Client %p connected.\n", c);
 
 	wl_list_insert(&srv->client_list, &c->link);
+
+	wl_list_init(&c->region_list);
 
 	/* XXX: this should be inside Waltham */
 	disp = wth_connection_get_display(c->connection);

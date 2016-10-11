@@ -1,5 +1,6 @@
 /*
  * Copyright © 2008 Kristian Høgsberg
+ * Copyright © 2016 DENSO CORPORATION
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -189,6 +190,14 @@ wl_list_insert_list(struct wl_list *list, struct wl_list *other);
 	     &pos->member != (head);					\
 	     pos = tmp,							\
 	     tmp = wl_container_of(pos->member.prev, tmp, member))
+
+#define wl_list_first_until_empty(pos, head, member)			\
+	while (!wl_list_empty(head) &&					\
+		(pos = wl_container_of((head)->next, pos, member), 1))
+
+#define wl_list_last_until_empty(pos, head, member)			\
+	while (!wl_list_empty(head) &&					\
+		(pos = wl_container_of((head)->prev, pos, member), 1))
 
 struct wl_array {
 	size_t size;
