@@ -22,8 +22,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef __MARSHALLER_H__
-#define __MARSHALLER_H__
+#ifndef MARSHALLER_H
+#define MARSHALLER_H
 
 #include <stdio.h>
 #include <unistd.h>

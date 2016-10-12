@@ -21,8 +21,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef __UTIL_MESSAGE_H__
-#define __UTIL_MESSAGE_H__
+#ifndef MESSAGE_H
+#define MESSAGE_H
 
 #include "waltham-message.h"
 

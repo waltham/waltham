@@ -617,7 +617,8 @@ if typegen == 'header':
       header_structs += "};\n\n"
 
    # header guard
-   out.write('#ifndef __WALTHAM_{0}__\n#define __WALTHAM_{0}__\n\n'.format(mode.upper()))
+   # FIXME this should be before the includes
+   out.write('#ifndef WALTHAM_{0}_H\n#define WALTHAM_{0}_H\n\n'.format(mode.upper()))
 
    out.write(header_structs)
    out.write(header_funcs)

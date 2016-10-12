@@ -22,8 +22,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef __WTH_OBJECT__
-#define __WTH_OBJECT__
+#ifndef WALTHAM_OBJECT_H
+#define WALTHAM_OBJECT_H
 
 #include <stdint.h>
 
@@ -78,4 +78,4 @@ wth_object_post_error(struct wth_object *obj,
 		      uint32_t code,
 		      const char *fmt, ...) APICALL;
 
-#endif /* __WTH_OBJECT__ */
+#endif

@@ -21,8 +21,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef __MARSHALLER_LOG_H__
-#define __MARSHALLER_LOG_H__
+#ifndef MARSHALLER_LOG_H
+#define MARSHALLER_LOG_H
 
 #include <stdio.h>
 #include <stdlib.h>

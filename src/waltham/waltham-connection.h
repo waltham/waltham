@@ -21,8 +21,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef __WALTHAM_CONNECTION_H__
-#define __WALTHAM_CONNECTION_H__
+#ifndef WALTHAM_CONNECTION_H
+#define WALTHAM_CONNECTION_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -344,4 +344,4 @@ wth_connection_get_protocol_error(struct wth_connection *conn,
 				  const char **interface,
 				  uint32_t *object_id) APICALL;
 
-#endif /* __WALTHAM_CONNECTION_H__ */
+#endif

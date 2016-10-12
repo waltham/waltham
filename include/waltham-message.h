@@ -21,8 +21,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef __WALTHAM_MESSAGE_H__
-#define __WALTHAM_MESSAGE_H__
+#ifndef WALTHAM_MESSAGE_H
+#define WALTHAM_MESSAGE_H
 
 #include <stdint.h>
 
@@ -54,4 +54,4 @@ typedef struct {
 
 #define OPCODE_REPLY 0xffff
 
-#endif /* __WALTHAM_MESSAGE_H__ */
+#endif
