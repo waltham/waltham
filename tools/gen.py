@@ -335,9 +335,6 @@ def demarshaller_generator(funcdef, opcode):
 
    return code
 
-def util_generator(funcdef, opcode):
-   return ""
-
 def get_func_params(funcdef):
    outstr = ''
 
@@ -547,8 +544,6 @@ def end_element(elementname):
             outstr = marshaller_generator(funcdef, opcode)
          elif typegen == "demarshaller":
             outstr = demarshaller_generator(funcdef, opcode)
-         elif typegen == "util":
-            outstr = util_generator(funcdef, opcode)
          elif typegen == "header":
             outstr = header_generator(funcdef, elementname)
          else:
@@ -604,9 +599,11 @@ for x in input_files:
 
 if typegen == 'demarshaller':
    # add array of function pointers
-   out.write("const demarshaller_helper_function_t {}_demarshaller_functions[] "
+   out.write("const int {0}_max_opcode __attribute__ ((visibility (\"default\"))) = {1};\n"
+             "const demarshaller_helper_function_t {2}_demarshaller_functions[] "
              "__attribute__ ((visibility (\"default\"))) = {{"
-             "\n".format("event" if mode == "client" else "request"))
+             "\n".format("demarshaller" if mode == "client" else "demarshaller_", max_opcode,
+                         "event" if mode == "client" else "request"))
    for x in range(0, max_opcode + 1):
       funcname = 'function_' + str(x)
       if x in demarshaller_generated_funcs:
@@ -628,9 +625,5 @@ if typegen == 'header':
 
    # header guard
    out.write('#endif')
-
-if typegen == 'util':
-   # add constants
-   out.write("const int util_max_opcode __attribute__ ((visibility (\"default\"))) = " + str(max_opcode) + ";\n")
 
 out.close()

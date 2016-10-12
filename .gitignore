@@ -27,7 +27,6 @@ Makefile.in
 /configure
 /libtool
 /m4/
-/src/util/util_generated.c
 /src/waltham/*serialice.c
 /src/waltham/waltham-client.h
 /src/waltham/waltham-server.h

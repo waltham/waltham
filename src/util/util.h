@@ -26,7 +26,7 @@
 #ifndef __UTIL_H__
 #define __UTIL_H__
 
-extern const int util_max_opcode;
+extern const int demarshaller_max_opcode;
 
 typedef void (*demarshaller_helper_function_t)(struct wth_connection *conn,
         const hdr_t *header, const char *body);
