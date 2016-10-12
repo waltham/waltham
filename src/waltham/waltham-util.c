@@ -34,65 +34,6 @@
 #include "wayland-private.h"
 
 WL_EXPORT void
-wl_list_init(struct wl_list *list)
-{
-	list->prev = list;
-	list->next = list;
-}
-
-WL_EXPORT void
-wl_list_insert(struct wl_list *list, struct wl_list *elm)
-{
-	elm->prev = list;
-	elm->next = list->next;
-	list->next = elm;
-	elm->next->prev = elm;
-}
-
-WL_EXPORT void
-wl_list_remove(struct wl_list *elm)
-{
-	elm->prev->next = elm->next;
-	elm->next->prev = elm->prev;
-	elm->next = NULL;
-	elm->prev = NULL;
-}
-
-WL_EXPORT int
-wl_list_length(const struct wl_list *list)
-{
-	struct wl_list *e;
-	int count;
-
-	count = 0;
-	e = list->next;
-	while (e != list) {
-		e = e->next;
-		count++;
-	}
-
-	return count;
-}
-
-WL_EXPORT int
-wl_list_empty(const struct wl_list *list)
-{
-	return list->next == list;
-}
-
-WL_EXPORT void
-wl_list_insert_list(struct wl_list *list, struct wl_list *other)
-{
-	if (wl_list_empty(other))
-		return;
-
-	other->next->prev = list;
-	other->prev->next = list->next;
-	list->next->prev = other->prev;
-	list->next = other->next;
-}
-
-WL_EXPORT void
 wl_array_init(struct wl_array *array)
 {
 	memset(array, 0, sizeof *array);
@@ -148,23 +89,6 @@ wl_array_copy(struct wl_array *array, struct wl_array *source)
 
 	memcpy(array->data, source->data, source->size);
 	return 0;
-}
-
-/** \cond */
-
-struct wl_object global_zombie_object;
-
-int
-wl_interface_equal(const struct wl_interface *a, const struct wl_interface *b)
-{
-	/* In most cases the pointer equality test is sufficient.
-	 * However, in some cases, depending on how things are split
-	 * across shared objects, we can end up with multiple
-	 * instances of the interface metadata constants.  So if the
-	 * pointers match, the interfaces are equal, if they don't
-	 * match we have to compare the interface names.
-	 */
-	return a == b || strcmp(a->name, b->name) == 0;
 }
 
 union map_entry {
@@ -387,35 +311,3 @@ wl_map_for_each(struct wl_map *map, wl_iterator_func_t func, void *data)
 	if (ret == WL_ITERATOR_CONTINUE)
 		for_each_helper(&map->server_entries, func, data);
 }
-
-static void
-wl_log_stderr_handler(const char *fmt, va_list arg)
-{
-	vfprintf(stderr, fmt, arg);
-}
-
-wl_log_func_t wl_log_handler = wl_log_stderr_handler;
-
-void
-wl_log(const char *fmt, ...)
-{
-	va_list argp;
-
-	va_start(argp, fmt);
-	wl_log_handler(fmt, argp);
-	va_end(argp);
-}
-
-void
-wl_abort(const char *fmt, ...)
-{
-	va_list argp;
-
-	va_start(argp, fmt);
-	wl_log_handler(fmt, argp);
-	va_end(argp);
-
-	abort();
-}
-
-/** \endcond */
