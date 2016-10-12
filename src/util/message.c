@@ -39,7 +39,6 @@
 #include <glib.h>
 
 #include "message.h"
-#include "log.h"
 #include "util.h"
 
 ClientReader *

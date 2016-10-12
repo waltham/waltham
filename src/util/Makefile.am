@@ -19,8 +19,6 @@ util_generated.c: $(extensions) $(tools)
 
 noinst_LTLIBRARIES = libwalthamutil.la
 libwalthamutil_la_SOURCES = 	\
-	log.c			\
-	log.h			\
 	message.c		\
 	message.h		\
 	profiling.h

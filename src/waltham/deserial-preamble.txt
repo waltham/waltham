@@ -27,11 +27,12 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <glib.h>
+
 #include "waltham-object.h"
 #include "waltham-connection.h"
 
 #include "waltham-message.h"
-#include "util/log.h"
 #include "util/util.h"
 
 //#define ENABLE_PROFILING 1
@@ -43,7 +44,7 @@
 #define END_TIMING(label) \
   msec = g_timer_elapsed (timer, NULL) * 1000; \
   g_timer_destroy (timer); \
-  log_debug ("%s (%f ms)", label, msec);
+  g_debug ("%s (%f ms)", label, msec);
 #else
 #define START_TIMING()
 #define END_TIMING(a)
