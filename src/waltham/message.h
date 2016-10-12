@@ -28,21 +28,19 @@
 
 #include <glib.h>
 
-#define API_CALL __attribute__ ((visibility ("default")))
-
 struct wth_connection;
 
 gboolean
-forward_raw_msg (int out, msg_t *msg) API_CALL;
+forward_raw_msg (int out, msg_t *msg);
 
 msg_t *
-copy_msg (msg_t *msg) API_CALL;
+copy_msg (msg_t *msg);
 
 void
-free_msg (msg_t *msg) API_CALL;
+free_msg (msg_t *msg);
 
 void
-msg_dispatch (struct wth_connection *conn, msg_t *msg) API_CALL;
+msg_dispatch (struct wth_connection *conn, msg_t *msg);
 
 /**** Ringbuffer based network reader & handler */
 typedef struct {
@@ -80,23 +78,23 @@ typedef struct {
 
 } ClientReader;
 
-ClientReader *new_reader (void) API_CALL;
-void free_reader (ClientReader *reader) API_CALL;
+ClientReader *new_reader (void);
+void free_reader (ClientReader *reader);
 
 gboolean reader_pull_new_messages (ClientReader *reader, int fd,
-  gboolean from_client) API_CALL;
+  gboolean from_client);
 
-void reader_map_message (ClientReader *reader, int m, msg_t *msg) API_CALL;
-void reader_unmap_message (ClientReader *reader, int m, msg_t *msg) API_CALL;
+void reader_map_message (ClientReader *reader, int m, msg_t *msg);
+void reader_unmap_message (ClientReader *reader, int m, msg_t *msg);
 
 /* Forward complete messages */
 gboolean reader_forward_message_range (ClientReader *reader, int fd,
-  int s, int e) API_CALL;
-gboolean reader_forward_all_messages (ClientReader *reader, int fd) API_CALL;
-void reader_flush (ClientReader *reader) API_CALL;
+  int s, int e);
+gboolean reader_forward_all_messages (ClientReader *reader, int fd);
+void reader_flush (ClientReader *reader);
 
 /** Network helpers */
-int connect_to_host (const char *host, const char *port) API_CALL;
-int connect_to_unix_socket (const char *path) API_CALL;
+int connect_to_host (const char *host, const char *port);
+int connect_to_unix_socket (const char *path);
 
 #endif

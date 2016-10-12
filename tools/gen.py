@@ -599,9 +599,8 @@ for x in input_files:
 
 if typegen == 'demarshaller':
    # add array of function pointers
-   out.write("const int {0}_max_opcode __attribute__ ((visibility (\"default\"))) = {1};\n"
-             "const demarshaller_helper_function_t {2}_demarshaller_functions[] "
-             "__attribute__ ((visibility (\"default\"))) = {{"
+   out.write("const int {0}_max_opcode = {1};\n"
+             "const demarshaller_helper_function_t {2}_demarshaller_functions[] = {{"
              "\n".format("demarshaller" if mode == "client" else "demarshaller_", max_opcode,
                          "event" if mode == "client" else "request"))
    for x in range(0, max_opcode + 1):
