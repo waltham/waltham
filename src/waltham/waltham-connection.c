@@ -35,7 +35,7 @@
 
 #include "waltham-connection.h"
 
-#include "util/message.h"
+#include "message.h"
 #include "marshaller.h"
 
 // FIXME

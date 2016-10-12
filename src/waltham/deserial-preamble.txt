@@ -33,7 +33,7 @@
 #include "waltham-connection.h"
 
 #include "waltham-message.h"
-#include "util/util.h"
+#include "util.h"
 
 //#define ENABLE_PROFILING 1
 

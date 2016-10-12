@@ -42,7 +42,6 @@ AC_CONFIG_FILES([Makefile
 		 data/waltham.pc
 		 include/Makefile
 		 src/Makefile
-		 src/util/Makefile
 		 src/waltham/Makefile
 		 tools/Makefile
 		 tests/Makefile

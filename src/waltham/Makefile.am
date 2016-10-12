@@ -20,13 +20,15 @@ AM_CFLAGS = \
 lib_LTLIBRARIES = libwaltham.la
 
 libwaltham_la_LDFLAGS = -version-info 0:0:0 -no-undefined
-libwaltham_la_LIBADD = \
-	$(top_builddir)/src/util/libwalthamutil.la
+libwaltham_la_LIBADD = @GLIB_LIBS@
 
 common_src = \
 	marshaller.c \
 	marshaller.h \
 	marshaller_log.h \
+	message.c \
+	message.h \
+	util.h \
 	waltham-connection.c \
 	waltham-connection.h \
 	waltham-object.c \
