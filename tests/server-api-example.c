@@ -167,59 +167,20 @@ client_destroy(struct client *c)
 	wl_list_last_until_empty(reg, &c->registry_list, link)
 		registry_destroy(reg);
 
-	wth_connection_flush(c->connection);
 	wl_list_remove(&c->link);
-
 	watch_ctl(&c->conn_watch, EPOLL_CTL_DEL, 0);
 	wth_connection_destroy(c->connection);
-
 	free(c);
 }
 
 static void
-object_post_error(struct wth_object *obj,
-		  uint32_t code,
-		  const char *fmt, ...)
+client_post_out_of_memory(struct client *c)
 {
-	struct client *c;
-	struct wth_connection *conn;
 	struct wth_display *disp;
-	char str[256];
-	va_list ap;
 
-	va_start(ap, fmt);
-	vsnprintf(str, sizeof str, fmt, ap);
-	va_end(ap);
-
-	conn = obj->connection; /* XXX: use a getter? */
-	disp = wth_connection_get_display(conn);
-	wth_display_send_error(disp, obj, code, str);
-
-	c = wth_object_get_user_data((struct wth_object *)disp);
-	fprintf(stderr, "client %p: sending fatal error '%s'\n", c, str);
-
-	/* XXX: AARGH!
-	 * However, getting the error message actually transmitted
-	 * while we want to close the connection without blocking
-	 * on it is a pretty nasty problem.
-	 */
-	sleep(1);
-
-	/* XXX: if we are in the middle of dispatching, which is very
-	 * likely, we should mark the wth_connection as errored.
-	 * Destroying it here means we probably crash.
-	 */
-	client_destroy(c);
-
-	/* XXX: http://stackoverflow.com/questions/3757289/tcp-option-so-linger-zero-when-its-required
-	 * So we should design this so that the client will be closing
-	 * the connection on a protocol error. Fair enough, so we should
-	 * just mark the connection as failed but not close it.
-	 * While it is failed, we should just ignore all incoming
-	 * messages and wait for it to close. We might also need a
-	 * timer to trigger a forced close if the client never closes it.
-	 * Would the TCP stack have anything to do that automatically?
-	 */
+	disp = wth_connection_get_display(c->connection);
+	wth_object_post_error((struct wth_object *)disp, 1,
+			      "out of memory");
 }
 
 static void
@@ -259,7 +220,8 @@ static void
 compositor_handle_create_surface(struct wthp_compositor *compositor,
 				 struct wthp_surface *id)
 {
-	object_post_error((struct wth_object *)compositor, 0, "unimplemented: %s", __func__);
+	wth_object_post_error((struct wth_object *)compositor, 0,
+			      "unimplemented: %s", __func__);
 }
 
 static void
@@ -273,8 +235,10 @@ compositor_handle_create_region(struct wthp_compositor *compositor,
 		comp->client, id);
 
 	region = zalloc(sizeof *region);
-	if (!region)
-		exit(1); /* XXX: send OOM error */
+	if (!region) {
+		client_post_out_of_memory(comp->client);
+		return;
+	}
 
 	region->obj = id;
 	wl_list_insert(&comp->client->region_list, &region->link);
@@ -302,8 +266,10 @@ client_bind_compositor(struct client *c, struct wthp_compositor *obj)
 	struct compositor *comp;
 
 	comp = zalloc(sizeof *comp);
-	if (!comp)
-		exit(1); /* XXX: send OOM error */
+	if (!comp) {
+		client_post_out_of_memory(c);
+		return;
+	}
 
 	comp->obj = obj;
 	comp->client = c;
@@ -330,7 +296,8 @@ registry_handle_bind(struct wthp_registry *registry,
 		/* XXX: check that name and interface match */
 		client_bind_compositor(reg->client, (struct wthp_compositor *)id);
 	} else {
-		object_post_error((struct wth_object *)registry, 0, "%s: unknown name %u", __func__, name);
+		wth_object_post_error((struct wth_object *)registry, 0,
+				      "%s: unknown name %u", __func__, name);
 		wth_object_delete(id);
 	}
 }
@@ -341,9 +308,11 @@ const struct wthp_registry_interface registry_implementation = {
 };
 
 static void
-display_handle_client_version(struct wth_display * wth_display, uint32_t client_version)
+display_handle_client_version(struct wth_display *wth_display,
+			      uint32_t client_version)
 {
-	object_post_error((struct wth_object *)wth_display, 0, "unimplemented: %s", __func__);
+	wth_object_post_error((struct wth_object *)wth_display, 0,
+			      "unimplemented: %s", __func__);
 }
 
 static void
@@ -364,8 +333,10 @@ display_handle_get_registry(struct wth_display *wth_display,
 	struct registry *reg;
 
 	reg = zalloc(sizeof *reg);
-	if (!reg)
-		exit(1); /* XXX: send OOM error */
+	if (!reg) {
+		client_post_out_of_memory(c);
+		return;
+	}
 
 	reg->obj = registry;
 	reg->client = c;
@@ -425,7 +396,7 @@ connection_handle_data(struct watch *w, uint32_t events)
 		}
 
 		ret = wth_connection_dispatch(c->connection);
-		if (ret < 0) {
+		if (ret < 0 && errno != EPROTO) {
 			fprintf(stderr, "Client %p dispatch error.\n", c);
 			client_destroy(c);
 
