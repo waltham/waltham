@@ -252,6 +252,7 @@ connection_handle_data(struct watch *w, uint32_t events)
 	}
 
 	if (events & EPOLLIN) {
+		/* Do not ignore EPROTO */
 		ret = wth_connection_read(dpy->connection);
 		if (ret < 0) {
 			perror("Connection read error\n");
@@ -307,6 +308,7 @@ roundtrip(struct display *dpy)
 	pfd.events = POLLIN;
 
 	while (!flag) {
+		/* Do not ignore EPROTO */
 		if (wth_connection_dispatch(dpy->connection) < 0)
 			break;
 
@@ -449,13 +451,41 @@ fiddle_timer_cb(struct wtimer *t, void *data)
 		wtimer_arm_once(t, 1000);
 }
 
+static void
+check_connection_errors(struct wth_connection *conn)
+{
+	int err;
+	uint32_t id;
+	uint32_t code;
+	const char *intf;
+
+	err = wth_connection_get_error(conn);
+	if (err) {
+		fprintf(stderr, "Connection error '%s'.\n", strerror(err));
+		if (err == EPROTO) {
+			code = wth_connection_get_protocol_error(conn,
+				&intf, &id);
+			fprintf(stderr,
+				"  protocol error was %s@%#x: %d\n",
+				intf, id, code);
+		}
+	} else {
+		fprintf(stderr, "No errors recorded.\n");
+	}
+}
+
 /* XXX: these three handlers should not be here */
 
 static void
 not_here_error(struct wth_display *d, struct wth_object *obj,
 	       uint32_t code, const char *msg)
 {
+	struct wth_connection *conn;
+
+	conn = wth_object_get_user_data((struct wth_object *)d);
 	fprintf(stderr, "fatal protocol error %d: %s\n", code, msg);
+	wth_connection_set_protocol_error(conn, 0xf000dead /* XXX obj->id */,
+					  "unknown", code);
 }
 
 static void
@@ -481,6 +511,7 @@ main(int arcg, char *argv[])
 {
 	struct display dpy = { 0 };
 	int fd;
+	int err;
 
 	dpy.epoll_fd = epoll_create1(EPOLL_CLOEXEC);
 	if (dpy.epoll_fd == -1) {
@@ -517,7 +548,7 @@ main(int arcg, char *argv[])
 	/* ..except Waltham does not yet, so let's plug in something
 	 * to print out stuff at least.
 	 */
-	wth_display_set_listener(dpy.display, &not_here_listener, NULL);
+	wth_display_set_listener(dpy.display, &not_here_listener, dpy.connection);
 
 	/* Create a registry so that we will get advertisements of the
 	 * interfaces implemented by the server.
@@ -538,6 +569,11 @@ main(int arcg, char *argv[])
 
 	fiddle_with_region(&dpy);
 
+#if 0
+	/* trigger a protocol error */
+	wthp_compositor_create_surface(dpy.compositor);
+#endif
+
 	fprintf(stderr, "sending wth_display.sync...\n");
 	dpy.bling = wth_display_sync(dpy.display);
 	wthp_callback_set_listener(dpy.bling, &bling_listener, &dpy);
@@ -552,6 +588,14 @@ main(int arcg, char *argv[])
 
 	/* This sends the request, unlike wthp_registry_free() */
 	wthp_registry_destroy(dpy.registry);
+
+	/* Do the final roundtrip to guarantee the server has received
+	 * all our tear-down requests.
+	 */
+	roundtrip(&dpy);
+
+	/* Check and report any errors */
+	check_connection_errors(dpy.connection);
 
 	/* Disconnect, automatically destroys wth_display, free
 	 * the connection.
