@@ -16,6 +16,7 @@ general:
   the hash table
 - implement object version inheritance
 - wth_connection needs user_data with getter and setter
+- add 64-bit protocol data types
 
 generator:
 - rewrite the generator to become more readable and maintainable
