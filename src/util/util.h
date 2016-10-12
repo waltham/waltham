@@ -27,13 +27,13 @@
 #define __UTIL_H__
 
 extern const int util_max_opcode;
-extern const int demarshaller_max_opcode;
 
 extern const char * util_function_names[];
 
 typedef void (*demarshaller_helper_function_t)(struct wth_connection *conn,
         const hdr_t *header, const char *body);
 
-extern const demarshaller_helper_function_t demarshaller_functions[];
+extern const demarshaller_helper_function_t event_demarshaller_functions[];
+extern const demarshaller_helper_function_t request_demarshaller_functions[];
 
 #endif

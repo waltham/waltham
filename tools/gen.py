@@ -595,6 +595,12 @@ for x in preamble_files:
    out.write(preamblefile.read())
    preamblefile.close()
 
+if typegen == 'marshaller' or typegen == 'demarshaller':
+   if mode == "client":
+      out.write('#include "waltham-client.h"\n\n')
+   else:
+      out.write('#include "waltham-server.h"\n\n')
+
 for x in input_files:
    inputfile = open( x, 'rb' )
 
@@ -606,14 +612,10 @@ for x in input_files:
    inputfile.close()
 
 if typegen == 'demarshaller':
-   # add constants
-   out.write("const int demarshaller_max_opcode __attribute__ ((visibility (\"default\"))) = " \
-             + str(max_opcode) + ";\n")
-
    # add array of function pointers
-   out.write("const demarshaller_helper_function_t demarshaller_functions" + \
-             "[" + str(max_opcode + 1) + "] \n")
-   out.write("__attribute__ ((visibility (\"default\"))) = {\n")
+   out.write("const demarshaller_helper_function_t {}_demarshaller_functions[] "
+             "__attribute__ ((visibility (\"default\"))) = {{"
+             "\n".format("event" if mode == "client" else "request"))
    for x in range(0, max_opcode + 1):
       funcname = 'function_' + str(x)
       if x in demarshaller_generated_funcs:

@@ -25,12 +25,6 @@
 #include "waltham-object.h"
 #include "waltham-connection.h"
 
-#ifdef WALTHAM_CLIENT
-#include "waltham-client.h"
-#else
-#include "waltham-server.h"
-#endif
-
 #include "marshaller_log.h"
 #include "marshaller.h"
 

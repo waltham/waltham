@@ -17,15 +17,10 @@ AM_CFLAGS = \
 	-I$(top_srcdir)/src \
 	$(NULL)
 
-lib_LTLIBRARIES = libwalthamclient.la libwalthamserver.la
+lib_LTLIBRARIES = libwaltham.la
 
-libwalthamclient_la_LDFLAGS = -version-info 0:0:0 -no-undefined
-libwalthamclient_la_LIBADD = \
-	$(top_builddir)/src/marshaller/libmarshaller.la \
-	$(top_builddir)/src/util/libwalthamutil.la
-
-libwalthamserver_la_LDFLAGS = -version-info 0:0:0 -no-undefined
-libwalthamserver_la_LIBADD = \
+libwaltham_la_LDFLAGS = -version-info 0:0:0 -no-undefined
+libwaltham_la_LIBADD = \
 	$(top_builddir)/src/marshaller/libmarshaller.la \
 	$(top_builddir)/src/util/libwalthamutil.la
 
@@ -66,15 +61,6 @@ client-deserialice.c: $(core_interface) $(tools) $(srcdir)/deserial-preamble.txt
 		-m client \
 		-t demarshaller
 
-libwalthamclient_la_SOURCES = \
-	$(common_src)
-
-nodist_libwalthamclient_la_SOURCES = \
-	client-serialice.c \
-	client-deserialice.c
-
-libwalthamclient_la_CFLAGS = $(AM_CFLAGS) -DWALTHAM_CLIENT
-
 waltham-server.h: $(tools) $(core_interface) $(extensions) $(srcdir)/header-preamble.txt
 	$(top_srcdir)/tools/gen.py \
 		-p $(srcdir)/header-preamble.txt \
@@ -99,11 +85,11 @@ server-deserialice.c: $(core_interface) $(tools) $(srcdir)/deserial-preamble.txt
 		-m server \
 		-t demarshaller
 
-libwalthamserver_la_SOURCES = \
+libwaltham_la_SOURCES = \
 	$(common_src)
 
-nodist_libwalthamserver_la_SOURCES = \
+nodist_libwaltham_la_SOURCES = \
+	client-serialice.c \
+	client-deserialice.c \
 	server-serialice.c \
 	server-deserialice.c
-
-libwalthamserver_la_CFLAGS = $(AM_CFLAGS) -DWALTHAM_SERVER

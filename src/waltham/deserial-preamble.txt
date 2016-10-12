@@ -30,12 +30,6 @@
 #include "waltham-object.h"
 #include "waltham-connection.h"
 
-#ifdef WALTHAM_CLIENT
-#include "waltham-client.h"
-#else
-#include "waltham-server.h"
-#endif
-
 #include "waltham-message.h"
 #include "util/log.h"
 #include "util/util.h"

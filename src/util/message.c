@@ -423,13 +423,17 @@ free_msg (msg_t *msg)
 void
 msg_dispatch (struct wth_connection *conn, msg_t *msg)
 {
-   if (msg->hdr->opcode > demarshaller_max_opcode
-       || demarshaller_functions[msg->hdr->opcode] == NULL) {
-     g_warning ("Invalid opcode %d, discard message", msg->hdr->opcode);
-     return;
-   }
+  if (msg->hdr->opcode > util_max_opcode
+      || (request_demarshaller_functions[msg->hdr->opcode] == NULL &&
+          event_demarshaller_functions[msg->hdr->opcode] == NULL)) {
+    g_warning ("Invalid opcode %d, discard message", msg->hdr->opcode);
+    return;
+  }
 
-   demarshaller_functions[msg->hdr->opcode](conn, msg->hdr, msg->body);
+  if (request_demarshaller_functions[msg->hdr->opcode])
+    request_demarshaller_functions[msg->hdr->opcode](conn, msg->hdr, msg->body);
+  else
+    event_demarshaller_functions[msg->hdr->opcode](conn, msg->hdr, msg->body);
 }
 
 /* Network helpers */
