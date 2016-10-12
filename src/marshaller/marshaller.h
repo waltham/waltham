@@ -38,12 +38,6 @@
 #include "waltham-message.h"
 #include "marshaller_log.h"
 
-/* All shared libraries in a process wanting to serialize data
- * to the AD side need to LOCK the common mutex first */
-
-/* This variable should only be declared in one shared library */
-extern pthread_mutex_t marshaller_mutex;
-
 static inline int send_all (int sock, const struct iovec *iov, int iovcnt)
 {
    int ret;
@@ -87,12 +81,6 @@ static inline int recv_all (int sock, struct iovec *iov, int iovcnt)
    ABORT_TIMING(_fmt, ## __VA_ARGS__); \
    return ret; \
 }
-
-
-#define LOCK()                          \
-   pthread_mutex_lock(&marshaller_mutex)
-#define UNLOCK()                        \
-   pthread_mutex_unlock(&marshaller_mutex)
 
 #define PADDED(sz) \
    (((sz) + 3) & ~3)
@@ -167,9 +155,6 @@ static inline int recv_all (int sock, struct iovec *iov, int iovcnt)
          exit (errno); \
       marshaller_paramid = 0; \
    }
-
-//STREAM_DEBUG ((unsigned char *) param, sz, "       <- ");
-//STREAM_DEBUG_DATA (param, sz);
 
 #define START_REPLY() \
    int data_sz __attribute__((unused)); \

@@ -22,11 +22,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <pthread.h>
-
 #include "marshaller.h"
 
-pthread_mutex_t marshaller_mutex __attribute__ ((visibility ("default"))) = PTHREAD_MUTEX_INITIALIZER;
 int timing_level __attribute__ ((visibility ("default"))) = 0;

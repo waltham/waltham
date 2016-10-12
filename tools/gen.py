@@ -149,8 +149,6 @@ def marshaller_generator(funcdef, opcode):
 
    outstr += '   START_TIMING("' + funcname + '", "' + fmt_string + '"' + fmt_params + ');\n'
 
-   outstr += '   LOCK();\n'
-
    #serialize message header
    outstr += '   START_MESSAGE( "' + funcname
    outstr += '", wth_connection_get_next_message_id(((struct wth_object *)' + funcdef.get('param0').get('val') + ')->connection), sz, '
@@ -205,8 +203,6 @@ def marshaller_generator(funcdef, opcode):
 
    if 'destructor' in funcdef:
       outstr += '   {0}_free({0});\n'.format(interface)
-
-   outstr += '   UNLOCK();\n'
 
    outstr += '   END_TIMING(' + fmt_ret + ');\n'
 
