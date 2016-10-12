@@ -39,7 +39,7 @@
 #include <glib.h>
 
 #include "message.h"
-#include "util.h"
+#include "demarshaller.h"
 
 ClientReader *
 new_reader (void)

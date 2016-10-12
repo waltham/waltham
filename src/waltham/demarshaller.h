@@ -23,8 +23,8 @@
 
 #include "waltham-message.h"
 
-#ifndef __UTIL_H__
-#define __UTIL_H__
+#ifndef DEMARSHALLER_H
+#define DEMARSHALLER_H
 
 extern const int demarshaller_max_opcode;
 
