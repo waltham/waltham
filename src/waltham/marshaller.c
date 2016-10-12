@@ -24,4 +24,4 @@
 
 #include "marshaller.h"
 
-int timing_level __attribute__ ((visibility ("default"))) = 0;
+int timing_level = 0;
