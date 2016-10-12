@@ -22,22 +22,6 @@ lib_LTLIBRARIES = libwaltham.la
 libwaltham_la_LDFLAGS = -version-info 0:0:0 -no-undefined
 libwaltham_la_LIBADD = @GLIB_LIBS@
 
-common_src = \
-	demarshaller.h \
-	marshaller.c \
-	marshaller.h \
-	marshaller_log.h \
-	message.c \
-	message.h \
-	waltham-connection.c \
-	waltham-connection.h \
-	waltham-object.c \
-	waltham-object.h \
-	waltham-private.h \
-	waltham-util.c \
-	waltham-util.h \
-	$(NULL)
-
 tools = \
 	$(top_srcdir)/tools/gen.py
 
@@ -93,7 +77,20 @@ server-deserialice.c: $(core_interface) $(tools) $(srcdir)/deserial-preamble.txt
 		-t demarshaller
 
 libwaltham_la_SOURCES = \
-	$(common_src)
+	demarshaller.h \
+	marshaller.c \
+	marshaller.h \
+	marshaller_log.h \
+	message.c \
+	message.h \
+	waltham-connection.c \
+	waltham-connection.h \
+	waltham-object.c \
+	waltham-object.h \
+	waltham-private.h \
+	waltham-util.c \
+	waltham-util.h \
+	$(NULL)
 
 nodist_libwaltham_la_SOURCES = \
 	client-serialice.c \
