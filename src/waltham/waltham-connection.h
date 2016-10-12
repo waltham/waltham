@@ -32,6 +32,10 @@
 
 #include <waltham-object.h>
 
+#ifdef  __cplusplus
+extern "C" {
+#endif
+
 #define APICALL __attribute__ ((visibility ("default")))
 
 /** A Waltham connection
@@ -343,5 +347,9 @@ uint32_t
 wth_connection_get_protocol_error(struct wth_connection *conn,
 				  const char **interface,
 				  uint32_t *object_id) APICALL;
+
+#ifdef  __cplusplus
+}
+#endif
 
 #endif

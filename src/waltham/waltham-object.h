@@ -27,6 +27,10 @@
 
 #include <stdint.h>
 
+#ifdef  __cplusplus
+extern "C" {
+#endif
+
 #define APICALL __attribute__ ((visibility ("default")))
 
 /* FIXME: move to waltham-private.h ? */
@@ -77,5 +81,9 @@ void
 wth_object_post_error(struct wth_object *obj,
 		      uint32_t code,
 		      const char *fmt, ...) APICALL;
+
+#ifdef  __cplusplus
+}
+#endif
 
 #endif

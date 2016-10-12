@@ -623,6 +623,11 @@ if typegen == 'header':
    out.write(header_structs)
    out.write(header_funcs)
 
+   # C++ guard
+   out.write('#ifdef  __cplusplus\n'
+             '}\n'
+             '#endif\n\n')
+
    # header guard
    out.write('#endif')
 

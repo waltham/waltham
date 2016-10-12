@@ -26,6 +26,10 @@
 
 #include <waltham-util.h>
 
+#ifdef  __cplusplus
+extern "C" {
+#endif
+
 struct wth_display;
 struct wthp_blob_factory;
 struct wthp_buffer;
