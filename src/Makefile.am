@@ -1,1 +1,1 @@
-SUBDIRS = util marshaller waltham
+SUBDIRS = util waltham

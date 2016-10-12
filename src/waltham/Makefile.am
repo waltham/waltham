@@ -21,10 +21,12 @@ lib_LTLIBRARIES = libwaltham.la
 
 libwaltham_la_LDFLAGS = -version-info 0:0:0 -no-undefined
 libwaltham_la_LIBADD = \
-	$(top_builddir)/src/marshaller/libmarshaller.la \
 	$(top_builddir)/src/util/libwalthamutil.la
 
 common_src = \
+	marshaller.c \
+	marshaller.h \
+	marshaller_log.h \
 	waltham-connection.c \
 	waltham-connection.h \
 	waltham-object.c \

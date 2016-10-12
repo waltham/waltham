@@ -41,7 +41,6 @@ AC_CONFIG_FILES([Makefile
 		 data/Makefile
 		 include/Makefile
 		 src/Makefile
-		 src/marshaller/Makefile
 		 src/util/Makefile
 		 src/waltham/Makefile
 		 tools/Makefile
