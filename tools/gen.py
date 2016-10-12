@@ -41,8 +41,6 @@ opcode = '0'
 
 demarshaller_generated_funcs = dict()
 
-generated_funcs = dict()
-
 max_opcode = 0
 
 preamble_files = []
@@ -342,9 +340,6 @@ def demarshaller_generator(funcdef, opcode):
    return code
 
 def util_generator(funcdef, opcode):
-   global generated_funcs
-
-   generated_funcs[int(opcode)] = funcdef.get('name')
    return ""
 
 def get_func_params(funcdef):
@@ -639,22 +634,7 @@ if typegen == 'header':
    out.write('#endif')
 
 if typegen == 'util':
-   out.write("#include <string.h>\n\n")
-
    # add constants
    out.write("const int util_max_opcode __attribute__ ((visibility (\"default\"))) = " + str(max_opcode) + ";\n")
-
-   # add array of function names
-   out.write("const char *util_function_names" + \
-             "[" + str(max_opcode + 1) + \
-             "] __attribute__ ((visibility (\"default\"))) =\n")
-   out.write("{\n")
-   for x in range(0, max_opcode + 1):
-      funcname = 'function_' + str(x)
-      if x in generated_funcs:
-         out.write('  "' + generated_funcs.get(x) + '",\n')
-      else:
-         out.write("  NULL,\n")
-   out.write("};\n")
 
 out.close()

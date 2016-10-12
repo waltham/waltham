@@ -28,8 +28,6 @@
 
 extern const int util_max_opcode;
 
-extern const char * util_function_names[];
-
 typedef void (*demarshaller_helper_function_t)(struct wth_connection *conn,
         const hdr_t *header, const char *body);
 
