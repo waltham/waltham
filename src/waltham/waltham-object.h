@@ -31,8 +31,6 @@
 extern "C" {
 #endif
 
-#define APICALL __attribute__ ((visibility ("default")))
-
 /* FIXME: move to waltham-private.h ? */
 struct wth_object {
 	struct wth_display *display;
@@ -44,20 +42,20 @@ struct wth_object {
 };
 
 struct wth_object *
-wth_object_new_with_id (struct wth_connection *connection, uint32_t id) APICALL;
+wth_object_new_with_id (struct wth_connection *connection, uint32_t id);
 
 struct wth_object *
-wth_object_new (struct wth_connection *connection) APICALL;
+wth_object_new (struct wth_connection *connection);
 
 void
-wth_object_delete (struct wth_object *object) APICALL;
+wth_object_delete (struct wth_object *object);
 
 void
 wth_object_set_listener(struct wth_object *obj,
-			void (**listener)(void), void *user_data) APICALL;
+			void (**listener)(void), void *user_data);
 
 void *
-wth_object_get_user_data(struct wth_object *obj) APICALL;
+wth_object_get_user_data(struct wth_object *obj);
 
 /** Post a fatal protocol error to a client
  *
@@ -80,7 +78,7 @@ wth_object_get_user_data(struct wth_object *obj) APICALL;
 void
 wth_object_post_error(struct wth_object *obj,
 		      uint32_t code,
-		      const char *fmt, ...) APICALL;
+		      const char *fmt, ...);
 
 #ifdef  __cplusplus
 }

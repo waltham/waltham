@@ -29,9 +29,11 @@
 #include <stdarg.h>
 
 #include "waltham-connection.h"
+#include "waltham-util.h"
+
 #include "waltham-object.h"
 
-struct wth_object *
+WTH_EXPORT struct wth_object *
 wth_object_new_with_id (struct wth_connection *connection, uint32_t id)
 {
 	struct wth_object *proxy = NULL;
@@ -50,7 +52,7 @@ wth_object_new_with_id (struct wth_connection *connection, uint32_t id)
 	return proxy;
 }
 
-struct wth_object *
+WTH_EXPORT struct wth_object *
 wth_object_new (struct wth_connection *connection)
 {
 	int id = wth_connection_get_next_object_id (connection);
@@ -58,7 +60,7 @@ wth_object_new (struct wth_connection *connection)
 	return wth_object_new_with_id (connection, id);
 }
 
-void
+WTH_EXPORT void
 wth_object_delete (struct wth_object *object)
 {
 	wth_connection_remove_object (object->connection, object);
@@ -66,7 +68,7 @@ wth_object_delete (struct wth_object *object)
 	free (object);
 }
 
-void
+WTH_EXPORT void
 wth_object_set_listener(struct wth_object *obj,
 			void (**listener)(void), void *user_data)
 {
@@ -77,17 +79,17 @@ wth_object_set_listener(struct wth_object *obj,
 	obj->user_data = user_data;
 }
 
-void *
+WTH_EXPORT void *
 wth_object_get_user_data(struct wth_object *obj)
 {
 	return obj->user_data;
 }
 
-/* Copied from walthan-server.h */
+/* XXX: Copied from walthan-server.h */
 void
-wth_display_send_error (struct wth_display * wth_display, struct wth_object * object_id, uint32_t code, const char * message) APICALL;
+wth_display_send_error (struct wth_display * wth_display, struct wth_object * object_id, uint32_t code, const char * message);
 
-void
+WTH_EXPORT void
 wth_object_post_error(struct wth_object *obj,
 		      uint32_t code,
 		      const char *fmt, ...)

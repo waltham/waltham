@@ -31,12 +31,12 @@
 
 #include <glib.h>
 
-#include <waltham-object.h>
-
-#include "waltham-connection.h"
-
 #include "message.h"
 #include "marshaller.h"
+#include "waltham-object.h"
+#include "waltham-util.h"
+
+#include "waltham-connection.h"
 
 // FIXME
 struct wth_display {
@@ -64,7 +64,7 @@ struct wth_connection {
 };
 
 
-struct wth_connection *
+WTH_EXPORT struct wth_connection *
 wth_connect_to_server(const char *host, const char *port)
 {
   struct wth_connection *conn = NULL;
@@ -78,7 +78,7 @@ wth_connect_to_server(const char *host, const char *port)
   return conn;
 }
 
-struct wth_connection *
+WTH_EXPORT struct wth_connection *
 wth_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
   struct wth_connection *conn = NULL;
@@ -92,7 +92,7 @@ wth_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
   return conn;
 }
 
-struct wth_connection *
+WTH_EXPORT struct wth_connection *
 wth_connection_from_fd(int fd, enum wth_connection_side side)
 {
   struct wth_connection *conn;
@@ -120,51 +120,51 @@ wth_connection_from_fd(int fd, enum wth_connection_side side)
   return conn;
 }
 
-int
+WTH_EXPORT int
 wth_connection_get_fd(struct wth_connection *conn)
 {
   return conn->fd;
 }
 
-struct wth_display *
+WTH_EXPORT struct wth_display *
 wth_connection_get_display(struct wth_connection *conn)
 {
   return conn->display;
 }
 
-int
+WTH_EXPORT int
 wth_connection_get_next_message_id(struct wth_connection *conn)
 {
   return conn->next_message_id++;
 }
 
-int
+WTH_EXPORT int
 wth_connection_get_next_object_id(struct wth_connection *conn)
 {
   return ++conn->next_object_id;
 }
 
-void
+WTH_EXPORT void
 wth_connection_insert_object(struct wth_connection *conn,
     struct wth_object *obj)
 {
   g_hash_table_insert (conn->hash, GUINT_TO_POINTER (obj->id), obj);
 }
 
-void
+WTH_EXPORT void
 wth_connection_remove_object(struct wth_connection *conn,
     struct wth_object *obj)
 {
   g_hash_table_remove (conn->hash, GUINT_TO_POINTER (obj->id));
 }
 
-struct wth_object *
+WTH_EXPORT struct wth_object *
 wth_connection_get_object(struct wth_connection *conn, uint32_t id)
 {
   return g_hash_table_lookup (conn->hash, GUINT_TO_POINTER (id));
 }
 
-void
+WTH_EXPORT void
 wth_connection_destroy(struct wth_connection *conn)
 {
   close(conn->fd);
@@ -176,7 +176,7 @@ wth_connection_destroy(struct wth_connection *conn)
   free(conn);
 }
 
-int
+WTH_EXPORT int
 wth_connection_flush(struct wth_connection *conn)
 {
   /* FIXME currently we don't use the ringbuffer to send messages,
@@ -186,7 +186,7 @@ wth_connection_flush(struct wth_connection *conn)
   return 0;
 }
 
-int
+WTH_EXPORT int
 wth_connection_read(struct wth_connection *conn)
 {
   if (!reader_pull_new_messages(conn->reader, conn->fd, TRUE))
@@ -195,7 +195,7 @@ wth_connection_read(struct wth_connection *conn)
     return 0;
 }
 
-int
+WTH_EXPORT int
 wth_connection_dispatch(struct wth_connection *conn)
 {
   int i, complete;
@@ -219,20 +219,20 @@ wth_connection_dispatch(struct wth_connection *conn)
   return complete;
 }
 
-int
+WTH_EXPORT int
 wth_roundtrip(struct wth_connection *conn)
 {
   // FIXME
   return -1;
 }
 
-void
+WTH_EXPORT void
 wth_connection_set_error(struct wth_connection *conn, int err)
 {
   conn->error = err;
 }
 
-void
+WTH_EXPORT void
 wth_connection_set_protocol_error(struct wth_connection *conn,
 				  uint32_t object_id,
 				  const char *interface,
@@ -244,13 +244,13 @@ wth_connection_set_protocol_error(struct wth_connection *conn,
   conn->protocol_error.code = error_code;
 }
 
-int
+WTH_EXPORT int
 wth_connection_get_error(struct wth_connection *conn)
 {
   return conn->error;
 }
 
-uint32_t
+WTH_EXPORT uint32_t
 wth_connection_get_protocol_error(struct wth_connection *conn,
 				  const char **interface,
 				  uint32_t *object_id)

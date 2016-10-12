@@ -36,8 +36,6 @@
 extern "C" {
 #endif
 
-#define APICALL __attribute__ ((visibility ("default")))
-
 /** A Waltham connection
  *
  * This represents the TCP connection carrying Waltham messages.
@@ -96,7 +94,7 @@ struct wth_connection;
  * and flush etc.
  */
 struct wth_connection *
-wth_connect_to_server(const char *host, const char *port) APICALL;
+wth_connect_to_server(const char *host, const char *port);
 
 /** Accept a Waltham client connection
  *
@@ -112,7 +110,7 @@ wth_connect_to_server(const char *host, const char *port) APICALL;
  * socket.
  */
 struct wth_connection *
-wth_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen) APICALL;
+wth_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
 
 enum wth_connection_side {
 	WTH_CONNECTION_SIDE_CLIENT,
@@ -135,7 +133,7 @@ enum wth_connection_side {
  * But this is completely optional otherwise.
  */
 struct wth_connection *
-wth_connection_from_fd(int fd, enum wth_connection_side side) APICALL;
+wth_connection_from_fd(int fd, enum wth_connection_side side);
 
 /** Get connection file descriptor
  *
@@ -152,7 +150,7 @@ wth_connection_from_fd(int fd, enum wth_connection_side side) APICALL;
  * The fd will remain owned by the wth_connection.
  */
 int
-wth_connection_get_fd(struct wth_connection *conn) APICALL;
+wth_connection_get_fd(struct wth_connection *conn);
 
 /** Get the Waltham display object
  *
@@ -168,7 +166,7 @@ wth_connection_get_fd(struct wth_connection *conn) APICALL;
  * This method is only used by clients.
  */
 struct wth_display *
-wth_connection_get_display(struct wth_connection *conn) APICALL;
+wth_connection_get_display(struct wth_connection *conn);
 
 /** Get an id to use in a message
  *
@@ -178,7 +176,7 @@ wth_connection_get_display(struct wth_connection *conn) APICALL;
  * Return the next id, to use in a new message.
  */
 int
-wth_connection_get_next_message_id(struct wth_connection *conn) APICALL;
+wth_connection_get_next_message_id(struct wth_connection *conn);
 
 /** Get an id to use in an object
  *
@@ -188,18 +186,18 @@ wth_connection_get_next_message_id(struct wth_connection *conn) APICALL;
  * Return a free object id, to use in a new object.
  */
 int
-wth_connection_get_next_object_id(struct wth_connection *conn) APICALL;
+wth_connection_get_next_object_id(struct wth_connection *conn);
 
 void
 wth_connection_insert_object(struct wth_connection *conn,
-    struct wth_object *obj) APICALL;
+    struct wth_object *obj);
 
 void
 wth_connection_remove_object(struct wth_connection *conn,
-    struct wth_object *obj) APICALL;
+    struct wth_object *obj);
 
 struct wth_object *
-wth_connection_get_object(struct wth_connection *conn, uint32_t id) APICALL;
+wth_connection_get_object(struct wth_connection *conn, uint32_t id);
 
 /** Disconnect
  *
@@ -211,7 +209,7 @@ wth_connection_get_object(struct wth_connection *conn, uint32_t id) APICALL;
  * This call does not block. Messages still en route may get discarded.
  */
 void
-wth_connection_destroy(struct wth_connection *conn) APICALL;
+wth_connection_destroy(struct wth_connection *conn);
 
 /** Flush buffered messages to the network
  *
@@ -231,7 +229,7 @@ wth_connection_destroy(struct wth_connection *conn) APICALL;
  * reach the client.
  */
 int
-wth_connection_flush(struct wth_connection *conn) APICALL;
+wth_connection_flush(struct wth_connection *conn);
 
 /** Read data received from the network
  *
@@ -250,7 +248,7 @@ wth_connection_flush(struct wth_connection *conn) APICALL;
  * discarded.
  */
 int
-wth_connection_read(struct wth_connection *conn) APICALL;
+wth_connection_read(struct wth_connection *conn);
 
 /** Dispatch incoming messages
  *
@@ -273,7 +271,7 @@ wth_connection_read(struct wth_connection *conn) APICALL;
  * to ensure the error event gets delivered to the client.
  */
 int
-wth_connection_dispatch(struct wth_connection *conn) APICALL;
+wth_connection_dispatch(struct wth_connection *conn);
 
 /** Make a roundtrip from client
  *
@@ -291,7 +289,7 @@ wth_connection_dispatch(struct wth_connection *conn) APICALL;
  * XXX: define EPROTO behaviour
  */
 int
-wth_roundtrip(struct wth_connection *conn) APICALL;
+wth_roundtrip(struct wth_connection *conn);
 
 /* Set wth_connection to errored state
  *
@@ -303,7 +301,7 @@ wth_roundtrip(struct wth_connection *conn) APICALL;
  * This should probably not be public exported API.
  */
 void
-wth_connection_set_error(struct wth_connection *conn, int err) APICALL;
+wth_connection_set_error(struct wth_connection *conn, int err);
 
 /* Set wth_connection into protocol error state
  *
@@ -316,7 +314,7 @@ void
 wth_connection_set_protocol_error(struct wth_connection *conn,
 				  uint32_t object_id,
 				  const char *interface,
-				  uint32_t error_code) APICALL;
+				  uint32_t error_code);
 
 /** Return the connection error state
  *
@@ -327,7 +325,7 @@ wth_connection_set_protocol_error(struct wth_connection *conn,
  * can be used to get the protocol error details.
  */
 int
-wth_connection_get_error(struct wth_connection *conn) APICALL;
+wth_connection_get_error(struct wth_connection *conn);
 
 /** Return protocol error details
  *
@@ -346,7 +344,7 @@ wth_connection_get_error(struct wth_connection *conn) APICALL;
 uint32_t
 wth_connection_get_protocol_error(struct wth_connection *conn,
 				  const char **interface,
-				  uint32_t *object_id) APICALL;
+				  uint32_t *object_id);
 
 #ifdef  __cplusplus
 }

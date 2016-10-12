@@ -47,5 +47,3 @@ struct wthp_seat;
 struct wthp_surface;
 struct wthp_touch;
 
-#define APICALL __attribute__ ((visibility ("default")))
-

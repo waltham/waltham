@@ -76,9 +76,9 @@ variable_size_attributes = dict()
 def marshaller_generator(funcdef, opcode):
    # func return type
    if 'rettype' in funcdef:
-      outstr = funcdef.get('rettype') + '\n'
+      outstr = 'WTH_EXPORT ' + funcdef.get('rettype') + '\n'
    else:
-      outstr = 'void\n'
+      outstr = 'WTH_EXPORT void\n'
 
    funcname = funcdef.get('name')
 
@@ -414,7 +414,7 @@ def header_generator(funcdef, type_):
       header_structs += "  void (*" + funcdef.get('origname') + ") " + get_func_params(funcdef) + ";\n"
       return ""
 
-   header_funcs += get_func_prototype (funcdef) + ' APICALL;\n\n'
+   header_funcs += get_func_prototype (funcdef) + ';\n\n'
    return ""
 
 def generate_func(funcdef, elemtype):
