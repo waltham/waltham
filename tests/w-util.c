@@ -30,7 +30,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include "wayland-util.h"
+#include "w-util.h"
 
 WL_EXPORT void
 wl_list_init(struct wl_list *list)
@@ -89,62 +89,4 @@ wl_list_insert_list(struct wl_list *list, struct wl_list *other)
 	other->prev->next = list->next;
 	list->next->prev = other->prev;
 	list->next = other->next;
-}
-
-WL_EXPORT void
-wl_array_init(struct wl_array *array)
-{
-	memset(array, 0, sizeof *array);
-}
-
-WL_EXPORT void
-wl_array_release(struct wl_array *array)
-{
-	free(array->data);
-}
-
-WL_EXPORT void *
-wl_array_add(struct wl_array *array, size_t size)
-{
-	size_t alloc;
-	void *data, *p;
-
-	if (array->alloc > 0)
-		alloc = array->alloc;
-	else
-		alloc = 16;
-
-	while (alloc < array->size + size)
-		alloc *= 2;
-
-	if (array->alloc < alloc) {
-		if (array->alloc > 0)
-			data = realloc(array->data, alloc);
-		else
-			data = malloc(alloc);
-
-		if (data == NULL)
-			return NULL;
-		array->data = data;
-		array->alloc = alloc;
-	}
-
-	p = array->data + array->size;
-	array->size += size;
-
-	return p;
-}
-
-WL_EXPORT int
-wl_array_copy(struct wl_array *array, struct wl_array *source)
-{
-	if (array->size < source->size) {
-		if (!wl_array_add(array, source->size - array->size))
-			return -1;
-	} else {
-		array->size = source->size;
-	}
-
-	memcpy(array->data, source->data, source->size);
-	return 0;
 }
