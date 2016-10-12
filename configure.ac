@@ -39,6 +39,7 @@ AC_SUBST(GCC_CFLAGS)
 
 AC_CONFIG_FILES([Makefile
 		 data/Makefile
+		 data/waltham.pc
 		 include/Makefile
 		 src/Makefile
 		 src/util/Makefile

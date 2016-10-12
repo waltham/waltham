@@ -5,6 +5,7 @@
 *.l[ao]
 *.loT
 *.orig
+*.pc
 *.py[co]
 *.rej
 *.sw[op]
