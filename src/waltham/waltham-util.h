@@ -23,13 +23,13 @@
  * SOFTWARE.
  */
 
-/** \file wayland-util.h
+/** \file waltham-util.h
  *
  * \brief Utility classes, functions, and macros.
  */
 
-#ifndef WAYLAND_UTIL_H
-#define WAYLAND_UTIL_H
+#ifndef WALTHAM_UTIL_H
+#define WALTHAM_UTIL_H
 
 #include <math.h>
 #include <stddef.h>
@@ -42,23 +42,23 @@ extern "C" {
 
 /* GCC visibility */
 #if defined(__GNUC__) && __GNUC__ >= 4
-#define WL_EXPORT __attribute__ ((visibility("default")))
+#define WTH_EXPORT __attribute__ ((visibility("default")))
 #else
-#define WL_EXPORT
+#define WTH_EXPORT
 #endif
 
 /* Deprecated attribute */
 #if defined(__GNUC__) && __GNUC__ >= 4
-#define WL_DEPRECATED __attribute__ ((deprecated))
+#define WTH_DEPRECATED __attribute__ ((deprecated))
 #else
-#define WL_DEPRECATED
+#define WTH_DEPRECATED
 #endif
 
 /* Printf annotation */
 #if defined(__GNUC__) && __GNUC__ >= 4
-#define WL_PRINTF(x, y) __attribute__((__format__(__printf__, x, y)))
+#define WTH_PRINTF(x, y) __attribute__((__format__(__printf__, x, y)))
 #else
-#define WL_PRINTF(x, y)
+#define WTH_PRINTF(x, y)
 #endif
 
 struct wth_array {
@@ -67,27 +67,27 @@ struct wth_array {
 	void *data;
 };
 
-#define wl_array_for_each(pos, array)					\
+#define wth_array_for_each(pos, array)					\
 	for (pos = (array)->data;					\
 	     (const char *) pos < ((const char *) (array)->data + (array)->size); \
 	     (pos)++)
 
 void
-wl_array_init(struct wl_array *array);
+wth_array_init(struct wth_array *array);
 
 void
-wl_array_release(struct wl_array *array);
+wth_array_release(struct wth_array *array);
 
 void *
-wl_array_add(struct wl_array *array, size_t size);
+wth_array_add(struct wth_array *array, size_t size);
 
 int
-wl_array_copy(struct wl_array *array, struct wl_array *source);
+wth_array_copy(struct wth_array *array, struct wth_array *source);
 
-typedef int32_t wl_fixed_t;
+typedef int32_t wth_fixed_t;
 
 static inline double
-wl_fixed_to_double (wl_fixed_t f)
+wth_fixed_to_double (wth_fixed_t f)
 {
 	union {
 		double d;
@@ -99,8 +99,8 @@ wl_fixed_to_double (wl_fixed_t f)
 	return u.d - (3LL << 43);
 }
 
-static inline wl_fixed_t
-wl_fixed_from_double(double d)
+static inline wth_fixed_t
+wth_fixed_from_double(double d)
 {
 	union {
 		double d;
@@ -113,26 +113,26 @@ wl_fixed_from_double(double d)
 }
 
 static inline int
-wl_fixed_to_int(wl_fixed_t f)
+wth_fixed_to_int(wth_fixed_t f)
 {
 	return f / 256;
 }
 
-static inline wl_fixed_t
-wl_fixed_from_int(int i)
+static inline wth_fixed_t
+wth_fixed_from_int(int i)
 {
 	return i * 256;
 }
 
-/** \enum wl_iterator_result
+/** \enum wth_iterator_result
  *
  * This enum represents the return value of an iterator function.
  */
-enum wl_iterator_result {
+enum wth_iterator_result {
 	/** Stop the iteration */
-	WL_ITERATOR_STOP,
+	WTH_ITERATOR_STOP,
 	/** Continue the iteration */
-	WL_ITERATOR_CONTINUE
+	WTH_ITERATOR_CONTINUE
 };
 
 #ifdef  __cplusplus
