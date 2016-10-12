@@ -98,3 +98,13 @@ nodist_libwaltham_la_SOURCES = \
 	client-deserialice.c \
 	server-serialice.c \
 	server-deserialice.c
+
+include_HEADERS = \
+	waltham-connection.h \
+	waltham-object.h \
+	waltham-util.h \
+	$(NULL)
+
+nodist_include_HEADERS = \
+	waltham-client.h \
+	waltham-server.h
