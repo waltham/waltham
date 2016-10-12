@@ -24,9 +24,11 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdarg.h>
 
 #include "waltham-connection.h"
-
 #include "waltham-object.h"
 
 struct wth_object *
@@ -79,4 +81,30 @@ void *
 wth_object_get_user_data(struct wth_object *obj)
 {
 	return obj->user_data;
+}
+
+/* Copied from walthan-server.h */
+void
+wth_display_send_error (struct wth_display * wth_display, struct wth_object * object_id, uint32_t code, const char * message) APICALL;
+
+void
+wth_object_post_error(struct wth_object *obj,
+		      uint32_t code,
+		      const char *fmt, ...)
+{
+	struct wth_connection *conn = obj->connection;
+	struct wth_display *disp;
+	char str[256];
+	va_list ap;
+
+	/* XXX: abort() if client is trying to do this */
+
+	va_start(ap, fmt);
+	vsnprintf(str, sizeof str, fmt, ap);
+	va_end(ap);
+
+	disp = wth_connection_get_display(conn);
+	wth_display_send_error(disp, obj, code, str);
+
+	wth_connection_set_protocol_error(conn, obj->id, "unknown", code);
 }

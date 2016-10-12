@@ -55,4 +55,27 @@ wth_object_set_listener(struct wth_object *obj,
 void *
 wth_object_get_user_data(struct wth_object *obj) APICALL;
 
+/** Post a fatal protocol error to a client
+ *
+ * \param obj The object that specifies the error code.
+ * \param code The error code, specific to the object's interface.
+ * \param fmt A freeform description of the error for human readers;
+ * printf-style format string.
+ *
+ * This call sends the protocol error event to the client, and sets
+ * the associated wth_connection into protocol error state. As a result,
+ * no further events will reach the client, and no requests from the
+ * client will be dispatched.
+ *
+ * After calling this, the server is expected to keep the wth_connection
+ * open until the client disconnects. This ensures the error event
+ * reaches the client.
+ *
+ * Clients cannot use this function.
+ */
+void
+wth_object_post_error(struct wth_object *obj,
+		      uint32_t code,
+		      const char *fmt, ...) APICALL;
+
 #endif /* __WTH_OBJECT__ */

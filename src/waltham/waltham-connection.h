@@ -38,10 +38,6 @@
  *
  * This represents the TCP connection carrying Waltham messages.
  *
- * Once the connection goes into error state due to remote timeout,
- * disconnect, Waltham protocol error, or any other reason, the various
- * functions will start returning errors.
- *
  * A Waltham client creates a wth_connection with wth_connect_to_server().
  * A Waltham server creates a wth_connection with wth_accept().
  *
@@ -52,6 +48,29 @@
  * After you have sent protocol messages, wth_connection_flush() must
  * be called to flush the messages to the network before you wait for
  * incoming messages.
+ *
+ * A server should not destroy a wth_connection before the client has
+ * closed it, so that the TCP TIME_WAIT state is left on the client
+ * system. In case of a protocol error, the server should call
+ * wth_object_post_error() and wait for the client to disconnect.
+ *
+ * A client should do one final roundtrip before destroying a
+ * wth_connection to ensure that all sent events have reached the
+ * server.
+ *
+ * Once the connection goes into error state due to remote timeout,
+ * disconnect, Waltham protocol error, or any other reason, the various
+ * functions will start returning appropriate errors as described in
+ * each of them.
+ *
+ * When the connection is specifically in protocol error state:
+ * - reading will discard all incoming data
+ * - dispatching will discard all pending messages and not dispatch
+ * - sending messages still works
+ * - flush still works
+ * The protocol error state is only returned from
+ * wth_connection_dispatch(), other functions will silently succeed
+ * unless there are further errors.
  */
 struct wth_connection;
 
@@ -185,7 +204,7 @@ wth_connection_get_object(struct wth_connection *conn, uint32_t id) APICALL;
  * Disconnects if still connected, and destroys the wth_connection.
  * The wth_display gets destroyed too.
  *
- * This call does not block.
+ * This call does not block. Messages still en route may get discarded.
  */
 void
 wth_connection_destroy(struct wth_connection *conn) APICALL;
@@ -200,7 +219,12 @@ wth_connection_destroy(struct wth_connection *conn) APICALL;
  * -1 is returned and errno is set to EAGAIN. In case of EAGAIN, poll
  * for writable and flush again.
  *
- * This call does not block. On error, errno is set.
+ * This call does not block. On failure, errno is set.
+ *
+ * This function does not indicate if the connection has been set as
+ * failed due to a protocol error. This behaviour allows the server to
+ * continue flushing events out so that the protocol error event will
+ * reach the client.
  */
 int
 wth_connection_flush(struct wth_connection *conn) APICALL;
@@ -216,6 +240,10 @@ wth_connection_flush(struct wth_connection *conn) APICALL;
  *
  * This call does not block. If no data is available, the call
  * returns immediately with success.
+ *
+ * The connection being in protocol error state does not cause this
+ * function to return error, but it does cause all read data to be
+ * discarded.
  */
 int
 wth_connection_read(struct wth_connection *conn) APICALL;
@@ -231,6 +259,14 @@ wth_connection_read(struct wth_connection *conn) APICALL;
  * from the network is attempted.
  *
  * On error, errno is set. For nothing to dispatch, 0 is returned.
+ *
+ * In case the connection is set to protocol error state during this
+ * call or earlier, this function will return -1 and set errno to
+ * EPROTO. No further messages will be dispatched once the protocol
+ * error state has been set.
+ *
+ * Servers should keep the connection open regardless of EPROTO errors
+ * to ensure the error event gets delivered to the client.
  */
 int
 wth_connection_dispatch(struct wth_connection *conn) APICALL;
@@ -247,8 +283,65 @@ wth_connection_dispatch(struct wth_connection *conn) APICALL;
  *
  * XXX: This does not actually need to be implemented in Waltham, it
  * could be implemented in the user as well.
+ *
+ * XXX: define EPROTO behaviour
  */
 int
 wth_roundtrip(struct wth_connection *conn) APICALL;
+
+/* Set wth_connection to errored state
+ *
+ * Once set to errored state, the connection is effectively dead.
+ * All incoming data will be discarded, no messages will be dispatched,
+ * and sent messages are silently dropped instead of sent. Various
+ * wth_connection functions will return errors.
+ *
+ * This should probably not be public exported API.
+ */
+void
+wth_connection_set_error(struct wth_connection *conn, int err) APICALL;
+
+/* Set wth_connection into protocol error state
+ *
+ * This implies wth_connection_set_error() with the error set to EPROTO.
+ * \param object_id ID of the object referenced in the error event
+ * \param interface interface name of the object referenced in the error event
+ * \param error_code interface-specific error code
+ */
+void
+wth_connection_set_protocol_error(struct wth_connection *conn,
+				  uint32_t object_id,
+				  const char *interface,
+				  uint32_t error_code) APICALL;
+
+/** Return the connection error state
+ *
+ * \param conn The Waltham connection.
+ * \return The error code from the 'errno' set, or zero for no error.
+ *
+ * If the returned code is EPROTO, wth_connection_get_protocol_error()
+ * can be used to get the protocol error details.
+ */
+int
+wth_connection_get_error(struct wth_connection *conn) APICALL;
+
+/** Return protocol error details
+ *
+ * \param conn The Waltham connection.
+ * \param interface Return pointer to the interface name.
+ * \param object_id Return the object ID.
+ * \return The interface specific error code.
+ *
+ * The returned interface name and object ID are for the object that
+ * was referenced when the server sent the error event. The returned
+ * error code is specific to that interface, and zero does not mean
+ * "no error".
+ *
+ * \sa wth_connection_get_error()
+ */
+uint32_t
+wth_connection_get_protocol_error(struct wth_connection *conn,
+				  const char **interface,
+				  uint32_t *object_id) APICALL;
 
 #endif /* __WALTHAM_CONNECTION_H__ */

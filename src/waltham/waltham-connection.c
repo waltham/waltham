@@ -48,6 +48,12 @@ struct wth_connection {
   enum wth_connection_side side;
 
   ClientReader *reader;
+  int error;
+  struct {
+    uint32_t code;
+    uint32_t id;
+    const char *interface;
+  } protocol_error;
 
   struct wth_display *display;
 
@@ -218,4 +224,39 @@ wth_roundtrip(struct wth_connection *conn)
 {
   // FIXME
   return -1;
+}
+
+void
+wth_connection_set_error(struct wth_connection *conn, int err)
+{
+  conn->error = err;
+}
+
+void
+wth_connection_set_protocol_error(struct wth_connection *conn,
+				  uint32_t object_id,
+				  const char *interface,
+				  uint32_t error_code)
+{
+  wth_connection_set_error(conn, EPROTO);
+  conn->protocol_error.interface = interface;
+  conn->protocol_error.id = object_id;
+  conn->protocol_error.code = error_code;
+}
+
+int
+wth_connection_get_error(struct wth_connection *conn)
+{
+  return conn->error;
+}
+
+uint32_t
+wth_connection_get_protocol_error(struct wth_connection *conn,
+				  const char **interface,
+				  uint32_t *object_id)
+{
+  *interface = conn->protocol_error.interface;
+  *object_id = conn->protocol_error.id;
+
+  return conn->protocol_error.code;
 }
