@@ -39,7 +39,7 @@
 #include <waltham-connection.h>
 //#include <waltham-client-protocol.h>
 
-#include "util/zalloc.h"
+#include "w-util.h"
 
 #ifndef ARRAY_LENGTH
 #define ARRAY_LENGTH(a) (sizeof (a) / sizeof (a)[0])

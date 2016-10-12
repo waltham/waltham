@@ -38,7 +38,6 @@
 #include <waltham-connection.h>
 //#include <waltham-server-protocol.h>
 
-#include "zalloc.h"
 #include "w-util.h"
 
 /* XXX: this should come from w-util.h */

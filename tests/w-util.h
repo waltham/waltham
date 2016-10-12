@@ -185,6 +185,12 @@ wl_list_insert_list(struct wl_list *list, struct wl_list *other);
 	while (!wl_list_empty(head) &&					\
 		(pos = wl_container_of((head)->prev, pos, member), 1))
 
+static inline void *
+zalloc(size_t size)
+{
+	return calloc(1, size);
+}
+
 #ifdef  __cplusplus
 }
 #endif
