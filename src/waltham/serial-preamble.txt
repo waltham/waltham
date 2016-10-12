@@ -28,5 +28,3 @@
 #include "marshaller_log.h"
 #include "marshaller.h"
 
-#include <wayland-client.h>
-

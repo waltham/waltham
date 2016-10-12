@@ -23,7 +23,8 @@
  */
 
 #include <stdint.h>
-#include <wayland-util.h>
+
+#include <waltham-util.h>
 
 struct wth_display;
 struct wthp_blob_factory;

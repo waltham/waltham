@@ -16,8 +16,7 @@ Waltham ABI and API are not yet stable. Breakage will likely occur.
 Building and testing
 ====================
 
-Waltham depends on glib and wayland, but these dependencies are to be
-removed.
+Waltham depends on glib, but this dependency is to be removed.
 
 To build:
 $ ./autogen.sh

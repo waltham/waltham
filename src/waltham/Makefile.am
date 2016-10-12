@@ -29,6 +29,9 @@ common_src = \
 	waltham-connection.h \
 	waltham-object.c \
 	waltham-object.h \
+	waltham-private.h \
+	waltham-util.c \
+	waltham-util.h \
 	$(NULL)
 
 tools = \

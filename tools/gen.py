@@ -52,9 +52,9 @@ mode = "client"
 native_types = {
   "int":      "int32_t",
   "uint":     "uint32_t",
-  "fixed":    "wl_fixed_t",
+  "fixed":    "wth_fixed_t",
   "string":   "const char *",
-  "array":    "struct wl_array *",
+  "array":    "struct wth_array *",
   "data":     "void *",
 }
 
@@ -267,7 +267,7 @@ def demarshaller_generator(funcdef, opcode):
            # input parameter: local variable initialized to point to the
            # right offset in the received message
            if params.get('is_array'):
-              code += '  struct wl_array ' + params.get('val') + \
+              code += '  struct wth_array ' + params.get('val') + \
                       ' = { ' + params.get('val') + '_sz, ' + params.get('val') +  '_sz, (void*)(body' + offset_string + ' + sizeof (unsigned int)) };\n'
               params_call += '&'
            else:
@@ -456,7 +456,7 @@ def sanitize_params(funcdef):
       paramitr += 1
       param = funcdef.get(searchstr)
       params.append(param)
-      if param.get('type') == "struct wl_array *":
+      if param.get('type') == "struct wth_array *":
          param['is_array'] = True
       if param.get('type') == "void *":
          param['is_data'] = True
