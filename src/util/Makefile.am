@@ -20,8 +20,7 @@ util_generated.c: $(extensions) $(tools)
 noinst_LTLIBRARIES = libwalthamutil.la
 libwalthamutil_la_SOURCES = 	\
 	message.c		\
-	message.h		\
-	profiling.h
+	message.h
 
 nodist_libwalthamutil_la_SOURCES = \
 	util_generated.c
