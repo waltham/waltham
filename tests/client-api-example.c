@@ -41,20 +41,6 @@
 
 #include "w-util.h"
 
-#ifndef ARRAY_LENGTH
-#define ARRAY_LENGTH(a) (sizeof (a) / sizeof (a)[0])
-#endif
-
-#ifndef container_of
-#define container_of(ptr, type, member) ({                              \
-	const __typeof__( ((type *)0)->member ) *__mptr = (ptr);        \
-	(type *)( (char *)__mptr - offsetof(type,member) );})
-#endif
-
-#ifndef MIN
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-#endif
-
 #define MAX_EPOLL_WATCHES 2
 
 struct display;
