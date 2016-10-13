@@ -40,11 +40,6 @@
 
 #include "w-util.h"
 
-/* XXX: this should come from w-util.h */
-#define wl_list_last_until_empty(pos, head, member)			\
-	while (!wl_list_empty(head) &&					\
-		(pos = wl_container_of((head)->prev, pos, member), 1))
-
 #ifndef ARRAY_LENGTH
 #define ARRAY_LENGTH(a) (sizeof (a) / sizeof (a)[0])
 #endif
