@@ -19,6 +19,8 @@ generator:
 - rewrite the generator to become more readable and maintainable
 - generate <object type>_get_user_data()
 - generate <object type>_get_version()
+- generate enums
+- generate SINCE macros (interface version adding the message)
 
 serialiser:
 - implement send-buffering (non-blocking sending)
