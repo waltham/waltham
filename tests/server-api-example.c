@@ -106,63 +106,6 @@ watch_ctl(struct watch *w, int op, uint32_t events)
 }
 
 static void
-region_destroy(struct region *region)
-{
-	fprintf(stderr, "region %p destroy\n", region->obj);
-
-	wthp_region_free(region->obj);
-	wl_list_remove(&region->link);
-	free(region);
-}
-
-static void
-compositor_destroy(struct compositor *comp)
-{
-	fprintf(stderr, "%s: %p\n", __func__, comp->obj);
-
-	wthp_compositor_free(comp->obj);
-	wl_list_remove(&comp->link);
-	free(comp);
-}
-
-static void
-registry_destroy(struct registry *reg)
-{
-	fprintf(stderr, "%s: %p\n", __func__, reg->obj);
-
-	wthp_registry_free(reg->obj);
-	wl_list_remove(&reg->link);
-	free(reg);
-}
-
-static void
-client_destroy(struct client *c)
-{
-	struct region *region;
-	struct compositor *comp;
-	struct registry *reg;
-
-	fprintf(stderr, "Client %p disconnected.\n", c);
-
-	/* clean up remaining client resources in case the client
-	 * did not.
-	 */
-	wl_list_last_until_empty(region, &c->region_list, link)
-		region_destroy(region);
-
-	wl_list_last_until_empty(comp, &c->compositor_list, link)
-		compositor_destroy(comp);
-
-	wl_list_last_until_empty(reg, &c->registry_list, link)
-		registry_destroy(reg);
-
-	wl_list_remove(&c->link);
-	watch_ctl(&c->conn_watch, EPOLL_CTL_DEL, 0);
-	wth_connection_destroy(c->connection);
-	free(c);
-}
-
-static void
 client_post_out_of_memory(struct client *c)
 {
 	struct wth_display *disp;
@@ -173,6 +116,16 @@ client_post_out_of_memory(struct client *c)
 }
 
 /* BEGIN wthp_region implementation */
+
+static void
+region_destroy(struct region *region)
+{
+	fprintf(stderr, "region %p destroy\n", region->obj);
+
+	wthp_region_free(region->obj);
+	wl_list_remove(&region->link);
+	free(region);
+}
 
 static void
 region_handle_destroy(struct wthp_region *wthp_region)
@@ -210,6 +163,16 @@ static const struct wthp_region_interface region_implementation = {
 /* END wthp_region implementation */
 
 /* BEGIN wthp_compositor implementation */
+
+static void
+compositor_destroy(struct compositor *comp)
+{
+	fprintf(stderr, "%s: %p\n", __func__, comp->obj);
+
+	wthp_compositor_free(comp->obj);
+	wl_list_remove(&comp->link);
+	free(comp);
+}
 
 static void
 compositor_handle_create_surface(struct wthp_compositor *compositor,
@@ -270,6 +233,16 @@ client_bind_compositor(struct client *c, struct wthp_compositor *obj)
 /* END wthp_compositor implementation */
 
 /* BEGIN wthp_registry implementation */
+
+static void
+registry_destroy(struct registry *reg)
+{
+	fprintf(stderr, "%s: %p\n", __func__, reg->obj);
+
+	wthp_registry_free(reg->obj);
+	wl_list_remove(&reg->link);
+	free(reg);
+}
 
 static void
 registry_handle_destroy(struct wthp_registry *registry)
@@ -360,6 +333,33 @@ static const struct wth_display_interface display_implementation = {
 };
 
 /* END wth_display implementation */
+
+static void
+client_destroy(struct client *c)
+{
+	struct region *region;
+	struct compositor *comp;
+	struct registry *reg;
+
+	fprintf(stderr, "Client %p disconnected.\n", c);
+
+	/* clean up remaining client resources in case the client
+	 * did not.
+	 */
+	wl_list_last_until_empty(region, &c->region_list, link)
+		region_destroy(region);
+
+	wl_list_last_until_empty(comp, &c->compositor_list, link)
+		compositor_destroy(comp);
+
+	wl_list_last_until_empty(reg, &c->registry_list, link)
+		registry_destroy(reg);
+
+	wl_list_remove(&c->link);
+	watch_ctl(&c->conn_watch, EPOLL_CTL_DEL, 0);
+	wth_connection_destroy(c->connection);
+	free(c);
+}
 
 static void
 connection_handle_data(struct watch *w, uint32_t events)
