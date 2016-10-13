@@ -36,7 +36,6 @@
 #include <waltham-object.h>
 #include <waltham-server.h>
 #include <waltham-connection.h>
-//#include <waltham-server-protocol.h>
 
 #include "w-util.h"
 
@@ -45,24 +44,28 @@
 struct server;
 struct client;
 
+/* epoll structure */
 struct watch {
 	struct server *server;
 	int fd;
 	void (*cb)(struct watch *w, uint32_t events);
 };
 
+/* wthp_region protocol object */
 struct region {
 	struct wthp_region *obj;
 	/* pixman_region32_t region; */
 	struct wl_list link; /* struct client::region_list */
 };
 
+/* wthp_compositor protocol object */
 struct compositor {
 	struct wthp_compositor *obj;
 	struct client *client;
 	struct wl_list link; /* struct client::compositor_list */
 };
 
+/* wthp_registry protocol object */
 struct registry {
 	struct wthp_registry *obj;
 	struct client *client;
@@ -72,13 +75,14 @@ struct registry {
 struct client {
 	struct wl_list link; /* struct server::client_list */
 	struct server *server;
+
 	struct wth_connection *connection;
 	struct watch conn_watch;
 
-	/* client object lists */
-	struct wl_list registry_list;
-	struct wl_list compositor_list;
-	struct wl_list region_list;
+	/* client object lists for clean-up on disconnection */
+	struct wl_list registry_list;   /* struct registry::link */
+	struct wl_list compositor_list; /* struct compositor::link */
+	struct wl_list region_list;     /* struct region::link */
 };
 
 struct server {
@@ -88,7 +92,7 @@ struct server {
 	bool running;
 	int epoll_fd;
 
-	struct wl_list client_list;
+	struct wl_list client_list; /* struct client::link */
 };
 
 static int
@@ -168,6 +172,8 @@ client_post_out_of_memory(struct client *c)
 			      "out of memory");
 }
 
+/* BEGIN wthp_region implementation */
+
 static void
 region_handle_destroy(struct wthp_region *wthp_region)
 {
@@ -200,6 +206,10 @@ static const struct wthp_region_interface region_implementation = {
 	region_handle_add,
 	region_handle_subtract
 };
+
+/* END wthp_region implementation */
+
+/* BEGIN wthp_compositor implementation */
 
 static void
 compositor_handle_create_surface(struct wthp_compositor *compositor,
@@ -238,14 +248,6 @@ static const struct wthp_compositor_interface compositor_implementation = {
 };
 
 static void
-registry_handle_destroy(struct wthp_registry *registry)
-{
-	struct registry *reg = wth_object_get_user_data((struct wth_object *)registry);
-
-	registry_destroy(reg);
-}
-
-static void
 client_bind_compositor(struct client *c, struct wthp_compositor *obj)
 {
 	struct compositor *comp;
@@ -263,6 +265,18 @@ client_bind_compositor(struct client *c, struct wthp_compositor *obj)
 	wthp_compositor_set_interface(obj, &compositor_implementation,
 				      comp);
 	fprintf(stderr, "client %p bound wthp_compositor\n", c);
+}
+
+/* END wthp_compositor implementation */
+
+/* BEGIN wthp_registry implementation */
+
+static void
+registry_handle_destroy(struct wthp_registry *registry)
+{
+	struct registry *reg = wth_object_get_user_data((struct wth_object *)registry);
+
+	registry_destroy(reg);
 }
 
 static void
@@ -291,6 +305,12 @@ const struct wthp_registry_interface registry_implementation = {
 	registry_handle_destroy,
 	registry_handle_bind
 };
+
+/* END wthp_registry implementation */
+
+/* BEGIN wth_display implementation
+ * This belongs in Waltham instead.
+ */
 
 static void
 display_handle_client_version(struct wth_display *wth_display,
@@ -338,6 +358,8 @@ static const struct wth_display_interface display_implementation = {
 	display_handle_sync,
 	display_handle_get_registry
 };
+
+/* END wth_display implementation */
 
 static void
 connection_handle_data(struct watch *w, uint32_t events)
