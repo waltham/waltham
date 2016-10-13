@@ -8,10 +8,7 @@ general:
 - implement object id re-use
 - implement server-side object allocation
 - implement protocol version negotiation
-- add listening socket API (usefulness?)
-- error delivery: see the comments in object_post_error() in
-  tests/server-api-example.c
-- add a function for sending OOM errors (server -> client)
+- error delivery: implement the documented behaviour in wth_connection
 - in wth_connection_destroy, print warnings for every item remaining in
   the hash table
 - implement object version inheritance
