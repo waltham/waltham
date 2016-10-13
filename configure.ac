@@ -14,6 +14,17 @@ AM_SILENT_RULES([yes])
 LT_PREREQ([2.2])
 LT_INIT
 
+dnl https://www.gnu.org/software/libtool/manual/libtool.html#Updating-version-info
+dnl when adding API: bump current and age, reset revision to zero
+dnl when breaking API: bump current, reset age and revision to zero
+dnl the rest of the time: bump revision
+CURRENT=0
+REVISION=0
+AGE=0
+
+VERSION_INFO="$CURRENT:$REVISION:$AGE"
+AC_SUBST(VERSION_INFO)
+
 # Check for programs
 AC_PROG_CC
 AC_PROG_CC_STDC

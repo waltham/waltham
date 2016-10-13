@@ -19,7 +19,7 @@ AM_CFLAGS = \
 
 lib_LTLIBRARIES = libwaltham.la
 
-libwaltham_la_LDFLAGS = -version-info 0:0:0 -no-undefined
+libwaltham_la_LDFLAGS = -version-info @VERSION_INFO@ -no-undefined
 libwaltham_la_LIBADD = @GLIB_LIBS@
 
 tools = \
