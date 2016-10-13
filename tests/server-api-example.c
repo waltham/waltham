@@ -541,7 +541,7 @@ mainloop(struct server *srv)
 		}
 
 		/* Handle all fds, both the listening socket
-		 * (see listen_handle_data()) and clients
+		 * (see listen_socket_handle_data()) and clients
 		 * (see connection_handle_data()).
 		 */
 		for (i = 0; i < count; i++) {
