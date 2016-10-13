@@ -586,7 +586,7 @@ int
 main(int arcg, char *argv[])
 {
 	struct server srv = { 0 };
-	int fd;
+	struct client *c;
 
 	wl_list_init(&srv.client_list);
 
@@ -613,6 +613,8 @@ main(int arcg, char *argv[])
 	mainloop(&srv);
 
 	/* destroy all things */
+	wl_list_last_until_empty(c, &srv.client_list, link)
+		client_destroy(c);
 
 	close(srv.listen_fd);
 	close(srv.epoll_fd);
