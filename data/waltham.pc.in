@@ -6,5 +6,5 @@ includedir=@includedir@
 Name: Waltham
 Description: Waltham library
 Version: @VERSION@
-Cflags: -I${includedir}
+Cflags: -I${includedir}/waltham
 Libs: -L${libdir} -lwaltham
