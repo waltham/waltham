@@ -37,7 +37,6 @@
 #include <waltham-object.h>
 #include <waltham-client.h>
 #include <waltham-connection.h>
-//#include <waltham-client-protocol.h>
 
 #include "w-util.h"
 
@@ -45,6 +44,7 @@
 
 struct display;
 
+/* epoll structure */
 struct watch {
 	struct display *display;
 	int fd;
@@ -67,12 +67,14 @@ struct display {
 	struct wtimer *fiddle_timer;
 };
 
+/* a timerfd based timer */
 struct wtimer {
 	struct watch watch;
 	void (*func)(struct wtimer *, void *);
 	void *data;
 };
 
+/* Have some fun with a wthp_region, just to excercise the protocol. */
 static void
 fiddle_with_region(struct display *dpy)
 {
@@ -91,7 +93,7 @@ fiddle_with_region(struct display *dpy)
  * We can store the ad for later and/or bind to it immediately
  * if we want to.
  * We also need to keep track of the globals we bind to, so that
- * global_remove can be handled properly.
+ * global_remove can be handled properly (not implemented).
  */
 static void
 registry_handle_global(struct wthp_registry *registry,
@@ -116,6 +118,7 @@ registry_handle_global(struct wthp_registry *registry,
  * and destroy the objects we created by binding to it.
  * The identification happens by global's name, so we need to keep
  * track what names we bound.
+ * (not implemented)
  */
 static void
 registry_handle_global_remove(struct wthp_registry *wthp_registry,
@@ -230,6 +233,9 @@ connection_handle_data(struct watch *w, uint32_t events)
 	}
 
 	if (events & EPOLLOUT) {
+		/* Flush out again. If the flush completes, stop
+		 * polling for writable as everything has been written.
+		 */
 		ret = wth_connection_flush(dpy->connection);
 		if (ret == 0)
 			watch_ctl(&dpy->conn_watch, EPOLL_CTL_MOD, EPOLLIN);
@@ -376,6 +382,7 @@ mainloop(struct display *dpy)
 			break;
 
 		/* Run any application idle tasks at this point. */
+		/* (nothing to run so far) */
 
 		/* Flush out buffered requests. If the Waltham socket is
 		 * full, poll it for writable too, and continue flushing then.
@@ -407,6 +414,7 @@ mainloop(struct display *dpy)
 	}
 }
 
+/* A one-off asynchronous open-coded roundtrip handler. */
 static void
 bling_done(struct wthp_callback *cb, uint32_t arg)
 {
@@ -414,7 +422,6 @@ bling_done(struct wthp_callback *cb, uint32_t arg)
 
 	fprintf(stderr, "...sync done.\n");
 
-	/* This needs to be safe! */
 	wthp_callback_free(cb);
 }
 
@@ -556,10 +563,13 @@ main(int arcg, char *argv[])
 	fiddle_with_region(&dpy);
 
 #if 0
-	/* trigger a protocol error */
+	/* Trigger a protocol error, since the test server does not
+	 * implement this.
+	 */
 	wthp_compositor_create_surface(dpy.compositor);
 #endif
 
+	/* A one-off asynchronous roundtrip, just for fun. */
 	fprintf(stderr, "sending wth_display.sync...\n");
 	dpy.bling = wth_display_sync(dpy.display);
 	wthp_callback_set_listener(dpy.bling, &bling_listener, &dpy);
