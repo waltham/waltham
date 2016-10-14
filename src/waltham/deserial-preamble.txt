@@ -32,7 +32,7 @@
 #include "waltham-object.h"
 #include "waltham-connection.h"
 
-#include "waltham-message.h"
+#include "message.h"
 #include "demarshaller.h"
 
 //#define ENABLE_PROFILING 1

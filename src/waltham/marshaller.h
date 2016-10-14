@@ -28,14 +28,13 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <errno.h>
-#include <assert.h>
-#include <pthread.h>
 
-#include "waltham-message.h"
+#include "message.h"
 #include "marshaller_log.h"
 
 static inline int send_all (int sock, const struct iovec *iov, int iovcnt)

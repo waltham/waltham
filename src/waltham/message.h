@@ -24,11 +24,35 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
-#include "waltham-message.h"
-
 #include <glib.h>
 
 struct wth_connection;
+
+#define M_OFFSET_MSG_ID 0
+#define M_OFFSET_SIZE 2
+#define M_OFFSET_OPCODE 4
+
+typedef struct __attribute__((__packed__)) hdr_t {
+   unsigned short id;
+   unsigned short sz;
+   unsigned short opcode;
+   unsigned short pad;
+} hdr_t;
+#define MESSAGE_MAX_SIZE (0xffff - sizeof (hdr_t))
+
+typedef struct data_t {
+   unsigned int sz;
+   void *data;
+} data_t;
+
+typedef struct {
+  hdr_t *hdr;
+  char *body;
+  struct chunk {
+    char *data;
+    size_t size;
+  } chunks[2];
+} msg_t;
 
 gboolean
 forward_raw_msg (int out, msg_t *msg);

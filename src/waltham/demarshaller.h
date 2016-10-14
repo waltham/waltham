@@ -21,7 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include "waltham-message.h"
+#include "message.h"
 
 #ifndef DEMARSHALLER_H
 #define DEMARSHALLER_H
