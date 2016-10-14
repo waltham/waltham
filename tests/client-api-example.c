@@ -376,7 +376,9 @@ mainloop(struct display *dpy)
 
 	while (1) {
 		/* Dispatch queued events. */
-		wth_connection_dispatch(dpy->connection);
+		ret = wth_connection_dispatch(dpy->connection);
+		if (ret < 0)
+			dpy->running = false;
 
 		if (!dpy->running)
 			break;
