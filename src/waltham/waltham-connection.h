@@ -144,9 +144,6 @@ wth_connection_from_fd(int fd, enum wth_connection_side side);
  * so that wth_connection_read() and wth_connection_flush() can be
  * called at the needed times.
  *
- * If there is no meaningful fd, e.g. due errors, -1 is returned
- * instead.
- *
  * The fd will remain owned by the wth_connection.
  */
 int
