@@ -9,6 +9,7 @@
 *.py[co]
 *.rej
 *.sw[op]
+*.tar.xz
 *~
 *#
 .#*
