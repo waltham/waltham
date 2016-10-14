@@ -156,28 +156,6 @@ static inline int recv_all (int sock, struct iovec *iov, int iovcnt)
       marshaller_paramid = 0; \
    }
 
-#define START_REPLY() \
-   int data_sz __attribute__((unused)); \
-   char recv_buffer[10] __attribute__((unused)); \
-   char padding_buffer[4] __attribute__((unused)); \
-   marshaller_paramid = 1; \
-   marshaller_params[0].iov_base = (void *) &hdr; \
-   marshaller_params[0].iov_len = sizeof(hdr_t); \
-   DEBUG_STAMP(); \
-
-#define END_REPLY(type) \
-   FLUSH_RECV() \
-   STREAM_DEBUG ((unsigned char *) &hdr, sizeof (hdr), "header <- "); \
-   if (hdr.opcode != OPCODE_REPLY) { \
-      printf ("\nInvalid message received in %s:\n", msg_name); \
-      printf ("id=%d sz=%d (incl. header %zu) opcode=%d\n", \
-              hdr.id, hdr.sz, sizeof (hdr), hdr.opcode); \
-   } \
-   assert(hdr.opcode == OPCODE_REPLY); \
-   DEBUG_TYPE(type);
-
-#define WAIT_REPLY()
-
 #define SKIP_PADDING(sz) \
    param_padding = (4 - ((sz) & 3)) & 3; \
    if (param_padding > 0) { \

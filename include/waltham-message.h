@@ -52,6 +52,4 @@ typedef struct {
   } chunks[2];
 } msg_t;
 
-#define OPCODE_REPLY 0xffff
-
 #endif
