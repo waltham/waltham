@@ -312,7 +312,8 @@ wth_connection_roundtrip(struct wth_connection *conn)
 WTH_EXPORT void
 wth_connection_set_error(struct wth_connection *conn, int err)
 {
-  conn->error = err;
+  if (!conn->error || err == EPROTO)
+    conn->error = err;
 }
 
 WTH_EXPORT void
