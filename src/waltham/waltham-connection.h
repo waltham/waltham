@@ -273,23 +273,27 @@ wth_connection_read(struct wth_connection *conn);
 int
 wth_connection_dispatch(struct wth_connection *conn);
 
-/** Make a roundtrip from client
+/** Make a roundtrip from a client
  *
  * \param conn The Waltham connection.
+ * \return 0 on success, -1 on failure.
  *
  * This is a helper for creating a wthp_callback object by sending
  * wth_display.sync request, and waiting for the callback to trigger.
  * As such, it is only usable for clients.
  *
- * This call blocks until the roundtrip completes.
+ * This call blocks indefinitely until the roundtrip completes or the
+ * connection fails. It will flush outgoing and dispatch incoming
+ * messages until it returns.
  *
- * XXX: This does not actually need to be implemented in Waltham, it
- * could be implemented in the user as well.
+ * On failure, use wth_connection_get_error() to inspect the error.
  *
- * XXX: define EPROTO behaviour
+ * If blocking indefinitely is not desireable or you want to be able
+ * to process other file descriptors in the mean time, you have to
+ * write your own roundtrip implementation using the public API.
  */
 int
-wth_roundtrip(struct wth_connection *conn);
+wth_connection_roundtrip(struct wth_connection *conn);
 
 /* Set wth_connection to errored state
  *

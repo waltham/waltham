@@ -28,6 +28,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <poll.h>
 
 #include <glib.h>
 
@@ -35,8 +36,8 @@
 #include "marshaller.h"
 #include "waltham-object.h"
 #include "waltham-util.h"
-
 #include "waltham-connection.h"
+#include "waltham-client.h"
 
 // FIXME
 struct wth_display {
@@ -219,11 +220,93 @@ wth_connection_dispatch(struct wth_connection *conn)
   return complete;
 }
 
-WTH_EXPORT int
-wth_roundtrip(struct wth_connection *conn)
+static void
+sync_listener_handle_done(struct wthp_callback *cb, uint32_t arg)
 {
-  // FIXME
-  return -1;
+  bool *flag = wth_object_get_user_data((struct wth_object *)cb);
+
+  *flag = true;
+}
+
+static const struct wthp_callback_listener sync_listener = {
+  sync_listener_handle_done
+};
+
+WTH_EXPORT int
+wth_connection_roundtrip(struct wth_connection *conn)
+{
+  struct wthp_callback *cb;
+  bool flag = false;
+  int ret;
+  struct pollfd pfd;
+
+  cb = wth_display_sync(conn->display);
+  wthp_callback_set_listener(cb, &sync_listener, &flag);
+
+  pfd.fd = conn->fd;
+  pfd.events = POLLIN;
+
+  while (!flag) {
+    /* Do not ignore EPROTO */
+    if (wth_connection_dispatch(conn) < 0)
+      break;
+
+    if (flag)
+      break;
+
+    ret = wth_connection_flush(conn);
+    if (ret < 0 && errno == EAGAIN) {
+      pfd.events = POLLIN | POLLOUT;
+    } else if (ret < 0) {
+      perror("Roundtrip connection flush failed");
+      break;
+    }
+
+    do {
+      ret = poll(&pfd, 1, -1);
+    } while (ret == -1 && errno == EINTR);
+    if (ret == -1) {
+      perror("Roundtrip error with poll");
+      break;
+    }
+
+    if (pfd.revents & (POLLERR | POLLNVAL)) {
+      fprintf(stderr, "Roundtrip connection errored out.\n");
+      break;
+    }
+
+    if (pfd.revents & POLLOUT) {
+      ret = wth_connection_flush(conn);
+      if (ret == 0)
+        pfd.events = POLLIN;
+      else if (ret < 0 && errno != EAGAIN) {
+        perror("Roundtrip connection re-flush failed");
+        break;
+      }
+    }
+
+    if (pfd.revents & POLLIN) {
+      ret = wth_connection_read(conn);
+      if (ret < 0) {
+        perror("Roundtrip connection read error");
+        break;
+      }
+    }
+
+    if (pfd.revents & POLLHUP) {
+      /* If there was also unread data when HUP
+       * happened, assume POLLIN was also set and
+       * we just read everything already, so the
+       * only thing left is to dispatch it.
+       */
+      wth_connection_dispatch(conn);
+      break;
+    }
+  }
+
+  wthp_callback_free(cb);
+
+  return flag ? 0 : -1;
 }
 
 WTH_EXPORT void
