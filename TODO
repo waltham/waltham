@@ -14,6 +14,9 @@ general:
 - implement object version inheritance
 - wth_connection needs user_data with getter and setter
 - add 64-bit protocol data types
+- figure out and document if recursive dispatch is allowed or not
+  (calling wth_connection_dispatch() from a handler called by
+  wth_connection_dispatch())
 
 generator:
 - rewrite the generator to become more readable and maintainable
