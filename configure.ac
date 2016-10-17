@@ -1,6 +1,6 @@
 AC_PREREQ([2.64])
 
-AC_INIT([waltham], [0.1.0])
+AC_INIT([Waltham], [0.1.0])
 
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_HEADERS([config.h])
@@ -46,9 +46,29 @@ if test "x$GCC" = "xyes"; then
 fi
 AC_SUBST(GCC_CFLAGS)
 
+AC_ARG_ENABLE(doc,
+	      AS_HELP_STRING([--enable-doc],
+			     [Documentation with Doxygen @<:@default=auto@:>@]),,
+	      enable_doc=auto)
+if test "x$enable_doc" != "xno"; then
+	AC_CHECK_PROGS([DOXYGEN], [doxygen])
+	if test "x$DOXYGEN" = "x" -a "x$enable_doc" = "xyes"; then
+		AC_MSG_ERROR([Documentation requested, but Doxygen not found.])
+	fi
+	if test "x$DOXYGEN" != "x"; then
+		enable_doc=yes
+	else
+		enable_doc=no
+	fi
+fi
+AM_CONDITIONAL(ENABLE_DOC, test "x$enable_doc" = "xyes")
+
+
 AC_CONFIG_FILES([Makefile
 		 data/Makefile
 		 data/waltham.pc
+		 doc/doxygen.conf
+		 doc/Makefile
 		 src/Makefile
 		 src/waltham/Makefile
 		 tools/Makefile

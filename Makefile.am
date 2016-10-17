@@ -1,4 +1,4 @@
-SUBDIRS = src data tools tests
+SUBDIRS = src data tools tests doc
 
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 

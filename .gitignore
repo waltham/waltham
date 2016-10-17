@@ -26,6 +26,8 @@ Makefile.in
 /config.status
 /config.sub
 /configure
+/doc/doxygen.conf
+/doc/html/
 /libtool
 /m4/
 /src/waltham/*serialice.c

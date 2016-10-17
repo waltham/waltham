@@ -1,0 +1,20 @@
+PROJECT_NAME           = @PACKAGE_NAME@
+PROJECT_NUMBER         = @VERSION@
+OUTPUT_DIRECTORY       = @top_builddir@/doc
+STRIP_FROM_PATH        = @top_srcdir@/src/waltham \
+                         @top_builddir@/src/waltham
+JAVADOC_AUTOBRIEF      = YES
+OPTIMIZE_OUTPUT_FOR_C  = YES
+TAB_SIZE               = 8
+PREDEFINED             = WTH_EXPORT=
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = YES
+EXTRACT_STATIC         = YES
+QUIET                  = YES
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+
+# INPUT comes from the Makefile
+
+# remove this once the generator produces documentation
+WARN_IF_UNDOCUMENTED   = NO
