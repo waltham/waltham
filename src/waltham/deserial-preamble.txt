@@ -27,16 +27,16 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <glib.h>
-
 #include "waltham-object.h"
 #include "waltham-connection.h"
+#include "waltham-private.h"
 
 #include "message.h"
 #include "demarshaller.h"
 
 //#define ENABLE_PROFILING 1
 
+// FIXME: we no longer use glib, so this is broken
 #ifdef ENABLE_PROFILING
 #define START_TIMING() \
   gdouble msec; \
