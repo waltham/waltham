@@ -24,7 +24,8 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
-#include <glib.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 struct wth_connection;
 
@@ -54,7 +55,7 @@ typedef struct {
   } chunks[2];
 } msg_t;
 
-gboolean
+bool
 forward_raw_msg (int out, msg_t *msg);
 
 msg_t *
@@ -68,53 +69,53 @@ msg_dispatch (struct wth_connection *conn, msg_t *msg);
 
 /**** Ringbuffer based network reader & handler */
 typedef struct {
-  guint8 *start;
-  gssize length;
-  guint16 id;
-  guint16 sz;
-  guint16 opcode;
-  guint16 pad;
+  uint8_t *start;
+  ssize_t length;
+  uint16_t id;
+  uint16_t sz;
+  uint16_t opcode;
+  uint16_t pad;
 } ReaderMessage;
 
-/* number of guint16 fields, starting from id, in ReaderMessage */
+/* number of uint16_t fields, starting from id, in ReaderMessage */
 #define READER_MESSAGE_FIELDS 4
 
 typedef struct {
-  guint8 *ringbuffer;
-  gssize ringsize;
-  guint8 *rp; /* read pointer */
-  guint8 *wp; /* write pointer */
+  uint8_t *ringbuffer;
+  ssize_t ringsize;
+  uint8_t *rp; /* read pointer */
+  uint8_t *wp; /* write pointer */
   ReaderMessage *messages; /* complete messages in the  ring */
   int m_complete;
   int m_total; /* total number of message slots */
 
   /* potential data tail */
-  guint8 *tail;
-  gssize tailsize;
-  gssize allocated_tailsize;
+  uint8_t *tail;
+  ssize_t tailsize;
+  ssize_t allocated_tailsize;
 
   /* mapping bounce buffer */
-  guint8 *bounce;
-  gssize allocated_bouncesize;
+  uint8_t *bounce;
+  ssize_t allocated_bouncesize;
 
   /* Stats */
-  gsize total_read;
+  size_t total_read;
 
 } ClientReader;
 
 ClientReader *new_reader (void);
 void free_reader (ClientReader *reader);
 
-gboolean reader_pull_new_messages (ClientReader *reader, int fd,
-  gboolean from_client);
+bool reader_pull_new_messages (ClientReader *reader, int fd,
+  bool from_client);
 
 void reader_map_message (ClientReader *reader, int m, msg_t *msg);
 void reader_unmap_message (ClientReader *reader, int m, msg_t *msg);
 
 /* Forward complete messages */
-gboolean reader_forward_message_range (ClientReader *reader, int fd,
+bool reader_forward_message_range (ClientReader *reader, int fd,
   int s, int e);
-gboolean reader_forward_all_messages (ClientReader *reader, int fd);
+bool reader_forward_all_messages (ClientReader *reader, int fd);
 void reader_flush (ClientReader *reader);
 
 /** Network helpers */

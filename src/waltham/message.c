@@ -23,12 +23,15 @@
 
 #include <errno.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <stdio.h>
 #include <unistd.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <string.h>
 #include <sys/uio.h>
 #include <inttypes.h>
+#include <assert.h>
 
 #include <sys/eventfd.h>
 #include <sys/types.h>
@@ -36,21 +39,20 @@
 #include <sys/un.h>
 #include <netdb.h>
 
-#include <glib.h>
-
 #include "message.h"
 #include "demarshaller.h"
+#include "waltham-private.h"
 
 ClientReader *
 new_reader (void)
 {
-  ClientReader *r = g_malloc0(sizeof(ClientReader));
+  ClientReader *r = calloc(1, sizeof(ClientReader));
 
   r->ringsize = (MESSAGE_MAX_SIZE + sizeof(hdr_t)) * 2 + 1;
-  r->ringbuffer = g_malloc (r->ringsize);
+  r->ringbuffer = malloc (r->ringsize);
 
   r->rp = r->wp = r->ringbuffer;
-  r->messages = g_malloc0(64 * sizeof(ReaderMessage));
+  r->messages = calloc(1, 64 * sizeof(ReaderMessage));
   r->m_total = 64;
 
   return r;
@@ -59,17 +61,17 @@ new_reader (void)
 void
 free_reader (ClientReader *reader)
 {
-  g_free (reader->ringbuffer);
-  g_free (reader->messages);
-  g_free (reader->tail);
-  g_free (reader->bounce);
-  g_free (reader);
+  free (reader->ringbuffer);
+  free (reader->messages);
+  free (reader->tail);
+  free (reader->bounce);
+  free (reader);
 }
 
-static inline gssize
-bytes_left (ClientReader *reader, guint8 *rp)
+static inline ssize_t
+bytes_left (ClientReader *reader, uint8_t *rp)
 {
-  gssize left;
+  ssize_t left;
   if (rp <= reader->wp)
     {
       left = reader->wp - rp;
@@ -85,77 +87,77 @@ bytes_left (ClientReader *reader, guint8 *rp)
   return left;
 }
 
-static inline guint8 *
-move_forward (ClientReader *reader, guint8 *rp, int offset)
+static inline uint8_t *
+move_forward (ClientReader *reader, uint8_t *rp, int offset)
 {
   ssize_t o = ((rp + offset) - reader->ringbuffer) % reader->ringsize;
   return reader->ringbuffer + o;
 }
 
-static inline guint8
-get_uint8 (ClientReader *reader, guint8 *rp, int offset)
+static inline uint8_t
+get_uint8 (ClientReader *reader, uint8_t *rp, int offset)
 {
   return * move_forward (reader, rp, offset);
 }
 
-static inline guint16
-get_uint16 (ClientReader *reader, guint8 *rp, int offset)
+static inline uint16_t
+get_uint16 (ClientReader *reader, uint8_t *rp, int offset)
 {
-  guint16 r = get_uint8 (reader, rp, offset + 1);
+  uint16_t r = get_uint8 (reader, rp, offset + 1);
   r <<= 8;
   r +=  get_uint8 (reader, rp, offset);
 
   return r;
 }
 
-static gboolean
+static bool
 get_one_message (ClientReader *reader)
 {
-  gsize size;
-  gsize left = bytes_left (reader, reader->rp);
+  size_t size;
+  size_t left = bytes_left (reader, reader->rp);
 
   if (left < sizeof(hdr_t))
-    return FALSE;
+    return false;
 
   size = get_uint16 (reader, reader->rp, M_OFFSET_SIZE);
 
   if (left < size)
-    return FALSE;
+    return false;
 
   if (size == 0)
     {
-      g_critical ("Invalid message size (0)");
-      return FALSE;
+      fprintf (stderr, "Invalid message size (0)");
+      return false;
     }
 
   reader->messages[reader->m_complete].start = reader->rp;
   reader->messages[reader->m_complete].length = size;
 
 
-  if (G_UNLIKELY (reader->rp + (READER_MESSAGE_FIELDS * sizeof (guint16)) >
-      reader->ringbuffer + reader->ringsize))
+  if (reader->rp + (READER_MESSAGE_FIELDS * sizeof (uint16_t)) >
+      reader->ringbuffer + reader->ringsize)
     {
-      gsize left = reader->ringsize + reader->ringbuffer - reader->rp;
-      guint8 *base = (guint8*)&reader->messages[reader->m_complete].id;
+      size_t left = reader->ringsize + reader->ringbuffer - reader->rp;
+      uint8_t *base = (uint8_t*)&reader->messages[reader->m_complete].id;
 
       memcpy (base, reader->rp, left);
       memcpy (base + left, reader->ringbuffer,
-              (READER_MESSAGE_FIELDS * sizeof (guint16)) - left);
+              (READER_MESSAGE_FIELDS * sizeof (uint16_t)) - left);
     }
   else
     {
       memcpy (&reader->messages[reader->m_complete].id,
-        reader->rp, READER_MESSAGE_FIELDS * sizeof (guint16));
+        reader->rp, READER_MESSAGE_FIELDS * sizeof (uint16_t));
     }
 
   reader->m_complete++;
 
   reader->rp = move_forward (reader, reader->rp, size);
 
-  return TRUE;
+  return true;
 }
 
-static gboolean
+static bool
 reader_fill_ring_buffer (ClientReader *reader, int fd)
 {
   struct iovec vecs[2];
@@ -163,7 +165,7 @@ reader_fill_ring_buffer (ClientReader *reader, int fd)
   ssize_t ret;
 
   /* Assuming all messages are sent out before push */
-  g_assert (reader->m_complete == 0);
+  assert (reader->m_complete == 0);
 
   vecs[0].iov_base = reader->wp;
   if (reader->rp > reader->wp)
@@ -185,8 +187,8 @@ reader_fill_ring_buffer (ClientReader *reader, int fd)
 
   ret = readv (fd, vecs, iocnt);
   if (ret <= 0) {
-    g_warning ("Error while filling buffer: %m");
-    return FALSE;
+    fprintf (stderr, "Error while filling buffer: %m");
+    return false;
   }
 
   reader->total_read += ret;
@@ -196,29 +198,29 @@ reader_fill_ring_buffer (ClientReader *reader, int fd)
   else
     reader->wp = reader->ringbuffer + ret - vecs[0].iov_len;
 
-  g_assert (reader->wp != reader->rp);
-  return TRUE;
+  assert (reader->wp != reader->rp);
+  return true;
 }
 
 
-gboolean
-reader_pull_new_messages (ClientReader *reader, int fd, gboolean from_client)
+bool
+reader_pull_new_messages (ClientReader *reader, int fd, bool from_client)
 {
   if (!reader_fill_ring_buffer (reader, fd))
-    return FALSE;
+    return false;
 
   /* Setup message headers */
   while (get_one_message (reader))
     {
       if (reader->m_complete == reader->m_total)
         {
-          reader->messages = g_realloc (reader->messages,
+          reader->messages = realloc (reader->messages,
             reader->m_total * 2 * sizeof(ReaderMessage));
           reader->m_total *= 2;
-          g_debug ("Updated client to %d messages", reader->m_total);
+          debug ("Updated client to %d messages", reader->m_total);
         }
     }
-  return TRUE;
+  return true;
 }
 
 /* File one message buffer */
@@ -229,24 +231,24 @@ reader_map_message (ClientReader *reader, int m, msg_t *msg)
   int nc = 0;
   void *start;
 
-  g_assert (m >= 0 && m < reader->m_complete);
+  assert (m >= 0 && m < reader->m_complete);
   memset (msg, 0, sizeof (msg_t));
 
   rm = &reader->messages[m];
 
   start = rm->start;
-  if (G_UNLIKELY ((rm->start + rm->length)
-      > (reader->ringbuffer + reader->ringsize)))
+  if ((rm->start + rm->length)
+      > (reader->ringbuffer + reader->ringsize))
     {
-      gsize l;
-      while (G_UNLIKELY (reader->allocated_bouncesize < rm->length))
+      size_t l;
+      while (reader->allocated_bouncesize < rm->length)
         {
-          g_free (reader->bounce);
+          free (reader->bounce);
           if (reader->allocated_bouncesize == 0)
             reader->allocated_bouncesize = 2048;
           else
             reader->allocated_bouncesize *= 2;
-          reader->bounce = g_malloc (reader->allocated_bouncesize);
+          reader->bounce = malloc (reader->allocated_bouncesize);
         }
       /* split message, simply copy the whole message to a bounce buffer  */
       l = (reader->ringbuffer + reader->ringsize) - rm->start;
@@ -278,22 +280,22 @@ reader_unmap_message (ClientReader *reader, int m, msg_t *msg)
 {
 }
 
-gboolean
+bool
 reader_forward_message_range (ClientReader *reader, int fd, int s, int e)
 {
   struct iovec vecs[3];
   int iocnt = 1;
-  gssize ret;
-  guint8 *start;
-  guint8 *end;
+  ssize_t ret;
+  uint8_t *start;
+  uint8_t *end;
 
-  g_assert (s <= e && e < reader->m_complete);
+  assert (s <= e && e < reader->m_complete);
 
   start = reader->messages[s].start;
   end = move_forward (reader, reader->messages[e].start,
     reader->messages[e].length);
 
-  g_assert (reader->m_complete > 0);
+  assert (reader->m_complete > 0);
 
   memset (vecs, 0, 3 * sizeof(struct iovec));
   vecs[0].iov_base = start;
@@ -319,7 +321,7 @@ reader_forward_message_range (ClientReader *reader, int fd, int s, int e)
 
   ret = writev (fd, vecs, iocnt);
 
-  return ret == (gssize)(vecs[0].iov_len + vecs[1].iov_len + vecs[2].iov_len);
+  return ret == (ssize_t)(vecs[0].iov_len + vecs[1].iov_len + vecs[2].iov_len);
 
 }
 
@@ -337,10 +339,10 @@ reader_flush (ClientReader *reader)
   reader->tailsize = 0;
 }
 
-gboolean
+bool
 reader_forward_all_messages (ClientReader *reader, int fd)
 {
-  gboolean ret;
+  bool ret;
 
   ret = reader_forward_message_range (reader, fd, 0, reader->m_complete - 1);
 
@@ -349,7 +351,7 @@ reader_forward_all_messages (ClientReader *reader, int fd)
   return ret;
 }
 
-gboolean
+bool
 forward_raw_msg (int fd, msg_t *msg)
 {
   struct iovec vecs[4];
@@ -389,10 +391,10 @@ forward_raw_msg (int fd, msg_t *msg)
 msg_t *
 copy_msg (msg_t *msg)
 {
-  gsize dsize;
-  msg_t *m = g_slice_new0 (msg_t);
+  size_t dsize;
+  msg_t *m = calloc (1, sizeof (msg_t));
 
-  m->hdr = g_malloc (msg->hdr->sz);
+  m->hdr = malloc (msg->hdr->sz);
   memcpy (m->hdr, msg->hdr, sizeof(hdr_t));
 
   m->body = (char *)m->hdr + sizeof(hdr_t);
@@ -401,7 +403,7 @@ copy_msg (msg_t *msg)
   dsize = m->chunks[0].size + m->chunks[1].size;
   if (dsize > 0)
     {
-      m->chunks[0].data = g_malloc (dsize);
+      m->chunks[0].data = malloc (dsize);
       m->chunks[0].size = dsize;
       memcpy (m->chunks[0].data, msg->chunks[0].data, msg->chunks[0].size);
       memcpy (m->chunks[0].data + msg->chunks[0].size, msg->chunks[1].data,
@@ -414,9 +416,9 @@ copy_msg (msg_t *msg)
 void
 free_msg (msg_t *msg)
 {
-  g_free (msg->hdr);
-  g_free (msg->chunks[0].data);
-  g_slice_free (msg_t, msg);
+  free (msg->hdr);
+  free (msg->chunks[0].data);
+  free (msg);
 }
 
 void
@@ -425,7 +427,7 @@ msg_dispatch (struct wth_connection *conn, msg_t *msg)
   if (msg->hdr->opcode > demarshaller_max_opcode
       || (request_demarshaller_functions[msg->hdr->opcode] == NULL &&
           event_demarshaller_functions[msg->hdr->opcode] == NULL)) {
-    g_warning ("Invalid opcode %d, discard message", msg->hdr->opcode);
+    fprintf (stderr, "Invalid opcode %d, discard message", msg->hdr->opcode);
     return;
   }
 
@@ -445,7 +447,7 @@ connect_to_unix_socket (const char *path)
 
   if (fd < 0)
     {
-      g_debug ("Failed to open socket: %s", strerror (errno));
+      debug ("Failed to open socket: %s", strerror (errno));
       return fd;
     }
 
@@ -456,7 +458,7 @@ connect_to_unix_socket (const char *path)
   if (connect (fd, (struct sockaddr *) &addr,
       sizeof(addr.sun_family) + 1 + strlen (path)) < 0)
     {
-      g_debug ("Failed to connect to %s: %s", path, strerror (errno));
+      debug ("Failed to connect to %s: %s", path, strerror (errno));
       close (fd);
       return -1;
     }
@@ -480,7 +482,7 @@ connect_to_host (const char *host, const char *port)
   ret = getaddrinfo (host, port, &hints, &res);
   if (ret < 0)
     {
-      g_critical ("Connect to %s port %s failed (getaddrinfo: %s)",
+      fprintf (stderr, "Connect to %s port %s failed (getaddrinfo: %s)",
         host, port,
         strerror(errno));
       return -1;
