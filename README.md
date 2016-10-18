@@ -35,8 +35,6 @@ Waltham and try it in your projects.
 Building and testing
 ====================
 
-Waltham depends on glib, but this dependency is to be removed.
-
 To build:
 ```
 $ ./autogen.sh

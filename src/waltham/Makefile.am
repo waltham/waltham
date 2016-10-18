@@ -11,7 +11,7 @@ CLEANFILES = $(BUILT_SOURCES)
 EXTRA_DIST = header-preamble.txt serial-preamble.txt deserial-preamble.txt
 
 AM_CFLAGS = \
-	@GCC_CFLAGS@ @GLIB_CFLAGS@ \
+	@GCC_CFLAGS@ \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/src/marshaller \
 	-I$(top_srcdir)/src \
@@ -20,7 +20,6 @@ AM_CFLAGS = \
 lib_LTLIBRARIES = libwaltham.la
 
 libwaltham_la_LDFLAGS = -version-info @VERSION_INFO@ -no-undefined
-libwaltham_la_LIBADD = @GLIB_LIBS@
 
 tools = \
 	$(top_srcdir)/tools/gen.py
