@@ -123,9 +123,13 @@ wth_connect_to_server(const char *host, const char *port);
 struct wth_connection *
 wth_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
 
+/** Define which side we are on
+ *
+ * Some operations and their availability depend on the side.
+ */
 enum wth_connection_side {
-	WTH_CONNECTION_SIDE_CLIENT,
-	WTH_CONNECTION_SIDE_SERVER
+	WTH_CONNECTION_SIDE_CLIENT, /**< Client-side object */
+	WTH_CONNECTION_SIDE_SERVER  /**< Server-side object */
 };
 
 /** Use an already connected socket
