@@ -47,7 +47,7 @@ wth_object_new_with_id (struct wth_connection *connection, uint32_t id)
 	proxy->id = id;
 	proxy->connection = connection;
 
-	wth_connection_insert_object(connection, proxy);
+	wth_connection_insert_object_with_id(connection, proxy);
 
 	return proxy;
 }
@@ -55,9 +55,19 @@ wth_object_new_with_id (struct wth_connection *connection, uint32_t id)
 WTH_EXPORT struct wth_object *
 wth_object_new (struct wth_connection *connection)
 {
-	int id = wth_connection_get_next_object_id (connection);
+	struct wth_object *proxy = NULL;
 
-	return wth_object_new_with_id (connection, id);
+	proxy = malloc(sizeof *proxy);
+	memset (proxy, 0, sizeof *proxy);
+
+	if (proxy == NULL)
+		return NULL;
+
+	proxy->connection = connection;
+
+	wth_connection_insert_new_object (connection, proxy);
+
+	return proxy;
 }
 
 WTH_EXPORT void

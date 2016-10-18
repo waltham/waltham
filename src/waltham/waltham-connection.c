@@ -30,14 +30,13 @@
 #include <sys/socket.h>
 #include <poll.h>
 
-#include <glib.h>
-
 #include "message.h"
 #include "marshaller.h"
-#include "waltham-object.h"
-#include "waltham-util.h"
-#include "waltham-connection.h"
 #include "waltham-client.h"
+#include "waltham-connection.h"
+#include "waltham-object.h"
+#include "waltham-private.h"
+#include "waltham-util.h"
 
 // FIXME
 struct wth_display {
@@ -57,8 +56,7 @@ struct wth_connection {
   } protocol_error;
 
   struct wth_display *display;
-
-  GHashTable *hash;
+  struct wth_map map;
 
   int next_message_id;
   int next_object_id;
@@ -107,10 +105,20 @@ wth_connection_from_fd(int fd, enum wth_connection_side side)
   conn->side = side;
 
   conn->reader = new_reader ();
-  conn->hash = g_hash_table_new (g_direct_hash, g_direct_equal);
+  wth_map_init (&conn->map, /* XXX different enum */ side);
 
-  /* Since this is a new connection, the display will always have id 1. */
-  conn->display = (struct wth_display *) wth_object_new (conn);
+  /* id 0 should be NULL, id 1 the display */
+  if (side == WTH_CONNECTION_SIDE_CLIENT)
+    {
+      wth_map_insert_at(&conn->map, 0, 0, NULL);
+      conn->display = (struct wth_display *) wth_object_new (conn);
+    }
+  else
+    {
+      wth_map_reserve_new(&conn->map, 0);
+      wth_map_insert_at(&conn->map, 0, 0, NULL);
+      conn->display = (struct wth_display *) wth_object_new_with_id (conn, 1);
+    }
 
   if (conn->display == NULL)
     {
@@ -146,23 +154,37 @@ wth_connection_get_next_object_id(struct wth_connection *conn)
 }
 
 WTH_EXPORT void
-wth_connection_insert_object(struct wth_connection *conn,
+wth_connection_insert_new_object(struct wth_connection *conn,
     struct wth_object *obj)
 {
-  g_hash_table_insert (conn->hash, GUINT_TO_POINTER (obj->id), obj);
+  obj->id = wth_map_insert_new(&conn->map, 0, obj);
+
+  debug("%s: new object id: %d\n", __func__, obj->id);
+}
+
+WTH_EXPORT void
+wth_connection_insert_object_with_id(struct wth_connection *conn,
+    struct wth_object *obj)
+{
+  debug("%s: %d\n", __func__, obj->id);
+
+  wth_map_reserve_new(&conn->map, obj->id);
+  wth_map_insert_at(&conn->map, 0, obj->id, obj);
 }
 
 WTH_EXPORT void
 wth_connection_remove_object(struct wth_connection *conn,
     struct wth_object *obj)
 {
-  g_hash_table_remove (conn->hash, GUINT_TO_POINTER (obj->id));
+  /* XXX use _remove when we are ready to reuse ids */
+  //wth_map_remove(&conn->map, obj->id);
+  wth_map_insert_at(&conn->map, 0, obj->id, NULL);
 }
 
 WTH_EXPORT struct wth_object *
 wth_connection_get_object(struct wth_connection *conn, uint32_t id)
 {
-  return g_hash_table_lookup (conn->hash, GUINT_TO_POINTER (id));
+  return wth_map_lookup(&conn->map, id);
 }
 
 WTH_EXPORT void
@@ -171,7 +193,7 @@ wth_connection_destroy(struct wth_connection *conn)
   close(conn->fd);
 
   wth_object_delete((struct wth_object *) conn->display);
-  g_hash_table_destroy(conn->hash);
+  wth_map_release(&conn->map);
   free_reader(conn->reader);
 
   free(conn);
@@ -198,7 +220,7 @@ wth_connection_read(struct wth_connection *conn)
       return -1;
     }
 
-  if (!reader_pull_new_messages(conn->reader, conn->fd, TRUE))
+  if (!reader_pull_new_messages(conn->reader, conn->fd, true))
     {
       /* Don't set the connection to error state in case of EAGAIN.
        * We still return -1, but the user should handle errno == EAGAIN. */
@@ -229,8 +251,8 @@ wth_connection_dispatch(struct wth_connection *conn)
       msg_t msg;
 
       reader_map_message (conn->reader, i, &msg);
-      g_debug ("Message received on conn %p: (%d) %d bytes",
-               conn, msg.hdr->opcode, msg.hdr->sz);
+      debug ("Message received on conn %p: (%d) %d bytes",
+             conn, msg.hdr->opcode, msg.hdr->sz);
 
       /* Don't dispatch more messages after the connection is set
        * to EPROTO. */
