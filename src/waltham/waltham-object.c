@@ -34,7 +34,7 @@
 
 #include "waltham-object.h"
 
-WTH_EXPORT struct wth_object *
+struct wth_object *
 wth_object_new_with_id (struct wth_connection *connection, uint32_t id)
 {
 	struct wth_object *proxy = NULL;
@@ -53,7 +53,7 @@ wth_object_new_with_id (struct wth_connection *connection, uint32_t id)
 	return proxy;
 }
 
-WTH_EXPORT struct wth_object *
+struct wth_object *
 wth_object_new (struct wth_connection *connection)
 {
 	struct wth_object *proxy = NULL;

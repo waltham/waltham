@@ -24,6 +24,7 @@
 
 #include "waltham-object.h"
 #include "waltham-connection.h"
+#include "waltham-private.h"
 
 #include "marshaller_log.h"
 #include "marshaller.h"

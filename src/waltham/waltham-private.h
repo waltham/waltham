@@ -107,4 +107,11 @@ wth_connection_remove_object(struct wth_connection *conn,
 struct wth_object *
 wth_connection_get_object(struct wth_connection *conn, uint32_t id);
 
+/* wth_object */
+struct wth_object *
+wth_object_new_with_id (struct wth_connection *connection, uint32_t id);
+
+struct wth_object *
+wth_object_new (struct wth_connection *connection);
+
 #endif

@@ -41,12 +41,6 @@ struct wth_object {
 	void *user_data;
 };
 
-struct wth_object *
-wth_object_new_with_id (struct wth_connection *connection, uint32_t id);
-
-struct wth_object *
-wth_object_new (struct wth_connection *connection);
-
 void
 wth_object_delete (struct wth_object *object);
 
