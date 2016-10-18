@@ -175,16 +175,6 @@ wth_connection_get_display(struct wth_connection *conn);
 int
 wth_connection_get_next_message_id(struct wth_connection *conn);
 
-/** Get an id to use in an object
- *
- * \param conn The Waltham connection.
- * \return The next object id.
- *
- * Return a free object id, to use in a new object.
- */
-int
-wth_connection_get_next_object_id(struct wth_connection *conn);
-
 void
 wth_connection_insert_new_object(struct wth_connection *conn,
     struct wth_object *obj);

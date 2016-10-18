@@ -59,7 +59,6 @@ struct wth_connection {
   struct wth_map map;
 
   int next_message_id;
-  int next_object_id;
 };
 
 
@@ -145,12 +144,6 @@ WTH_EXPORT int
 wth_connection_get_next_message_id(struct wth_connection *conn)
 {
   return conn->next_message_id++;
-}
-
-WTH_EXPORT int
-wth_connection_get_next_object_id(struct wth_connection *conn)
-{
-  return ++conn->next_object_id;
 }
 
 WTH_EXPORT void
