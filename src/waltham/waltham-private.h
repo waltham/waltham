@@ -108,6 +108,15 @@ struct wth_object *
 wth_connection_get_object(struct wth_connection *conn, uint32_t id);
 
 /* wth_object */
+struct wth_object {
+	struct wth_display *display;
+	struct wth_connection *connection;
+	uint32_t id;
+
+	void (**vfunc)(void);
+	void *user_data;
+};
+
 struct wth_object *
 wth_object_new_with_id (struct wth_connection *connection, uint32_t id);
 

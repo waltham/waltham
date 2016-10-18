@@ -31,15 +31,7 @@
 extern "C" {
 #endif
 
-/* FIXME: move to waltham-private.h ? */
-struct wth_object {
-	struct wth_display *display;
-	struct wth_connection *connection;
-	uint32_t id;
-
-	void (**vfunc)(void);
-	void *user_data;
-};
+struct wth_object;
 
 void
 wth_object_delete (struct wth_object *object);
