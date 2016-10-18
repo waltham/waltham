@@ -36,7 +36,14 @@
 extern "C" {
 #endif
 
-/** A Waltham connection
+/** \file
+ *
+ * \brief Waltham connection management API
+ */
+
+/** \class wth_connection
+ *
+ * \brief A Waltham connection
  *
  * This represents the TCP connection carrying Waltham messages.
  *
@@ -92,6 +99,8 @@ struct wth_connection;
  * We should find a way to make this a non-blocking operation, so that
  * if the connection fails to form, we get an error back from read
  * and flush etc.
+ *
+ * \memberof wth_connection
  */
 struct wth_connection *
 wth_connect_to_server(const char *host, const char *port);
@@ -108,6 +117,8 @@ wth_connect_to_server(const char *host, const char *port);
  * This creates a server-side wth_connection, representing a single
  * connected client, by accepting a new connection from the listening
  * socket.
+ *
+ * \memberof wth_connection
  */
 struct wth_connection *
 wth_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
@@ -131,6 +142,8 @@ enum wth_connection_side {
  * XXX: You could probably use this as an internal helper too,
  * for the common things of wth_connect_to_server() and wth_accept().
  * But this is completely optional otherwise.
+ *
+ * \memberof wth_connection
  */
 struct wth_connection *
 wth_connection_from_fd(int fd, enum wth_connection_side side);
@@ -145,6 +158,8 @@ wth_connection_from_fd(int fd, enum wth_connection_side side);
  * called at the needed times.
  *
  * The fd will remain owned by the wth_connection.
+ *
+ * \memberof wth_connection
  */
 int
 wth_connection_get_fd(struct wth_connection *conn);
@@ -161,6 +176,8 @@ wth_connection_get_fd(struct wth_connection *conn);
  * The wth_display gets destroyed when the wth_connection is destroyed.
  *
  * This method is only used by clients.
+ *
+ * \memberof wth_connection
  */
 struct wth_display *
 wth_connection_get_display(struct wth_connection *conn);
@@ -173,6 +190,8 @@ wth_connection_get_display(struct wth_connection *conn);
  * The wth_display gets destroyed too.
  *
  * This call does not block. Messages still en route may get discarded.
+ *
+ * \memberof wth_connection
  */
 void
 wth_connection_destroy(struct wth_connection *conn);
@@ -193,6 +212,8 @@ wth_connection_destroy(struct wth_connection *conn);
  * failed due to a protocol error. This behaviour allows the server to
  * continue flushing events out so that the protocol error event will
  * reach the client.
+ *
+ * \memberof wth_connection
  */
 int
 wth_connection_flush(struct wth_connection *conn);
@@ -212,6 +233,8 @@ wth_connection_flush(struct wth_connection *conn);
  * The connection being in protocol error state does not cause this
  * function to return error, but it does cause all read data to be
  * discarded.
+ *
+ * \memberof wth_connection
  */
 int
 wth_connection_read(struct wth_connection *conn);
@@ -235,6 +258,8 @@ wth_connection_read(struct wth_connection *conn);
  *
  * Servers should keep the connection open regardless of EPROTO errors
  * to ensure the error event gets delivered to the client.
+ *
+ * \memberof wth_connection
  */
 int
 wth_connection_dispatch(struct wth_connection *conn);
@@ -257,11 +282,13 @@ wth_connection_dispatch(struct wth_connection *conn);
  * If blocking indefinitely is not desireable or you want to be able
  * to process other file descriptors in the mean time, you have to
  * write your own roundtrip implementation using the public API.
+ *
+ * \memberof wth_connection
  */
 int
 wth_connection_roundtrip(struct wth_connection *conn);
 
-/* Set wth_connection to errored state
+/** Set wth_connection to errored state
  *
  * Once set to errored state, the connection is effectively dead.
  * All incoming data will be discarded, no messages will be dispatched,
@@ -269,16 +296,22 @@ wth_connection_roundtrip(struct wth_connection *conn);
  * wth_connection functions will return errors.
  *
  * This should probably not be public exported API.
+ *
+ * \memberof wth_connection
+ * \private
  */
 void
 wth_connection_set_error(struct wth_connection *conn, int err);
 
-/* Set wth_connection into protocol error state
+/** Set wth_connection into protocol error state
  *
  * This implies wth_connection_set_error() with the error set to EPROTO.
  * \param object_id ID of the object referenced in the error event
  * \param interface interface name of the object referenced in the error event
  * \param error_code interface-specific error code
+ *
+ * \memberof wth_connection
+ * \private
  */
 void
 wth_connection_set_protocol_error(struct wth_connection *conn,
@@ -293,6 +326,8 @@ wth_connection_set_protocol_error(struct wth_connection *conn,
  *
  * If the returned code is EPROTO, wth_connection_get_protocol_error()
  * can be used to get the protocol error details.
+ *
+ * \memberof wth_connection
  */
 int
 wth_connection_get_error(struct wth_connection *conn);
@@ -310,6 +345,8 @@ wth_connection_get_error(struct wth_connection *conn);
  * "no error".
  *
  * \sa wth_connection_get_error()
+ *
+ * \memberof wth_connection
  */
 uint32_t
 wth_connection_get_protocol_error(struct wth_connection *conn,
