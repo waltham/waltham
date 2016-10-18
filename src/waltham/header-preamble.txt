@@ -24,6 +24,7 @@
 
 #include <stdint.h>
 
+#include <waltham-object.h>
 #include <waltham-util.h>
 
 #ifdef  __cplusplus
