@@ -221,6 +221,9 @@ wth_connection_dispatch(struct wth_connection *conn)
 {
   int i, complete;
 
+  /* If there is an error, we still want to empty the ringbuffer.
+   * Messages won't be dispatched though, so this should be safe. */
+
   for (i = 0 ; i < conn->reader->m_complete; i++)
     {
       msg_t msg;
@@ -228,7 +231,12 @@ wth_connection_dispatch(struct wth_connection *conn)
       reader_map_message (conn->reader, i, &msg);
       g_debug ("Message received on conn %p: (%d) %d bytes",
                conn, msg.hdr->opcode, msg.hdr->sz);
-      msg_dispatch (conn, &msg);
+
+      /* Don't dispatch more messages after the connection is set
+       * to EPROTO. */
+      if (conn->error != EPROTO)
+        msg_dispatch (conn, &msg);
+
       reader_unmap_message (conn->reader, i, &msg);
     }
 
@@ -236,6 +244,13 @@ wth_connection_dispatch(struct wth_connection *conn)
 
   /* Remove processed messages */
   reader_flush (conn->reader);
+
+  /* The connection has been set to error in this call. */
+  if (conn->error)
+    {
+      errno = conn->error;
+      return -1;
+    }
 
   return complete;
 }
