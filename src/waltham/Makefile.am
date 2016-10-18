@@ -10,12 +10,7 @@ BUILT_SOURCES = \
 CLEANFILES = $(BUILT_SOURCES)
 EXTRA_DIST = header-preamble.txt serial-preamble.txt deserial-preamble.txt
 
-AM_CFLAGS = \
-	@GCC_CFLAGS@ \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/src/marshaller \
-	-I$(top_srcdir)/src \
-	$(NULL)
+AM_CFLAGS = @GCC_CFLAGS@
 
 lib_LTLIBRARIES = libwaltham.la
 
