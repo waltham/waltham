@@ -80,6 +80,8 @@ extern "C" {
  * The protocol error state is only returned from
  * wth_connection_dispatch(), other functions will silently succeed
  * unless there are further errors.
+ *
+ * \common_api
  */
 struct wth_connection;
 
@@ -101,6 +103,7 @@ struct wth_connection;
  * and flush etc.
  *
  * \memberof wth_connection
+ * \client_api
  */
 struct wth_connection *
 wth_connect_to_server(const char *host, const char *port);
@@ -119,6 +122,7 @@ wth_connect_to_server(const char *host, const char *port);
  * socket.
  *
  * \memberof wth_connection
+ * \server_api
  */
 struct wth_connection *
 wth_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
@@ -148,6 +152,7 @@ enum wth_connection_side {
  * But this is completely optional otherwise.
  *
  * \memberof wth_connection
+ * \common_api
  */
 struct wth_connection *
 wth_connection_from_fd(int fd, enum wth_connection_side side);
@@ -164,6 +169,7 @@ wth_connection_from_fd(int fd, enum wth_connection_side side);
  * The fd will remain owned by the wth_connection.
  *
  * \memberof wth_connection
+ * \common_api
  */
 int
 wth_connection_get_fd(struct wth_connection *conn);
@@ -182,6 +188,7 @@ wth_connection_get_fd(struct wth_connection *conn);
  * This method is only used by clients.
  *
  * \memberof wth_connection
+ * \common_api
  */
 struct wth_display *
 wth_connection_get_display(struct wth_connection *conn);
@@ -196,6 +203,7 @@ wth_connection_get_display(struct wth_connection *conn);
  * This call does not block. Messages still en route may get discarded.
  *
  * \memberof wth_connection
+ * \common_api
  */
 void
 wth_connection_destroy(struct wth_connection *conn);
@@ -218,6 +226,7 @@ wth_connection_destroy(struct wth_connection *conn);
  * reach the client.
  *
  * \memberof wth_connection
+ * \common_api
  */
 int
 wth_connection_flush(struct wth_connection *conn);
@@ -239,6 +248,7 @@ wth_connection_flush(struct wth_connection *conn);
  * discarded.
  *
  * \memberof wth_connection
+ * \common_api
  */
 int
 wth_connection_read(struct wth_connection *conn);
@@ -264,6 +274,7 @@ wth_connection_read(struct wth_connection *conn);
  * to ensure the error event gets delivered to the client.
  *
  * \memberof wth_connection
+ * \common_api
  */
 int
 wth_connection_dispatch(struct wth_connection *conn);
@@ -288,6 +299,7 @@ wth_connection_dispatch(struct wth_connection *conn);
  * write your own roundtrip implementation using the public API.
  *
  * \memberof wth_connection
+ * \client_api
  */
 int
 wth_connection_roundtrip(struct wth_connection *conn);
@@ -303,6 +315,7 @@ wth_connection_roundtrip(struct wth_connection *conn);
  *
  * \memberof wth_connection
  * \private
+ * \server_api
  */
 void
 wth_connection_set_error(struct wth_connection *conn, int err);
@@ -316,6 +329,7 @@ wth_connection_set_error(struct wth_connection *conn, int err);
  *
  * \memberof wth_connection
  * \private
+ * \server_api
  */
 void
 wth_connection_set_protocol_error(struct wth_connection *conn,
@@ -332,6 +346,7 @@ wth_connection_set_protocol_error(struct wth_connection *conn,
  * can be used to get the protocol error details.
  *
  * \memberof wth_connection
+ * \common_api
  */
 int
 wth_connection_get_error(struct wth_connection *conn);
@@ -351,6 +366,7 @@ wth_connection_get_error(struct wth_connection *conn);
  * \sa wth_connection_get_error()
  *
  * \memberof wth_connection
+ * \common_api
  */
 uint32_t
 wth_connection_get_protocol_error(struct wth_connection *conn,

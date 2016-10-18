@@ -1,0 +1,25 @@
+/**
+
+\defgroup api_server Server API
+
+Common and exclusive API for servers
+
+These functions are exclusive to a server.
+They will abort the program if called in the context of a
+client-side wth_connection. For the common functions, see
+\ref api_common.
+
+\defgroup api_client Client API
+
+Common and exclusive API for clients
+
+These functions are exclusive to a client.
+They will abort the program if called in the context of a
+server-side wth_connection. For the common functions, see
+\ref api_common.
+
+\defgroup api_common Common API for both server and client
+\ingroup api_server
+\ingroup api_client
+
+ */

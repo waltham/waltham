@@ -1,10 +1,13 @@
-EXTRA_DIST = doxygen.conf.in
+EXTRA_DIST = \
+	doxygen.conf.in \
+	api_groups.dox
 
 if ENABLE_DOC
 noinst_DATA = html/index.html
 endif
 
 public_API_files = \
+	@top_srcdir@/doc/api_groups.dox \
 	@top_srcdir@/src/waltham/waltham-connection.h \
 	@top_srcdir@/src/waltham/waltham-object.h \
 	@top_srcdir@/src/waltham/waltham-util.h \

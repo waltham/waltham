@@ -14,6 +14,10 @@ QUIET                  = YES
 GENERATE_HTML          = YES
 GENERATE_LATEX         = NO
 
+ALIASES               += "server_api=\ingroup api_server"
+ALIASES               += "client_api=\ingroup api_client"
+ALIASES               += "common_api=\ingroup api_common"
+
 # INPUT comes from the Makefile
 
 # remove this once the generator produces documentation

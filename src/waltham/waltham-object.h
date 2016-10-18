@@ -44,6 +44,8 @@ extern "C" {
  * types that are generated from the protocol XML description files.
  * A wth_object instance backs every protocol object instance on
  * both server and client side.
+ *
+ * \common_api
  */
 struct wth_object;
 
@@ -58,6 +60,7 @@ struct wth_object;
  * by the code generator. You should not need to call this manually.
  *
  * \memberof wth_object
+ * \common_api
  */
 void
 wth_object_delete (struct wth_object *object);
@@ -80,7 +83,11 @@ wth_object_delete (struct wth_object *object);
  * This function is usually called by the wrapper functions created
  * by the code generator. You should not need to call this manually.
  *
+ * \note Server and client side objects use a different set of
+ * function pointers.
+ *
  * \memberof wth_object
+ * \common_api
  */
 void
 wth_object_set_listener(struct wth_object *obj,
@@ -97,6 +104,7 @@ wth_object_set_listener(struct wth_object *obj,
  * by the code generator. You should not need to call this manually.
  *
  * \memberof wth_object
+ * \common_api
  */
 void *
 wth_object_get_user_data(struct wth_object *obj);
@@ -120,6 +128,7 @@ wth_object_get_user_data(struct wth_object *obj);
  * Clients cannot use this function.
  *
  * \memberof wth_object
+ * \server_api
  */
 void
 wth_object_post_error(struct wth_object *obj,
