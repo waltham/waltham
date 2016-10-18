@@ -150,9 +150,7 @@ def marshaller_generator(funcdef, opcode):
    outstr += '   START_TIMING("' + funcname + '", "' + fmt_string + '"' + fmt_params + ');\n'
 
    #serialize message header
-   outstr += '   START_MESSAGE( "' + funcname
-   outstr += '", wth_connection_get_next_message_id(((struct wth_object *)' + funcdef.get('param0').get('val') + ')->connection), sz, '
-   outstr += str(opcode) + ' );\n'
+   outstr += '   START_MESSAGE("{}", sz, {});\n'.format(funcname, opcode)
 
    #serialize params
    haveparams = 1

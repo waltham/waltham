@@ -84,9 +84,9 @@ static inline int recv_all (int sock, struct iovec *iov, int iovcnt)
 #define PADDED(sz) \
    (((sz) + 3) & ~3)
 
-#define START_MESSAGE(name, id, sz, opcode) \
+#define START_MESSAGE(name, sz, opcode) \
    const char *msg_name __attribute__((unused)) = name; \
-   hdr_t hdr = { id, sz, opcode, 0 }; \
+   hdr_t hdr = { 0, sz, opcode, 0 }; \
    int send_ret; \
    struct iovec marshaller_params[16]; \
    int marshaller_paramid = 1; \

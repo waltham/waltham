@@ -33,6 +33,7 @@ struct wth_connection;
 #define M_OFFSET_SIZE 2
 #define M_OFFSET_OPCODE 4
 
+/* XXX id is unused, remove it */
 typedef struct __attribute__((__packed__)) hdr_t {
    unsigned short id;
    unsigned short sz;

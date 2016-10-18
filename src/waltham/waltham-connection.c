@@ -57,8 +57,6 @@ struct wth_connection {
 
   struct wth_display *display;
   struct wth_map map;
-
-  int next_message_id;
 };
 
 
@@ -138,12 +136,6 @@ WTH_EXPORT struct wth_display *
 wth_connection_get_display(struct wth_connection *conn)
 {
   return conn->display;
-}
-
-WTH_EXPORT int
-wth_connection_get_next_message_id(struct wth_connection *conn)
-{
-  return conn->next_message_id++;
 }
 
 WTH_EXPORT void
