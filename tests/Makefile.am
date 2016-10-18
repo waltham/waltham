@@ -3,6 +3,7 @@ noinst_PROGRAMS = client server
 client_LDADD = \
 	$(top_builddir)/src/waltham/libwaltham.la
 client_CFLAGS = \
+	@GCC_CFLAGS@ \
 	-I$(top_builddir)/src/waltham/ \
 	-I$(top_srcdir)/src/waltham/
 client_SOURCES = \
@@ -12,6 +13,7 @@ client_SOURCES = \
 server_LDADD = \
 	$(top_builddir)/src/waltham/libwaltham.la
 server_CFLAGS = \
+	@GCC_CFLAGS@ \
 	-I$(top_builddir)/src/waltham/ \
 	-I$(top_srcdir)/src/waltham/
 server_SOURCES = \
