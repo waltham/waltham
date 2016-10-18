@@ -34,6 +34,12 @@
 
 #include "waltham-util.h"
 
+#ifdef DEBUG
+#define debug printf
+#else
+#define debug(...)
+#endif
+
 #define ARRAY_LENGTH(a) (sizeof (a) / sizeof (a)[0])
 
 #define WTH_MAP_SERVER_SIDE 0
