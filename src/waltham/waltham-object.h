@@ -31,15 +31,73 @@
 extern "C" {
 #endif
 
+/** \file
+ *
+ * \brief Waltham generic protocol object interface
+ */
+
+/** \class wth_object
+ *
+ * \brief A generic Waltham protocol object representation (a proxy)
+ *
+ * wth_object is the underlying implementation for all protocol object
+ * types that are generated from the protocol XML description files.
+ * A wth_object instance backs every protocol object instance on
+ * both server and client side.
+ */
 struct wth_object;
 
+/** Destroy a protocol object
+ *
+ * \param object The protocol object cast from a specific
+ * interface type.
+ *
+ * The wth_object is destroyed and its object ID is no longer valid.
+ *
+ * This function is usually called by the wrapper functions created
+ * by the code generator. You should not need to call this manually.
+ *
+ * \memberof wth_object
+ */
 void
 wth_object_delete (struct wth_object *object);
 
+/** Set incoming message handlers for a protocol object
+ *
+ * \param obj The protocol object cast from a specific
+ * interface type.
+ * \param listener An array of function pointers, cast from a
+ * virtual function table (a struct created by the code generator).
+ * \param user_data Arbitrary pointer to store with the wth_object.
+ *
+ * After this call, wth_connection_dispatch() will call the given
+ * function pointers for incoming messages for this particular
+ * protocol object instance.
+ *
+ * The user data pointer can be retrieved with
+ * wth_object_get_user_data().
+ *
+ * This function is usually called by the wrapper functions created
+ * by the code generator. You should not need to call this manually.
+ *
+ * \memberof wth_object
+ */
 void
 wth_object_set_listener(struct wth_object *obj,
 			void (**listener)(void), void *user_data);
 
+/** Set incoming message handlers for a protocol object
+ *
+ * \param obj The protocol object cast from a specific
+ * interface type.
+ *
+ * Returns the user data pointer set by wth_object_set_listener().
+ *
+ * This function is usually called by the wrapper functions created
+ * by the code generator. You should not need to call this manually.
+ *
+ * \memberof wth_object
+ */
 void *
 wth_object_get_user_data(struct wth_object *obj);
 
@@ -60,6 +118,8 @@ wth_object_get_user_data(struct wth_object *obj);
  * reaches the client.
  *
  * Clients cannot use this function.
+ *
+ * \memberof wth_object
  */
 void
 wth_object_post_error(struct wth_object *obj,

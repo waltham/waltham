@@ -117,9 +117,28 @@ struct wth_object {
 	void *user_data;
 };
 
+/** Create a protocol object with given ID
+ *
+ * \param connection The Waltham connection.
+ * \param id The object ID to reserve.
+ * \return A new protocol object proxy with the given ID.
+ *
+ * \memberof wth_object
+ * \private
+ */
 struct wth_object *
 wth_object_new_with_id (struct wth_connection *connection, uint32_t id);
 
+/** Create a protocol object
+ *
+ * \param connection The Waltham connection.
+ * \return A new protocol object proxy.
+ *
+ * The object ID on the wire is automatically allocated.
+ *
+ * \memberof wth_object
+ * \private
+ */
 struct wth_object *
 wth_object_new (struct wth_connection *connection);
 
