@@ -29,6 +29,7 @@
 #include <stdarg.h>
 
 #include "waltham-connection.h"
+#include "waltham-private.h"
 #include "waltham-util.h"
 
 #include "waltham-object.h"

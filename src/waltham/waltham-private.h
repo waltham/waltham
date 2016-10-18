@@ -32,6 +32,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include "waltham-object.h"
+#include "waltham-connection.h"
 #include "waltham-util.h"
 
 #ifdef DEBUG
@@ -88,5 +90,21 @@ wth_map_lookup_flags(struct wth_map *map, uint32_t i);
 
 void
 wth_map_for_each(struct wth_map *map, wth_iterator_func_t func, void *data);
+
+/* wth_connection */
+void
+wth_connection_insert_new_object(struct wth_connection *conn,
+    struct wth_object *obj);
+
+void
+wth_connection_insert_object_with_id(struct wth_connection *conn,
+    struct wth_object *obj);
+
+void
+wth_connection_remove_object(struct wth_connection *conn,
+    struct wth_object *obj);
+
+struct wth_object *
+wth_connection_get_object(struct wth_connection *conn, uint32_t id);
 
 #endif

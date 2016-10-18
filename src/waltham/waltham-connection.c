@@ -138,7 +138,7 @@ wth_connection_get_display(struct wth_connection *conn)
   return conn->display;
 }
 
-WTH_EXPORT void
+void
 wth_connection_insert_new_object(struct wth_connection *conn,
     struct wth_object *obj)
 {
@@ -147,7 +147,7 @@ wth_connection_insert_new_object(struct wth_connection *conn,
   debug("%s: new object id: %d\n", __func__, obj->id);
 }
 
-WTH_EXPORT void
+void
 wth_connection_insert_object_with_id(struct wth_connection *conn,
     struct wth_object *obj)
 {
@@ -157,7 +157,7 @@ wth_connection_insert_object_with_id(struct wth_connection *conn,
   wth_map_insert_at(&conn->map, 0, obj->id, obj);
 }
 
-WTH_EXPORT void
+void
 wth_connection_remove_object(struct wth_connection *conn,
     struct wth_object *obj)
 {
@@ -166,7 +166,7 @@ wth_connection_remove_object(struct wth_connection *conn,
   wth_map_insert_at(&conn->map, 0, obj->id, NULL);
 }
 
-WTH_EXPORT struct wth_object *
+struct wth_object *
 wth_connection_get_object(struct wth_connection *conn, uint32_t id)
 {
   return wth_map_lookup(&conn->map, id);

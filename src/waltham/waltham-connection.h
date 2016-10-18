@@ -165,21 +165,6 @@ wth_connection_get_fd(struct wth_connection *conn);
 struct wth_display *
 wth_connection_get_display(struct wth_connection *conn);
 
-void
-wth_connection_insert_new_object(struct wth_connection *conn,
-    struct wth_object *obj);
-
-void
-wth_connection_insert_object_with_id(struct wth_connection *conn,
-    struct wth_object *obj);
-
-void
-wth_connection_remove_object(struct wth_connection *conn,
-    struct wth_object *obj);
-
-struct wth_object *
-wth_connection_get_object(struct wth_connection *conn, uint32_t id);
-
 /** Disconnect
  *
  * \param conn The Waltham connection.
