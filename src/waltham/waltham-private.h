@@ -42,8 +42,6 @@
 
 #define ARRAY_LENGTH(a) (sizeof (a) / sizeof (a)[0])
 
-#define WTH_MAP_SERVER_SIDE 0
-#define WTH_MAP_CLIENT_SIDE 1
 #define WTH_SERVER_ID_START 0xff000000
 
 /* Flags for wth_map_insert_new and wth_map_insert_at.  Flags can be queried with

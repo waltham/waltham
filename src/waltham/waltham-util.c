@@ -31,6 +31,7 @@
 #include <stdarg.h>
 
 #include "waltham-util.h"
+#include "waltham-connection.h"
 #include "waltham-private.h"
 
 WTH_EXPORT void
@@ -121,7 +122,7 @@ wth_map_insert_new(struct wth_map *map, uint32_t flags, void *data)
 	struct wth_array *entries;
 	uint32_t base;
 
-	if (map->side == WTH_MAP_CLIENT_SIDE) {
+	if (map->side == WTH_CONNECTION_SIDE_CLIENT) {
 		entries = &map->client_entries;
 		base = 0;
 	} else {
@@ -182,12 +183,12 @@ wth_map_reserve_new(struct wth_map *map, uint32_t i)
 	struct wth_array *entries;
 
 	if (i < WTH_SERVER_ID_START) {
-		if (map->side == WTH_MAP_CLIENT_SIDE)
+		if (map->side == WTH_CONNECTION_SIDE_CLIENT)
 			return -1;
 
 		entries = &map->client_entries;
 	} else {
-		if (map->side == WTH_MAP_SERVER_SIDE)
+		if (map->side == WTH_CONNECTION_SIDE_SERVER)
 			return -1;
 
 		entries = &map->server_entries;
@@ -220,12 +221,12 @@ wth_map_remove(struct wth_map *map, uint32_t i)
 	struct wth_array *entries;
 
 	if (i < WTH_SERVER_ID_START) {
-		if (map->side == WTH_MAP_SERVER_SIDE)
+		if (map->side == WTH_CONNECTION_SIDE_SERVER)
 			return;
 
 		entries = &map->client_entries;
 	} else {
-		if (map->side == WTH_MAP_CLIENT_SIDE)
+		if (map->side == WTH_CONNECTION_SIDE_CLIENT)
 			return;
 
 		entries = &map->server_entries;
