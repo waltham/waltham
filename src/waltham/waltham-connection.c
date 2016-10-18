@@ -190,10 +190,30 @@ wth_connection_flush(struct wth_connection *conn)
 WTH_EXPORT int
 wth_connection_read(struct wth_connection *conn)
 {
+  /* If the connection is set to EPROTO, we still want to empty the kernel
+   * buffers. We just discard the messages without dispatching them. */
+  if (conn->error && conn->error != EPROTO)
+    {
+      errno = conn->error;
+      return -1;
+    }
+
   if (!reader_pull_new_messages(conn->reader, conn->fd, TRUE))
-    return -1;
-  else
-    return 0;
+    {
+      /* Don't set the connection to error state in case of EAGAIN.
+       * We still return -1, but the user should handle errno == EAGAIN. */
+      if (errno != EAGAIN)
+        wth_connection_set_error(conn, errno);
+
+      return -1;
+    }
+
+  /* Discard read messages without dispatching them if the connection
+   * was set to EPROTO. */
+  if (conn->error == EPROTO)
+    reader_flush (conn->reader);
+
+  return 0;
 }
 
 WTH_EXPORT int
