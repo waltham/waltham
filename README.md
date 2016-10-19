@@ -54,6 +54,13 @@ $ ./tests/client
 The client runs for about five seconds excercising the protocol and
 exits automatically. The server can be stopped with `ctrl+c`.
 
+If you want to run the example server or client under GDB or Valgrind,
+use e.g. the following:
+```
+$ libtool --mode=execute gdb ./tests/server
+$ libtool --mode=execute valgrind -v --leak-check=full --show-reachable=yes --track-origins=yes --num-callers=30 ./tests/server
+```
+
 
 Design
 ======
