@@ -32,6 +32,7 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <assert.h>
+#include <signal.h>
 
 #include <waltham-object.h>
 #include <waltham-server.h>
@@ -580,11 +581,36 @@ server_listen(uint16_t tcp_port)
 	return fd;
 }
 
+static bool *signal_int_handler_run_flag;
+
+static void
+signal_int_handler(int signum)
+{
+	if (!*signal_int_handler_run_flag)
+		abort();
+
+	*signal_int_handler_run_flag = false;
+}
+
+static void
+set_sigint_handler(bool *running)
+{
+	struct sigaction sigint;
+
+	signal_int_handler_run_flag = running;
+	sigint.sa_handler = signal_int_handler;
+	sigemptyset(&sigint.sa_mask);
+	sigint.sa_flags = SA_RESETHAND;
+	sigaction(SIGINT, &sigint, NULL);
+}
+
 int
 main(int arcg, char *argv[])
 {
 	struct server srv = { 0 };
 	struct client *c;
+
+	set_sigint_handler(&srv.running);
 
 	wl_list_init(&srv.client_list);
 
