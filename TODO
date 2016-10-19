@@ -16,6 +16,7 @@ general:
 - figure out and document if recursive dispatch is allowed or not
   (calling wth_connection_dispatch() from a handler called by
   wth_connection_dispatch())
+- handle errors from wth_map functions
 
 generator:
 - rewrite the generator to become more readable and maintainable
