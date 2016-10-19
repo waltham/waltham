@@ -7,6 +7,7 @@ noinst_DATA = html/index.html
 endif
 
 public_API_files = \
+	@top_srcdir@/README.md \
 	@top_srcdir@/doc/api_groups.dox \
 	@top_srcdir@/src/waltham/waltham-connection.h \
 	@top_srcdir@/src/waltham/waltham-object.h \

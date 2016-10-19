@@ -1,5 +1,5 @@
-Waltham
-=======
+Waltham IPC Library                                      {#mainpage}
+===================
 
 [Waltham] is a network IPC library designed to resemble [Wayland] both
 protocol and protocol-API wise. Protocol is described in XML files. A
