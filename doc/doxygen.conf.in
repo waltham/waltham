@@ -3,6 +3,7 @@ PROJECT_NUMBER         = @VERSION@
 OUTPUT_DIRECTORY       = @top_builddir@/doc
 STRIP_FROM_PATH        = @top_srcdir@/src/waltham \
                          @top_builddir@/src/waltham
+EXAMPLE_PATH           = @top_srcdir@/tests
 JAVADOC_AUTOBRIEF      = YES
 OPTIMIZE_OUTPUT_FOR_C  = YES
 TAB_SIZE               = 8

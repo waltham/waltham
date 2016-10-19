@@ -1,0 +1,20 @@
+/**
+
+\page api_usage API Usage
+
+\brief How to use the API
+
+The Waltham API consists of two partially overlapping sets of functions:
+\ref api_server and \ref api_client.
+
+There are simple examples for a server \ref server-api-example.c
+and a client \ref client-api-example.c .
+
+\example server-api-example.c
+An example of a server that can handle multiple clients concurrently.
+
+\example client-api-example.c
+An example of a client that connects to a server and excercises
+some of the protocol requests.
+
+*/
