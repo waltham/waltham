@@ -56,13 +56,23 @@ if test "x$enable_doc" != "xno"; then
 		AC_MSG_ERROR([Documentation requested, but Doxygen not found.])
 	fi
 	if test "x$DOXYGEN" != "x"; then
-		enable_doc=yes
+		AC_MSG_CHECKING([doxygen is at least version 1.8])
+		doxygen_version=`$DOXYGEN --version`
+		AS_VERSION_COMPARE([$doxygen_version], [1.8.0],
+		                   [doxygen_ok=no], [doxygen_ok=yes],
+		                   [doxygen_ok=yes])
+		AC_MSG_RESULT([$doxygen_ok])
+
+		if test "x$doxygen_ok" != "xyes" -a "x$enable_doc" = "xyes"; then
+			AC_MSG_ERROR([Doxygen $doxygen_version is too old.])
+		fi
+
+		enable_doc=$doxygen_ok
 	else
 		enable_doc=no
 	fi
 fi
 AM_CONDITIONAL(ENABLE_DOC, test "x$enable_doc" = "xyes")
-
 
 AC_CONFIG_FILES([Makefile
 		 data/Makefile
