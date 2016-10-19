@@ -496,7 +496,6 @@ static void
 listen_socket_handle_data(struct watch *w, uint32_t events)
 {
 	struct server *srv = container_of(w, struct server, listen_watch);
-	int ret;
 
 	if (events & EPOLLERR) {
 		fprintf(stderr, "Listening socket errored out.\n");
@@ -523,7 +522,6 @@ mainloop(struct server *srv)
 	struct watch *w;
 	int count;
 	int i;
-	int ret;
 
 	srv->running = true;
 

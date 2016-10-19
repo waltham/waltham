@@ -318,8 +318,6 @@ mainloop(struct display *dpy)
 static void
 bling_done(struct wthp_callback *cb, uint32_t arg)
 {
-	struct display *dpy = wth_object_get_user_data((struct wth_object *)cb);
-
 	fprintf(stderr, "...sync done.\n");
 
 	wthp_callback_free(cb);
@@ -403,8 +401,6 @@ int
 main(int arcg, char *argv[])
 {
 	struct display dpy = { 0 };
-	int fd;
-	int err;
 
 	dpy.epoll_fd = epoll_create1(EPOLL_CLOEXEC);
 	if (dpy.epoll_fd == -1) {
