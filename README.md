@@ -32,6 +32,17 @@ until Waltham 1.0.0 has been released. You are still welcome to install
 Waltham and try it in your projects.
 
 
+Documentation
+=============
+
+In addition to this README, the project can build API documentation
+with Doxygen. Build the project as described below, and you should find
+the documentation in your `@top_builddir@/doc/html/index.html`. This
+README is mirrored on the front page. If the documentation does not
+seem to get built, try passing `--enable-doc` to `./autogen.sh` or
+`./configure` and see what it complains about.
+
+
 Building and testing
 ====================
 
