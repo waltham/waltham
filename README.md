@@ -42,6 +42,9 @@ README is mirrored on the front page. If the documentation does not
 seem to get built, try passing `--enable-doc` to `./autogen.sh` or
 `./configure` and see what it complains about.
 
+You can also read a manually updated snapshot of the
+[Waltham documentation](https://waltham.github.io/waltham/).
+
 
 Building and testing
 ====================
@@ -148,5 +151,5 @@ particular external event loop library. It makes `libwaltham` a much
 thinner library than `libwayland-server`.
 
 
-[Waltham]: https://a.github.url.invalid
+[Waltham]: https://github.com/waltham/waltham
 [Wayland]: https://wayland.freedesktop.org/
