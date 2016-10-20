@@ -1,4 +1,4 @@
-Waltham IPC Library                                      {#mainpage}
+Waltham IPC Library
 ===================
 
 [Waltham] is a network IPC library designed to resemble [Wayland] both

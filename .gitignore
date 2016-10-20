@@ -27,6 +27,7 @@ Makefile.in
 /config.sub
 /configure
 /doc/doxygen.conf
+/doc/mainpage.md
 /doc/html/
 /libtool
 /m4/
