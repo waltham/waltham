@@ -17,7 +17,7 @@ public_API_files = \
 	@top_builddir@/src/waltham/waltham-client.h \
 	@top_builddir@/src/waltham/waltham-server.h
 
-html/index.html: doxygen.conf $(public_API_files)
+html/index.html: doxygen.conf $(public_API_files) Makefile
 	$(AM_V_GEN)(cat doxygen.conf; \
 	            echo "INPUT= $(public_API_files)"; \
 		   ) | $(DOXYGEN) -
@@ -25,7 +25,7 @@ html/index.html: doxygen.conf $(public_API_files)
 GH_TO_DOX_SUBSTS = \
 	-e 's|^Waltham IPC Library$$|Waltham IPC Library {\#mainpage}|'
 
-@top_builddir@/doc/mainpage.md: @top_srcdir@/README.md
+@top_builddir@/doc/mainpage.md: @top_srcdir@/README.md Makefile
 	$(AM_V_GEN)$(SED) $(GH_TO_DOX_SUBSTS) < $< > $@
 
 CLEANFILES = @top_builddir@/doc/mainpage.md
