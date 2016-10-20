@@ -102,7 +102,7 @@ wth_connection_from_fd(int fd, enum wth_connection_side side)
 	conn->side = side;
 
 	conn->reader = new_reader();
-	wth_map_init(&conn->map, /* XXX different enum */ side);
+	wth_map_init(&conn->map, side);
 
 	/* id 0 should be NULL, id 1 the display */
 	if (side == WTH_CONNECTION_SIDE_CLIENT) {
