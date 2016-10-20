@@ -63,7 +63,7 @@ struct wth_object;
  * \common_api
  */
 void
-wth_object_delete (struct wth_object *object);
+wth_object_delete(struct wth_object *object);
 
 /** Set incoming message handlers for a protocol object
  *

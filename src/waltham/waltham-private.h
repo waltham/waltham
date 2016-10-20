@@ -127,7 +127,7 @@ struct wth_object {
  * \private
  */
 struct wth_object *
-wth_object_new_with_id (struct wth_connection *connection, uint32_t id);
+wth_object_new_with_id(struct wth_connection *connection, uint32_t id);
 
 /** Create a protocol object
  *
@@ -140,6 +140,6 @@ wth_object_new_with_id (struct wth_connection *connection, uint32_t id);
  * \private
  */
 struct wth_object *
-wth_object_new (struct wth_connection *connection);
+wth_object_new(struct wth_connection *connection);
 
 #endif
