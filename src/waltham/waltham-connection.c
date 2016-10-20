@@ -311,9 +311,9 @@ wth_connection_roundtrip(struct wth_connection *conn)
 
 		if (pfd.revents & POLLOUT) {
 			ret = wth_connection_flush(conn);
-			if (ret == 0)
+			if (ret == 0) {
 				pfd.events = POLLIN;
-			else if (ret < 0 && errno != EAGAIN) {
+			} else if (ret < 0 && errno != EAGAIN) {
 				perror("Roundtrip connection re-flush failed");
 				break;
 			}
