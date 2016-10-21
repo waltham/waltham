@@ -1,13 +1,9 @@
 general:
 - implement wth_display protocol
-- Write documentation and use Doxygen to format it
-- code clean-up: style unification, dead code removal
-- wthp_registry implementation?
 - the fate of wth_display, hide it completely in wth_connection and rename?
 - implement object id re-use
 - implement server-side object allocation
 - implement protocol version negotiation
-- error delivery: implement the documented behaviour in wth_connection
 - in wth_connection_destroy, print warnings for every item remaining in
   the hash table
 - implement object version inheritance
@@ -17,6 +13,15 @@ general:
   (calling wth_connection_dispatch() from a handler called by
   wth_connection_dispatch())
 - handle errors from wth_map functions
+- check for and fix endianess issues
+
+documentation:
+- migrate from Doxygen to https://github.com/hotdoc/hotdoc
+- document the protocol XML language
+- document the protocol wire format
+- write usage guidelines (how server and client init and operate)
+- write something about protocol design principles (or maybe write it
+  for Wayland and just copy it to Waltham, since it's all the same)
 
 generator:
 - rewrite the generator to become more readable and maintainable
@@ -24,7 +29,7 @@ generator:
 - generate <object type>_get_version()
 - generate enums
 - generate SINCE macros (interface version adding the message)
-- generate documentation for Doxygen
+- generate documentation
 
 serialiser:
 - implement send-buffering (non-blocking sending)
@@ -35,8 +40,11 @@ deserialiser:
 
 tests/examples:
 - fix server read error when client disconnects
-- make the examples use more protocol and document better
-- write a test suite
+- pick a test suite framework
+- write tests for every API entrypoint
+- write higher level tests, maybe based on the example server and client
+- test raising all possible error conditions
 
 build:
 - check for timerfd in configure
+- set up CI
