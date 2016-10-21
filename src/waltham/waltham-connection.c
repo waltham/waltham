@@ -274,6 +274,8 @@ wth_connection_roundtrip(struct wth_connection *conn)
 	int ret;
 	struct pollfd pfd;
 
+	ASSERT_CLIENT_SIDE(conn);
+
 	cb = wth_display_sync(conn->display);
 	wthp_callback_set_listener(cb, &sync_listener, &flag);
 
@@ -386,4 +388,35 @@ wth_connection_get_protocol_error(struct wth_connection *conn,
 	*object_id = conn->protocol_error.id;
 
 	return conn->protocol_error.code;
+}
+
+static const char *
+side_to_str(enum wth_connection_side side)
+{
+	switch (side) {
+	case WTH_CONNECTION_SIDE_CLIENT:
+		return "client";
+	case WTH_CONNECTION_SIDE_SERVER:
+		return "server";
+	default:
+		return "(invalid)";
+	}
+}
+
+void
+wth_connection_assert_side(struct wth_connection *conn,
+			   const char *func,
+			   enum wth_connection_side expected)
+{
+	const char *conn_side;
+	const char *expected_side;
+
+	if (conn->side == expected)
+		return;
+
+	conn_side = side_to_str(conn->side);
+	expected_side = side_to_str(expected);
+
+	wth_abort("function %s is %s-only but it was called on a %s side object",
+		  func, expected_side, conn_side);
 }

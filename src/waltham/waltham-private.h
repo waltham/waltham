@@ -110,6 +110,19 @@ wth_connection_remove_object(struct wth_connection *conn,
 struct wth_object *
 wth_connection_get_object(struct wth_connection *conn, uint32_t id);
 
+void
+wth_connection_assert_side(struct wth_connection *conn,
+			   const char *func,
+			   enum wth_connection_side expected);
+
+#define ASSERT_CLIENT_SIDE(conn) \
+	wth_connection_assert_side((conn), __func__, \
+				   WTH_CONNECTION_SIDE_CLIENT)
+
+#define ASSERT_SERVER_SIDE(conn) \
+	wth_connection_assert_side((conn), __func__, \
+				   WTH_CONNECTION_SIDE_SERVER)
+
 /* wth_object */
 struct wth_object {
 	struct wth_display *display;

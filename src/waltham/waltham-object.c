@@ -110,7 +110,7 @@ wth_object_post_error(struct wth_object *obj,
 	char str[256];
 	va_list ap;
 
-	/* XXX: abort() if client is trying to do this */
+	ASSERT_SERVER_SIDE(conn);
 
 	va_start(ap, fmt);
 	vsnprintf(str, sizeof str, fmt, ap);
