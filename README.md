@@ -45,6 +45,10 @@ seem to get built, try passing `--enable-doc` to `./autogen.sh` or
 You can also read a manually updated snapshot of the
 [Waltham documentation](https://waltham.github.io/waltham/).
 
+Usage guidelines can be found in
+[Related pages](https://waltham.github.io/waltham/pages.html)
+in the Doxygen-generated documentation.
+
 
 Building and testing
 ====================

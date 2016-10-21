@@ -1,14 +1,167 @@
 /**
 
-\page api_usage API Usage
+\page server_usage Server API Usage
 
-\brief How to use the API
+\brief How to use the server API while following the example code
 
-The Waltham API consists of two partially overlapping sets of functions:
-\ref api_server and \ref api_client.
+References to functions in \ref server-api-example.c are in square
+brackets. See \ref api_server for a summary of the available API.
 
-There are simple examples for a server \ref server-api-example.c
-and a client \ref client-api-example.c .
+A server needs to create its listening socket for TCP itself
+\c [server_listen]. Once it is listening and receives a connection, it
+shall call wth_accept() to create a wth_connection for the new client
+\c [server_accept_client]. Alternatively, if the server wants to call
+\c accept() on its own, it can call wth_connection_from_fd() with
+::WTH_CONNECTION_SIDE_SERVER.
+
+The file descriptor of a new wth_connection needs to be polled for
+events \c [client_create]. Use wth_connection_get_fd() to fetch the
+connection file descriptor and add it in your poll set for \c POLLIN.
+(The example also fetches the wth_display for the connection and sets
+the implementation, but this should be done by Waltham under the hood.)
+
+The wth_connection file descriptor must be serviced as follows
+\c [connection_handle_data]:
+
+\li \c POLLERR and \c POLLHUP: the connection has died and all client
+resources need to be cleaned up.
+
+\li \c POLLOUT: The server explicitly polled for \c POLLOUT because
+an earlier call to wth_connection_flush() returned with failure
+\c EAGAIN. Now call wth_connection_flush() again. If it succeeds, stop
+polling for \c POLLOUT. If it fails with \c EAGAIN, continue polling
+for \c POLLOUT.
+
+\li \c POLLIN: The server must read incoming data into a buffer in
+wth_connection by calling wth_connection_read(). Once the server
+is ready to process the read messages, it must call
+wth_connection_dispatch().
+
+The server must implement wthp_registry protocol interface. The
+callback \c [display_handle_get_registry] gets called when a client
+creates a wthp_registry object. The server must send a list of the
+global interfaces it supports as a response. Global interfaces are the
+interfaces a client can instantiate with the wthp_registry \c bind
+request (handled in \c [registry_handle_bind]). The bind request is the
+first means for clients to create protocol objects.
+
+If a client causes an error, the server must use wth_object_post_error()
+to deliver an error event to the client. The server should not destroy
+the wth_connection immediately however, to allow the TCP connection
+to be torn down gracefully and leave the TCP \c TIME_WAIT state with
+the client. Only once the connection hangs up, the server must destroy
+the wth_connection. This is also why \c EPROTO from
+wth_connection_dispatch() should be ignored by servers
+\c [connection_handle_data].
+
+The server is reponsible for cleaning up all client resources
+\c [client_destroy]. Even though wth_connection keeps track of
+protocol object IDs and wth_object instances, it does not automatically
+free them. When everything is freed, the server calls
+wth_connection_destroy().
+
+Events sent to clients are not guaranteed to be sent out to the network
+automatically, the server needs to call wth_connection_flush() on
+each wth_connection explicitly \c [server_flush_clients]. This is best
+done in the server main loop just before sleeping on \c poll
+\c [mainloop].
+
+*/
+
+/**
+\page client_usage Client API Usage
+
+\brief How to use the client API while following the example code
+
+References to functions in \ref client-api-example.c are in square
+brackets. See \ref api_client for a summary of the available API.
+
+A client starts by calling wth_connect_to_server() to create a
+wth_connection \c [main]. Alternatively, it is also possible to
+create the TCP connection by other means and pass the socket file
+descriptor to wth_connection_from_fd() with
+::WTH_CONNECTION_SIDE_CLIENT.
+
+The file descriptor of a new wth_connection needs to be polled for
+events \c [main]. Use wth_connection_get_fd() to fetch the
+connection file descriptor and add it in your poll set for \c POLLIN.
+(The example also fetches the wth_display for the connection and sets
+the implementation, but this should be done by Waltham under the hood.)
+
+The wth_connection file descriptor must be serviced as follows
+\c [connection_handle_data]:
+
+\li \c POLLERR and \c POLLHUP: the connection has died and
+resources need to be cleaned up.
+
+\li \c POLLOUT: The client explicitly polled for \c POLLOUT because
+an earlier call to wth_connection_flush() returned with failure
+\c EAGAIN. Now call wth_connection_flush() again. If it succeeds, stop
+polling for \c POLLOUT. If it fails with \c EAGAIN, continue polling
+for \c POLLOUT.
+
+\li \c POLLIN: The client must read incoming data into a buffer in
+wth_connection by calling wth_connection_read(). Once the client
+is ready to process the read messages, it must call
+wth_connection_dispatch() \c [mainloop].
+
+Requests sent to a server are not guaranteed to be sent out to the
+network automatically, the client needs to call wth_connection_flush()
+explicitly \c [mainloop], preferably just before sleeping on \c poll.
+
+Protocol-wise, the first thing to do is to create a wthp_registry
+\c [main]. Once the server processes the creation, it will send events
+for each global interface it supports. An easy way to guarantee that
+the client has seen all such advertisements is to call
+wth_connection_roundtrip(). Often binding to the global interfaces
+happens already in the wthp_registry event handler
+\c [registry_handle_global]. Eventually the client enters its main loop
+\c [main, mainloop].
+
+If the client causes an error in the server, the server will send an
+error event. This sets the wth_connection into an error state
+\c [not_here_error] and no more events will be dispatched. Instead,
+wth_connection_dispatch() will fail with \c EPROTO. The client should
+clean up and call wth_connection_destroy() to tear down the connection.
+
+The client is reponsible for cleaning up all the resources. Even though
+wth_connection keeps track of protocol object IDs and wth_object
+instances, it does not automatically free them.
+
+*/
+
+/**
+\page object_usage Protocol object API Usage
+
+\brief How to use the protocol object APIs in both servers and clients
+
+Unlike in Wayland, Waltham's protocol object API is completely
+symmetric on server vs. client side. Both sides use opaque
+interface-typed pointers to refer to protocol objects whose
+implementation is wth_object.
+
+The methods and virtual function tables are naturally different between
+server and client side. Server-side function tables are called
+\e interfaces and client-side function tables are called
+\e listeners : wthp_surface_interface and wthp_surface_listener
+for example.
+
+Almost all protocol objects get created by sending a request
+(from a client) or an event (from a server). Calling a generated C
+function to send will create a wth_object cast to an opaque pointer
+type. To set the virtual function table, one calls a type-specific
+setter, e.g. wthp_surface_set_interface() or
+wthp_surface_set_listener(). The callbacks set this way will be called
+from inside wth_connection_dispatch().
+
+It is not usually necessary to call the wth_object API directly. Most
+use cases are covered by the type-safe wrappers created by the code
+generator. However, it is possible to just cast a typed pointer to
+a wth_object pointer as necessary.
+
+*/
+
+/**
 
 \example server-api-example.c
 An example of a server that can handle multiple clients concurrently.

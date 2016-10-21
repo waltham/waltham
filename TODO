@@ -19,7 +19,6 @@ documentation:
 - migrate from Doxygen to https://github.com/hotdoc/hotdoc
 - document the protocol XML language
 - document the protocol wire format
-- write usage guidelines (how server and client init and operate)
 - write something about protocol design principles (or maybe write it
   for Wayland and just copy it to Waltham, since it's all the same)
 
