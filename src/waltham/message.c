@@ -126,7 +126,7 @@ get_one_message (ClientReader *reader)
 
   if (size == 0)
     {
-      fprintf (stderr, "Invalid message size (0)");
+      wth_error ("Invalid message size (0)");
       return false;
     }
 
@@ -187,7 +187,7 @@ reader_fill_ring_buffer (ClientReader *reader, int fd)
 
   ret = readv (fd, vecs, iocnt);
   if (ret <= 0) {
-    fprintf (stderr, "Error while filling buffer: %m");
+    wth_error ("Error while filling buffer: %m");
     return false;
   }
 
@@ -427,7 +427,7 @@ msg_dispatch (struct wth_connection *conn, msg_t *msg)
   if (msg->hdr->opcode > demarshaller_max_opcode
       || (request_demarshaller_functions[msg->hdr->opcode] == NULL &&
           event_demarshaller_functions[msg->hdr->opcode] == NULL)) {
-    fprintf (stderr, "Invalid opcode %d, discard message", msg->hdr->opcode);
+    wth_error ("Invalid opcode %d, discard message", msg->hdr->opcode);
     return;
   }
 
