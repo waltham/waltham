@@ -84,7 +84,7 @@ wth_object_set_listener(struct wth_object *obj,
 			void (**listener)(void), void *user_data)
 {
 	if (obj->vfunc)
-		fprintf(stderr, "vfunc table already set!");
+		wth_debug("vfunc table already set!");
 
 	obj->vfunc = listener;
 	obj->user_data = user_data;

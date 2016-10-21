@@ -140,14 +140,14 @@ wth_connection_insert_new_object(struct wth_connection *conn,
 {
 	obj->id = wth_map_insert_new(&conn->map, 0, obj);
 
-	debug("%s: new object id: %d\n", __func__, obj->id);
+	wth_debug("%s: new object id: %d", __func__, obj->id);
 }
 
 void
 wth_connection_insert_object_with_id(struct wth_connection *conn,
 		struct wth_object *obj)
 {
-	debug("%s: %d\n", __func__, obj->id);
+	wth_debug("%s: %d", __func__, obj->id);
 
 	wth_map_reserve_new(&conn->map, obj->id);
 	wth_map_insert_at(&conn->map, 0, obj->id, obj);
@@ -229,8 +229,8 @@ wth_connection_dispatch(struct wth_connection *conn)
 		msg_t msg;
 
 		reader_map_message(conn->reader, i, &msg);
-		debug("Message received on conn %p: (%d) %d bytes",
-		      conn, msg.hdr->opcode, msg.hdr->sz);
+		wth_debug("Message received on conn %p: (%d) %d bytes",
+			  conn, msg.hdr->opcode, msg.hdr->sz);
 
 		/* Don't dispatch more messages after the connection is set
 		 * to EPROTO. */

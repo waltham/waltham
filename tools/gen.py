@@ -318,7 +318,7 @@ def demarshaller_generator(funcdef, opcode):
     if paramitr != 0:
         code += '\n'
 
-    code += '  debug ("' + apifuncname + '(' + fmt_string + ') (opcode ' \
+    code += '  wth_debug ("' + apifuncname + '(' + fmt_string + ') (opcode ' \
             + str(opcode) + ') called."' + fmt_params + ');\n'
 
     objname = funcdef['param0']['val']

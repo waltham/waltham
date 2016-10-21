@@ -217,7 +217,7 @@ reader_pull_new_messages (ClientReader *reader, int fd, bool from_client)
           reader->messages = realloc (reader->messages,
             reader->m_total * 2 * sizeof(ReaderMessage));
           reader->m_total *= 2;
-          debug ("Updated client to %d messages", reader->m_total);
+          wth_debug ("Updated client to %d messages", reader->m_total);
         }
     }
   return true;
@@ -447,7 +447,7 @@ connect_to_unix_socket (const char *path)
 
   if (fd < 0)
     {
-      debug ("Failed to open socket: %s", strerror (errno));
+      wth_debug ("Failed to open socket: %s", strerror (errno));
       return fd;
     }
 
@@ -458,7 +458,7 @@ connect_to_unix_socket (const char *path)
   if (connect (fd, (struct sockaddr *) &addr,
       sizeof(addr.sun_family) + 1 + strlen (path)) < 0)
     {
-      debug ("Failed to connect to %s: %s", path, strerror (errno));
+      wth_debug ("Failed to connect to %s: %s", path, strerror (errno));
       close (fd);
       return -1;
     }

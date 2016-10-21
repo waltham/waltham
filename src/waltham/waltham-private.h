@@ -36,12 +36,6 @@
 #include "waltham-connection.h"
 #include "waltham-util.h"
 
-#ifdef DEBUG
-#define debug printf
-#else
-#define debug(...)
-#endif
-
 void
 wth_debug(const char *fmt, ...) WTH_PRINTF(1, 2);
 
