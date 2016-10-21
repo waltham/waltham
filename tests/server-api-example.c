@@ -609,6 +609,7 @@ main(int arcg, char *argv[])
 {
 	struct server srv = { 0 };
 	struct client *c;
+	uint16_t tcp_port = 34400;
 
 	set_sigint_handler(&srv.running);
 
@@ -620,7 +621,7 @@ main(int arcg, char *argv[])
 		exit(1);
 	}
 
-	srv.listen_fd = server_listen(34400);
+	srv.listen_fd = server_listen(tcp_port);
 	if (srv.listen_fd < 0) {
 		perror("Error setting up listening socket");
 		exit(1);
@@ -633,6 +634,9 @@ main(int arcg, char *argv[])
 		perror("Error setting up listen polling");
 		exit(1);
 	}
+
+	printf("Waltham server listening on TCP port %u...\n",
+	       tcp_port);
 
 	mainloop(&srv);
 
