@@ -292,7 +292,8 @@ wth_connection_roundtrip(struct wth_connection *conn)
 		if (ret < 0 && errno == EAGAIN) {
 			pfd.events = POLLIN | POLLOUT;
 		} else if (ret < 0) {
-			perror("Roundtrip connection flush failed");
+			wth_debug("Roundtrip connection flush failed: %s",
+				  strerror(errno));
 			break;
 		}
 
@@ -300,12 +301,13 @@ wth_connection_roundtrip(struct wth_connection *conn)
 			ret = poll(&pfd, 1, -1);
 		} while (ret == -1 && errno == EINTR);
 		if (ret == -1) {
-			perror("Roundtrip error with poll");
+			wth_debug("Roundtrip error with poll: %s",
+				  strerror(errno));
 			break;
 		}
 
 		if (pfd.revents & (POLLERR | POLLNVAL)) {
-			fprintf(stderr, "Roundtrip connection errored out.\n");
+			wth_debug("Roundtrip connection errored out.");
 			break;
 		}
 
@@ -314,7 +316,8 @@ wth_connection_roundtrip(struct wth_connection *conn)
 			if (ret == 0) {
 				pfd.events = POLLIN;
 			} else if (ret < 0 && errno != EAGAIN) {
-				perror("Roundtrip connection re-flush failed");
+				wth_debug("Roundtrip connection re-flush failed: %s",
+					strerror(errno));
 				break;
 			}
 		}
@@ -322,7 +325,8 @@ wth_connection_roundtrip(struct wth_connection *conn)
 		if (pfd.revents & POLLIN) {
 			ret = wth_connection_read(conn);
 			if (ret < 0) {
-				perror("Roundtrip connection read error");
+				wth_debug("Roundtrip connection read error: %s",
+					  strerror(errno));
 				break;
 			}
 		}
@@ -333,7 +337,12 @@ wth_connection_roundtrip(struct wth_connection *conn)
 			 * we just read everything already, so the
 			 * only thing left is to dispatch it.
 			 */
-			wth_connection_dispatch(conn);
+			ret = wth_connection_dispatch(conn);
+			if (ret < 0) {
+				wth_debug("Roundtrip dispatch error: %s",
+					  strerror(errno));
+				break;
+			}
 			break;
 		}
 	}
