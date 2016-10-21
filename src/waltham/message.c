@@ -482,7 +482,7 @@ connect_to_host (const char *host, const char *port)
   ret = getaddrinfo (host, port, &hints, &res);
   if (ret < 0)
     {
-      fprintf (stderr, "Connect to %s port %s failed (getaddrinfo: %s)",
+      wth_error ("Connect to %s port %s failed (getaddrinfo: %s)",
         host, port,
         strerror(errno));
       return -1;
