@@ -34,6 +34,47 @@
 #include "waltham-connection.h"
 #include "waltham-private.h"
 
+static void
+wth_pfx_print(const char *pfx, const char *fmt, va_list argp)
+{
+	char msg[512];
+
+	vsnprintf(msg, sizeof msg, fmt, argp);
+
+	fprintf(stderr, "%s: %s\n", pfx, msg);
+}
+
+void
+wth_debug(const char *fmt, ...)
+{
+	va_list argp;
+
+	va_start(argp, fmt);
+	wth_pfx_print("debug", fmt, argp);
+	va_end(argp);
+}
+
+void
+wth_error(const char *fmt, ...)
+{
+	va_list argp;
+
+	va_start(argp, fmt);
+	wth_pfx_print("Error", fmt, argp);
+	va_end(argp);
+}
+
+void
+wth_abort(const char *fmt, ...)
+{
+	va_list argp;
+
+	va_start(argp, fmt);
+	wth_pfx_print("Fatal", fmt, argp);
+	va_end(argp);
+	abort();
+}
+
 WTH_EXPORT void
 wth_array_init(struct wth_array *array)
 {
