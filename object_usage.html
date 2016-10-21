@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.11"/>
-<title>Waltham: API Usage</title>
+<title>Waltham: Protocol object API Usage</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -79,12 +79,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">API Usage </div>  </div>
+<div class="title">Protocol object API Usage </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>How to use the API</p>
-<p>The Waltham API consists of two partially overlapping sets of functions: <a class="el" href="group__api__server.html">Server API</a> and <a class="el" href="group__api__client.html">Client API</a>.</p>
-<p>There are simple examples for a server <a class="el" href="server-api-example_8c-example.html">server-api-example.c</a> and a client <a class="el" href="client-api-example_8c-example.html">client-api-example.c</a> . </p>
+<div class="textblock"><p>How to use the protocol object APIs in both servers and clients</p>
+<p>Unlike in Wayland, Waltham's protocol object API is completely symmetric on server vs. client side. Both sides use opaque interface-typed pointers to refer to protocol objects whose implementation is <a class="el" href="classwth__object.html" title="A generic Waltham protocol object representation (a proxy) ">wth_object</a>.</p>
+<p>The methods and virtual function tables are naturally different between server and client side. Server-side function tables are called <em>interfaces</em> and client-side function tables are called <em>listeners</em> : <a class="el" href="structwthp__surface__interface.html">wthp_surface_interface</a> and <a class="el" href="structwthp__surface__listener.html">wthp_surface_listener</a> for example.</p>
+<p>Almost all protocol objects get created by sending a request (from a client) or an event (from a server). Calling a generated C function to send will create a <a class="el" href="classwth__object.html" title="A generic Waltham protocol object representation (a proxy) ">wth_object</a> cast to an opaque pointer type. To set the virtual function table, one calls a type-specific setter, e.g. wthp_surface_set_interface() or wthp_surface_set_listener(). The callbacks set this way will be called from inside <a class="el" href="group__api__common.html#gabe1b48fb7be58159f6f98c8dc2b61e1f" title="Dispatch incoming messages. ">wth_connection_dispatch()</a>.</p>
+<p>It is not usually necessary to call the <a class="el" href="classwth__object.html" title="A generic Waltham protocol object representation (a proxy) ">wth_object</a> API directly. Most use cases are covered by the type-safe wrappers created by the code generator. However, it is possible to just cast a typed pointer to a <a class="el" href="classwth__object.html" title="A generic Waltham protocol object representation (a proxy) ">wth_object</a> pointer as necessary. </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

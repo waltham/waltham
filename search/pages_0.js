@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['api_20usage',['API Usage',['../api_usage.html',1,'']]]
+  ['client_20api_20usage',['Client API Usage',['../client_usage.html',1,'']]]
 ];

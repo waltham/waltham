@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['waltham_20ipc_20library',['Waltham IPC Library',['../index.html',1,'']]]
+  ['protocol_20object_20api_20usage',['Protocol object API Usage',['../object_usage.html',1,'']]]
 ];
