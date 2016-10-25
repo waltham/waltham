@@ -1,6 +1,10 @@
 AC_PREREQ([2.64])
 
-AC_INIT([Waltham], [0.1.0])
+AC_INIT([Waltham],
+        [0.1.0],
+        [https://github.com/waltham/waltham/issues/new],
+        [waltham],
+        [https://github.com/waltham/waltham])
 
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_HEADERS([config.h])
