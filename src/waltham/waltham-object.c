@@ -40,10 +40,10 @@ wth_object_new_with_id(struct wth_connection *connection, uint32_t id)
 	struct wth_object *proxy = NULL;
 
 	proxy = malloc(sizeof *proxy);
-	memset(proxy, 0, sizeof *proxy);
-
 	if (proxy == NULL)
 		return NULL;
+
+	memset(proxy, 0, sizeof *proxy);
 
 	proxy->id = id;
 	proxy->connection = connection;
@@ -59,10 +59,10 @@ wth_object_new(struct wth_connection *connection)
 	struct wth_object *proxy = NULL;
 
 	proxy = malloc(sizeof *proxy);
-	memset(proxy, 0, sizeof *proxy);
-
 	if (proxy == NULL)
 		return NULL;
+
+	memset(proxy, 0, sizeof *proxy);
 
 	proxy->connection = connection;
 
