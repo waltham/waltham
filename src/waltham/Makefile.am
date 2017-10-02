@@ -20,12 +20,16 @@ tools = \
 	$(top_srcdir)/tools/gen.py
 
 core_interface = \
+	$(top_srcdir)/data/private.xml \
+	$(top_srcdir)/data/public.xml \
 	$(top_srcdir)/data/command.xml
+
+core_interface_include := $(addprefix -i ,$(core_interface))
 
 waltham-client.h: $(tools) $(core_interface) $(extensions) $(srcdir)/header-preamble.txt
 	$(top_srcdir)/tools/gen.py \
 		-p $(srcdir)/header-preamble.txt \
-		-i $(core_interface) \
+		$(core_interface_include) \
 		-o $@ \
 		-m client \
 		-t header
@@ -33,7 +37,7 @@ waltham-client.h: $(tools) $(core_interface) $(extensions) $(srcdir)/header-prea
 client-serialice.c: $(tools) $(core_interface) $(extensions) $(srcdir)/serial-preamble.txt waltham-client.h
 	$(top_srcdir)/tools/gen.py \
 		-p $(srcdir)/serial-preamble.txt \
-		-i $(core_interface) \
+		$(core_interface_include) \
 		-o $@ \
 		-m client \
 		-t marshaller
@@ -41,7 +45,7 @@ client-serialice.c: $(tools) $(core_interface) $(extensions) $(srcdir)/serial-pr
 client-deserialice.c: $(core_interface) $(tools) $(srcdir)/deserial-preamble.txt waltham-client.h
 	$(top_srcdir)/tools/gen.py \
 		-p $(srcdir)/deserial-preamble.txt \
-		-i $(top_srcdir)/data/command.xml \
+		$(core_interface_include) \
 		-o $@ \
 		-m client \
 		-t demarshaller
@@ -49,7 +53,7 @@ client-deserialice.c: $(core_interface) $(tools) $(srcdir)/deserial-preamble.txt
 waltham-server.h: $(tools) $(core_interface) $(extensions) $(srcdir)/header-preamble.txt
 	$(top_srcdir)/tools/gen.py \
 		-p $(srcdir)/header-preamble.txt \
-		-i $(core_interface) \
+		$(core_interface_include) \
 		-o $@ \
 		-m server \
 		-t header
@@ -57,7 +61,7 @@ waltham-server.h: $(tools) $(core_interface) $(extensions) $(srcdir)/header-prea
 server-serialice.c: $(tools) $(core_interface) $(extensions) $(srcdir)/serial-preamble.txt waltham-server.h
 	$(top_srcdir)/tools/gen.py \
 		-p $(srcdir)/serial-preamble.txt \
-		-i $(core_interface) \
+		$(core_interface_include) \
 		-o $@ \
 		-m server \
 		-t marshaller
@@ -65,7 +69,7 @@ server-serialice.c: $(tools) $(core_interface) $(extensions) $(srcdir)/serial-pr
 server-deserialice.c: $(core_interface) $(tools) $(srcdir)/deserial-preamble.txt waltham-server.h
 	$(top_srcdir)/tools/gen.py \
 		-p $(srcdir)/deserial-preamble.txt \
-		-i $(top_srcdir)/data/command.xml \
+		$(core_interface_include) \
 		-o $@ \
 		-m server \
 		-t demarshaller
