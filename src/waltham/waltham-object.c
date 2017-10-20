@@ -96,17 +96,12 @@ wth_object_get_user_data(struct wth_object *obj)
 	return obj->user_data;
 }
 
-/* XXX: Copied from walthan-server.h */
-void
-wth_display_send_error(struct wth_display * wth_display, struct wth_object * object_id, uint32_t code, const char * message);
-
 WTH_EXPORT void
 wth_object_post_error(struct wth_object *obj,
 		      uint32_t code,
 		      const char *fmt, ...)
 {
 	struct wth_connection *conn = obj->connection;
-	struct wth_display *disp;
 	char str[256];
 	va_list ap;
 
@@ -116,8 +111,7 @@ wth_object_post_error(struct wth_object *obj,
 	vsnprintf(str, sizeof str, fmt, ap);
 	va_end(ap);
 
-	disp = wth_connection_get_display(conn);
-	wth_display_send_error(disp, obj, code, str);
+	wth_connection_send_error(conn, obj, code, str);
 
 	wth_connection_set_protocol_error(conn, obj->id, "unknown", code);
 }

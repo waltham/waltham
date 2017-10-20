@@ -53,7 +53,6 @@ struct watch {
 struct display {
 	struct wth_connection *connection;
 	struct watch conn_watch;
-	struct wth_display *display;
 
 	bool running;
 	int epoll_fd;
@@ -365,38 +364,6 @@ check_connection_errors(struct wth_connection *conn)
 	}
 }
 
-/* XXX: these three handlers should not be here */
-
-static void
-not_here_error(struct wth_display *d, struct wth_object *obj,
-	       uint32_t code, const char *msg)
-{
-	struct wth_connection *conn;
-
-	conn = wth_object_get_user_data((struct wth_object *)d);
-	fprintf(stderr, "fatal protocol error %d: %s\n", code, msg);
-	wth_connection_set_protocol_error(conn, 0xf000dead /* XXX obj->id */,
-					  "unknown", code);
-}
-
-static void
-not_here_delete_id(struct wth_display *d, uint32_t id)
-{
-	fprintf(stderr, "wth_display.delete_id(%d)\n", id);
-}
-
-static void
-not_here_server_version(struct wth_display *d, uint32_t ver)
-{
-	fprintf(stderr, "wth_display.server_version(%d)\n", ver);
-}
-
-static const struct wth_display_listener not_here_listener = {
-	not_here_error,
-	not_here_delete_id,
-	not_here_server_version
-};
-
 int
 main(int arcg, char *argv[])
 {
@@ -429,20 +396,10 @@ main(int arcg, char *argv[])
 		exit(1);
 	}
 
-	dpy.display = wth_connection_get_display(dpy.connection);
-	 /* wth_display_set_listener() is already done by waltham, as
-	  * all the events are just control messaging.
-	  */
-
-	/* ..except Waltham does not yet, so let's plug in something
-	 * to print out stuff at least.
-	 */
-	wth_display_set_listener(dpy.display, &not_here_listener, dpy.connection);
-
 	/* Create a registry so that we will get advertisements of the
 	 * interfaces implemented by the server.
 	 */
-	dpy.registry = wth_display_get_registry(dpy.display);
+	dpy.registry = wth_connection_create_registry(dpy.connection);
 	wthp_registry_set_listener(dpy.registry, &registry_listener, &dpy);
 
 	/* Roundtrip ensures all globals' ads have been received. */
@@ -467,7 +424,7 @@ main(int arcg, char *argv[])
 
 	/* A one-off asynchronous roundtrip, just for fun. */
 	fprintf(stderr, "sending wth_display.sync...\n");
-	dpy.bling = wth_display_sync(dpy.display);
+	dpy.bling = wth_connection_sync(dpy.connection);
 	wthp_callback_set_listener(dpy.bling, &bling_listener, &dpy);
 
 	/* Create surfaces, draw initial content, etc. if you want. */

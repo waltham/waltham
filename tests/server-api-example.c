@@ -106,16 +106,6 @@ watch_ctl(struct watch *w, int op, uint32_t events)
 	return epoll_ctl(w->server->epoll_fd, op, w->fd, &ee);
 }
 
-static void
-client_post_out_of_memory(struct client *c)
-{
-	struct wth_display *disp;
-
-	disp = wth_connection_get_display(c->connection);
-	wth_object_post_error((struct wth_object *)disp, 1,
-			      "out of memory");
-}
-
 /* BEGIN wthp_region implementation */
 
 static void
@@ -195,7 +185,7 @@ compositor_handle_create_region(struct wthp_compositor *compositor,
 
 	region = zalloc(sizeof *region);
 	if (!region) {
-		client_post_out_of_memory(comp->client);
+		wth_connection_post_error_no_memory(comp->client->connection);
 		return;
 	}
 
@@ -218,7 +208,7 @@ client_bind_compositor(struct client *c, struct wthp_compositor *obj)
 
 	comp = zalloc(sizeof *comp);
 	if (!comp) {
-		client_post_out_of_memory(c);
+		wth_connection_post_error_no_memory(c->connection);
 		return;
 	}
 
@@ -282,38 +272,16 @@ const struct wthp_registry_interface registry_implementation = {
 
 /* END wthp_registry implementation */
 
-/* BEGIN wth_display implementation
- * This belongs in Waltham instead.
- */
-
 static void
-display_handle_client_version(struct wth_display *wth_display,
-			      uint32_t client_version)
+display_handle_get_registry(struct wthp_registry *registry,
+                            void *user_pointer)
 {
-	wth_object_post_error((struct wth_object *)wth_display, 0,
-			      "unimplemented: %s", __func__);
-}
-
-static void
-display_handle_sync(struct wth_display * wth_display, struct wthp_callback * callback)
-{
-	struct client *c = wth_object_get_user_data((struct wth_object *)wth_display);
-
-	fprintf(stderr, "Client %p requested wth_display.sync\n", c);
-	wthp_callback_send_done(callback, 0);
-	wthp_callback_free(callback);
-}
-
-static void
-display_handle_get_registry(struct wth_display *wth_display,
-			    struct wthp_registry *registry)
-{
-	struct client *c = wth_object_get_user_data((struct wth_object *)wth_display);
+	struct client *c = (struct client *)user_pointer;
 	struct registry *reg;
 
 	reg = zalloc(sizeof *reg);
 	if (!reg) {
-		client_post_out_of_memory(c);
+		wth_connection_post_error_no_memory(c->connection);
 		return;
 	}
 
@@ -321,19 +289,11 @@ display_handle_get_registry(struct wth_display *wth_display,
 	reg->client = c;
 	wl_list_insert(&c->registry_list, &reg->link);
 	wthp_registry_set_interface(registry,
-				    &registry_implementation, reg);
+	                            &registry_implementation, reg);
 
 	/* XXX: advertise our globals */
 	wthp_registry_send_global(registry, 1, "wthp_compositor", 4);
 }
-
-static const struct wth_display_interface display_implementation = {
-	display_handle_client_version,
-	display_handle_sync,
-	display_handle_get_registry
-};
-
-/* END wth_display implementation */
 
 static void
 client_destroy(struct client *c)
@@ -417,7 +377,6 @@ static struct client *
 client_create(struct server *srv, struct wth_connection *conn)
 {
 	struct client *c;
-	struct wth_display *disp;
 
 	c = zalloc(sizeof *c);
 	if (!c)
@@ -442,9 +401,7 @@ client_create(struct server *srv, struct wth_connection *conn)
 	wl_list_init(&c->compositor_list);
 	wl_list_init(&c->region_list);
 
-	/* XXX: this should be inside Waltham */
-	disp = wth_connection_get_display(c->connection);
-	wth_display_set_interface(disp, &display_implementation, c);
+	wth_connection_set_registry_callback(conn, display_handle_get_registry, c);
 
 	return c;
 }

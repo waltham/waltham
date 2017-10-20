@@ -174,25 +174,6 @@ wth_connection_from_fd(int fd, enum wth_connection_side side);
 int
 wth_connection_get_fd(struct wth_connection *conn);
 
-/** Get the Waltham display object
- *
- * \param conn The Waltham connection.
- * \return The Waltham display object.
- *
- * The wth_display is the fundamental protocol object in Waltham. It
- * always exists if a connection exists. This function returns a
- * pointer to wth_display, but it remains owned by the wth_connection.
- *
- * The wth_display gets destroyed when the wth_connection is destroyed.
- *
- * This method is only used by clients.
- *
- * \memberof wth_connection
- * \common_api
- */
-struct wth_display *
-wth_connection_get_display(struct wth_connection *conn);
-
 /** Disconnect
  *
  * \param conn The Waltham connection.
@@ -372,6 +353,87 @@ uint32_t
 wth_connection_get_protocol_error(struct wth_connection *conn,
 				  const char **interface,
 				  uint32_t *object_id);
+
+/** Creates a new registry using the internal wth_display
+ *
+ * \param conn The Waltham connection.
+ * \return A new registry object.
+ *
+ * The returned registry can then be used to retrieve other global
+ * objects, using its usual interface.
+ *
+ * \memberof wth_connection
+ * \client_api
+ */
+struct wthp_registry *
+wth_connection_create_registry(struct wth_connection *conn);
+
+/** Return a callback using the internal wth_display
+ *
+ * \param conn The Waltham connection.
+ * \return A new callback object.
+ *
+ * The returned callback will emit a 'done' event once the server has
+ * seen all preceding requests.
+ *
+ * \memberof wth_connection
+ * \client_api
+ */
+struct wthp_callback *
+wth_connection_sync(struct wth_connection *conn);
+
+/** Prototype of the callback to be called whenever a client creates a
+ * registry
+ *
+ * \param registry The registry which has been created.
+ * \param user_data The data set in
+ * wth_connection_set_registry_callback, generally identifying the
+ * client this registry pertains to.
+ *
+ * A function implementing this callback will receive a pointer to the
+ * newly-created registry, as well as the data previously set in
+ * wth_connection_set_registry_callback.
+ *
+ * \sa wth_connection_set_registry_callback
+ * \sa wth_connection_create_registry
+ *
+ * \memberof wth_connection
+ * \server_api
+ */
+typedef void (*wth_registry_callback_func)(struct wthp_registry *registry,
+                                           void *user_data);
+
+/** Set the callback to be called once a client creates a registry
+ *
+ * \param conn The Waltham connection.
+ * \param registry_callback The registry callback.
+ * \param user_data Any data to be passed to the callback, generally
+ * related to the client expected to create registries.
+ *
+ * The callback will be stored inside of the connection, and will be
+ * called each time the client creates a registry.
+ *
+ * \sa wth_connection_create_registry
+ *
+ * \memberof wth_connection
+ * \server_api
+ */
+void
+wth_connection_set_registry_callback(struct wth_connection *conn,
+                                     wth_registry_callback_func registry_callback,
+                                     void *user_data);
+
+/** Post an out of memory display error
+ *
+ * \param conn The Waltham connection.
+ *
+ * Post the out of memory error on the internal display object.
+ *
+ * \memberof wth_connection
+ * \server_api
+ */
+void
+wth_connection_post_error_no_memory(struct wth_connection *conn);
 
 #ifdef  __cplusplus
 }

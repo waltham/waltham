@@ -125,7 +125,6 @@ wth_connection_assert_side(struct wth_connection *conn,
 
 /* wth_object */
 struct wth_object {
-	struct wth_display *display;
 	struct wth_connection *connection;
 	uint32_t id;
 
@@ -157,5 +156,22 @@ wth_object_new_with_id(struct wth_connection *connection, uint32_t id);
  */
 struct wth_object *
 wth_object_new(struct wth_connection *connection);
+
+/** Send an error on a specific object
+ *
+ * \param conn The Waltham connection.
+ * \param obj A Waltham object.
+ * \param code The error code.
+ * \param str The error message.
+ *
+ * This function wraps the wth_display_send_error display function, so
+ * the server doesn’t have to use this private API.
+ *
+ * \memberof wth_connection
+ * \server_api
+ */
+void
+wth_connection_send_error(struct wth_connection *conn, struct wth_object *obj,
+                          uint32_t code, const char *str);
 
 #endif
