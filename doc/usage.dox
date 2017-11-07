@@ -17,8 +17,6 @@ shall call wth_accept() to create a wth_connection for the new client
 The file descriptor of a new wth_connection needs to be polled for
 events \c [client_create]. Use wth_connection_get_fd() to fetch the
 connection file descriptor and add it in your poll set for \c POLLIN.
-(The example also fetches the wth_display for the connection and sets
-the implementation, but this should be done by Waltham under the hood.)
 
 The wth_connection file descriptor must be serviced as follows
 \c [connection_handle_data]:
@@ -37,11 +35,11 @@ wth_connection by calling wth_connection_read(). Once the server
 is ready to process the read messages, it must call
 wth_connection_dispatch().
 
-The server must implement wthp_registry protocol interface. The
-callback \c [display_handle_get_registry] gets called when a client
-creates a wthp_registry object. The server must send a list of the
-global interfaces it supports as a response. Global interfaces are the
-interfaces a client can instantiate with the wthp_registry \c bind
+The server must pass a wth_registry_callback_func() function using
+wth_connection_set_registry_callback(). This callback gets called when
+a client creates a wthp_registry object. The server must send a list of
+the global interfaces it supports as a response. Global interfaces are
+the interfaces a client can instantiate with the wthp_registry \c bind
 request (handled in \c [registry_handle_bind]). The bind request is the
 first means for clients to create protocol objects.
 
@@ -85,8 +83,6 @@ descriptor to wth_connection_from_fd() with
 The file descriptor of a new wth_connection needs to be polled for
 events \c [main]. Use wth_connection_get_fd() to fetch the
 connection file descriptor and add it in your poll set for \c POLLIN.
-(The example also fetches the wth_display for the connection and sets
-the implementation, but this should be done by Waltham under the hood.)
 
 The wth_connection file descriptor must be serviced as follows
 \c [connection_handle_data]:

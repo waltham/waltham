@@ -1,6 +1,5 @@
 general:
 - implement wth_display protocol
-- the fate of wth_display, hide it completely in wth_connection and rename?
 - implement object id re-use
 - implement server-side object allocation
 - implement protocol version negotiation
