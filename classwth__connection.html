@@ -60,6 +60,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a>  </div>
   <div class="headertitle">
 <div class="title">wth_connection Class Reference<div class="ingroups"><a class="el" href="group__api__server.html">Server API</a> &#124; <a class="el" href="group__api__client.html">Client API</a> &raquo; <a class="el" href="group__api__common.html">Common API for both server and client</a></div></div>  </div>
@@ -71,6 +72,12 @@ $(function() {
 
 <p><code>#include &lt;<a class="el" href="waltham-connection_8h_source.html">waltham-connection.h</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:ga4fc249eb0c3c36a12d7014cd02c5cc6a"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__api__server.html#ga4fc249eb0c3c36a12d7014cd02c5cc6a">wth_registry_callback_func</a>) (struct wthp_registry *registry, void *user_data)</td></tr>
+<tr class="memdesc:ga4fc249eb0c3c36a12d7014cd02c5cc6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prototype of the callback to be called whenever a client creates a registry.  <a href="group__api__server.html#ga4fc249eb0c3c36a12d7014cd02c5cc6a">More...</a><br /></td></tr>
+<tr class="separator:ga4fc249eb0c3c36a12d7014cd02c5cc6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ga92558808e3c20da42ed44fc2d540da07"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="classwth__connection.html">wth_connection</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__api__client.html#ga92558808e3c20da42ed44fc2d540da07">wth_connect_to_server</a> (const char *host, const char *port)</td></tr>
@@ -85,9 +92,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ga842cca1f1ccb767bea5bd086e035194b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__api__common.html#ga842cca1f1ccb767bea5bd086e035194b">wth_connection_get_fd</a> (struct <a class="el" href="classwth__connection.html">wth_connection</a> *conn)</td></tr>
 <tr class="memdesc:ga842cca1f1ccb767bea5bd086e035194b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get connection file descriptor.  <a href="group__api__common.html#ga842cca1f1ccb767bea5bd086e035194b">More...</a><br /></td></tr>
 <tr class="separator:ga842cca1f1ccb767bea5bd086e035194b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaf6dbc2744e207734f9d3fdca3f02af06"><td class="memItemLeft" align="right" valign="top">struct wth_display *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__api__common.html#gaf6dbc2744e207734f9d3fdca3f02af06">wth_connection_get_display</a> (struct <a class="el" href="classwth__connection.html">wth_connection</a> *conn)</td></tr>
-<tr class="memdesc:gaf6dbc2744e207734f9d3fdca3f02af06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Waltham display object.  <a href="group__api__common.html#gaf6dbc2744e207734f9d3fdca3f02af06">More...</a><br /></td></tr>
-<tr class="separator:gaf6dbc2744e207734f9d3fdca3f02af06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gadb62b719598fd0d1f7242a9c003be263"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__api__common.html#gadb62b719598fd0d1f7242a9c003be263">wth_connection_destroy</a> (struct <a class="el" href="classwth__connection.html">wth_connection</a> *conn)</td></tr>
 <tr class="memdesc:gadb62b719598fd0d1f7242a9c003be263"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disconnect.  <a href="group__api__common.html#gadb62b719598fd0d1f7242a9c003be263">More...</a><br /></td></tr>
 <tr class="separator:gadb62b719598fd0d1f7242a9c003be263"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -109,6 +113,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ga93db72bc2f462d21fa283f024e189e85"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__api__common.html#ga93db72bc2f462d21fa283f024e189e85">wth_connection_get_protocol_error</a> (struct <a class="el" href="classwth__connection.html">wth_connection</a> *conn, const char **interface, uint32_t *object_id)</td></tr>
 <tr class="memdesc:ga93db72bc2f462d21fa283f024e189e85"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return protocol error details.  <a href="group__api__common.html#ga93db72bc2f462d21fa283f024e189e85">More...</a><br /></td></tr>
 <tr class="separator:ga93db72bc2f462d21fa283f024e189e85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga71482299a4e8a68a8a1f3c5b574d10ab"><td class="memItemLeft" align="right" valign="top">struct wthp_registry *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__api__client.html#ga71482299a4e8a68a8a1f3c5b574d10ab">wth_connection_create_registry</a> (struct <a class="el" href="classwth__connection.html">wth_connection</a> *conn)</td></tr>
+<tr class="memdesc:ga71482299a4e8a68a8a1f3c5b574d10ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new registry using the internal wth_display.  <a href="group__api__client.html#ga71482299a4e8a68a8a1f3c5b574d10ab">More...</a><br /></td></tr>
+<tr class="separator:ga71482299a4e8a68a8a1f3c5b574d10ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga61f841e989c611a23220b710ff62da43"><td class="memItemLeft" align="right" valign="top">struct wthp_callback *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__api__client.html#ga61f841e989c611a23220b710ff62da43">wth_connection_sync</a> (struct <a class="el" href="classwth__connection.html">wth_connection</a> *conn)</td></tr>
+<tr class="memdesc:ga61f841e989c611a23220b710ff62da43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a callback using the internal wth_display.  <a href="group__api__client.html#ga61f841e989c611a23220b710ff62da43">More...</a><br /></td></tr>
+<tr class="separator:ga61f841e989c611a23220b710ff62da43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaca96980a0350051d95d53a7e485c673f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__api__server.html#gaca96980a0350051d95d53a7e485c673f">wth_connection_set_registry_callback</a> (struct <a class="el" href="classwth__connection.html">wth_connection</a> *conn, <a class="el" href="group__api__server.html#ga4fc249eb0c3c36a12d7014cd02c5cc6a">wth_registry_callback_func</a> registry_callback, void *user_data)</td></tr>
+<tr class="memdesc:gaca96980a0350051d95d53a7e485c673f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the callback to be called once a client creates a registry.  <a href="group__api__server.html#gaca96980a0350051d95d53a7e485c673f">More...</a><br /></td></tr>
+<tr class="separator:gaca96980a0350051d95d53a7e485c673f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga02300d71bc208f5e87ffa062427aa8bf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__api__server.html#ga02300d71bc208f5e87ffa062427aa8bf">wth_connection_post_error_no_memory</a> (struct <a class="el" href="classwth__connection.html">wth_connection</a> *conn)</td></tr>
+<tr class="memdesc:ga02300d71bc208f5e87ffa062427aa8bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Post an out of memory display error.  <a href="group__api__server.html#ga02300d71bc208f5e87ffa062427aa8bf">More...</a><br /></td></tr>
+<tr class="separator:ga02300d71bc208f5e87ffa062427aa8bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A Waltham connection. </p>

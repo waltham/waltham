@@ -83,6 +83,12 @@ Functions</h2></td></tr>
 <tr class="memitem:ga402f82228a650f0c93ebf8fb4bcbcb0c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__api__client.html#ga402f82228a650f0c93ebf8fb4bcbcb0c">wth_connection::wth_connection_roundtrip</a> (struct <a class="el" href="classwth__connection.html">wth_connection</a> *conn)</td></tr>
 <tr class="memdesc:ga402f82228a650f0c93ebf8fb4bcbcb0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make a roundtrip from a client.  <a href="#ga402f82228a650f0c93ebf8fb4bcbcb0c">More...</a><br /></td></tr>
 <tr class="separator:ga402f82228a650f0c93ebf8fb4bcbcb0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga71482299a4e8a68a8a1f3c5b574d10ab"><td class="memItemLeft" align="right" valign="top">struct wthp_registry *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__api__client.html#ga71482299a4e8a68a8a1f3c5b574d10ab">wth_connection::wth_connection_create_registry</a> (struct <a class="el" href="classwth__connection.html">wth_connection</a> *conn)</td></tr>
+<tr class="memdesc:ga71482299a4e8a68a8a1f3c5b574d10ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new registry using the internal wth_display.  <a href="#ga71482299a4e8a68a8a1f3c5b574d10ab">More...</a><br /></td></tr>
+<tr class="separator:ga71482299a4e8a68a8a1f3c5b574d10ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga61f841e989c611a23220b710ff62da43"><td class="memItemLeft" align="right" valign="top">struct wthp_callback *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__api__client.html#ga61f841e989c611a23220b710ff62da43">wth_connection::wth_connection_sync</a> (struct <a class="el" href="classwth__connection.html">wth_connection</a> *conn)</td></tr>
+<tr class="memdesc:ga61f841e989c611a23220b710ff62da43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a callback using the internal wth_display.  <a href="#ga61f841e989c611a23220b710ff62da43">More...</a><br /></td></tr>
+<tr class="separator:ga61f841e989c611a23220b710ff62da43"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>Common and exclusive API for clients. </p>
@@ -129,6 +135,34 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="ga71482299a4e8a68a8a1f3c5b574d10ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga71482299a4e8a68a8a1f3c5b574d10ab">&#9670;&nbsp;</a></span>wth_connection_create_registry()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct wthp_registry * wth_connection_create_registry </td>
+          <td>(</td>
+          <td class="paramtype">struct <a class="el" href="classwth__connection.html">wth_connection</a> *&#160;</td>
+          <td class="paramname"><em>conn</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Creates a new registry using the internal wth_display. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">conn</td><td>The Waltham connection. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A new registry object.</dd></dl>
+<p>The returned registry can then be used to retrieve other global objects, using its usual interface. </p>
+
+</div>
+</div>
 <a id="ga402f82228a650f0c93ebf8fb4bcbcb0c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga402f82228a650f0c93ebf8fb4bcbcb0c">&#9670;&nbsp;</a></span>wth_connection_roundtrip()</h2>
 
@@ -157,6 +191,34 @@ Functions</h2></td></tr>
 <p>This call blocks indefinitely until the roundtrip completes or the connection fails. It will flush outgoing and dispatch incoming messages until it returns.</p>
 <p>On failure, use <a class="el" href="group__api__common.html#gae088971a3c3ea3ed63cc9875fd4f751b" title="Return the connection error state. ">wth_connection_get_error()</a> to inspect the error.</p>
 <p>If blocking indefinitely is not desireable or you want to be able to process other file descriptors in the mean time, you have to write your own roundtrip implementation using the public API. </p>
+
+</div>
+</div>
+<a id="ga61f841e989c611a23220b710ff62da43"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga61f841e989c611a23220b710ff62da43">&#9670;&nbsp;</a></span>wth_connection_sync()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct wthp_callback * wth_connection_sync </td>
+          <td>(</td>
+          <td class="paramtype">struct <a class="el" href="classwth__connection.html">wth_connection</a> *&#160;</td>
+          <td class="paramname"><em>conn</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return a callback using the internal wth_display. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">conn</td><td>The Waltham connection. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A new callback object.</dd></dl>
+<p>The returned callback will emit a 'done' event once the server has seen all preceding requests. </p>
 
 </div>
 </div>

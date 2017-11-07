@@ -61,6 +61,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#groups">Modules</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">Server API</div>  </div>
@@ -75,11 +76,23 @@ Modules</h2></td></tr>
 <tr class="memitem:group__api__common"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__api__common.html">Common API for both server and client</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:ga4fc249eb0c3c36a12d7014cd02c5cc6a"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__api__server.html#ga4fc249eb0c3c36a12d7014cd02c5cc6a">wth_connection::wth_registry_callback_func</a>) (struct wthp_registry *registry, void *user_data)</td></tr>
+<tr class="memdesc:ga4fc249eb0c3c36a12d7014cd02c5cc6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prototype of the callback to be called whenever a client creates a registry.  <a href="#ga4fc249eb0c3c36a12d7014cd02c5cc6a">More...</a><br /></td></tr>
+<tr class="separator:ga4fc249eb0c3c36a12d7014cd02c5cc6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:ga9073b3086e003ba09ec15c7b142a4140"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="classwth__connection.html">wth_connection</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__api__server.html#ga9073b3086e003ba09ec15c7b142a4140">wth_connection::wth_accept</a> (int sockfd, struct sockaddr *addr, socklen_t *addrlen)</td></tr>
 <tr class="memdesc:ga9073b3086e003ba09ec15c7b142a4140"><td class="mdescLeft">&#160;</td><td class="mdescRight">Accept a Waltham client connection.  <a href="#ga9073b3086e003ba09ec15c7b142a4140">More...</a><br /></td></tr>
 <tr class="separator:ga9073b3086e003ba09ec15c7b142a4140"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaca96980a0350051d95d53a7e485c673f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__api__server.html#gaca96980a0350051d95d53a7e485c673f">wth_connection::wth_connection_set_registry_callback</a> (struct <a class="el" href="classwth__connection.html">wth_connection</a> *conn, <a class="el" href="group__api__server.html#ga4fc249eb0c3c36a12d7014cd02c5cc6a">wth_registry_callback_func</a> registry_callback, void *user_data)</td></tr>
+<tr class="memdesc:gaca96980a0350051d95d53a7e485c673f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the callback to be called once a client creates a registry.  <a href="#gaca96980a0350051d95d53a7e485c673f">More...</a><br /></td></tr>
+<tr class="separator:gaca96980a0350051d95d53a7e485c673f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga02300d71bc208f5e87ffa062427aa8bf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__api__server.html#ga02300d71bc208f5e87ffa062427aa8bf">wth_connection::wth_connection_post_error_no_memory</a> (struct <a class="el" href="classwth__connection.html">wth_connection</a> *conn)</td></tr>
+<tr class="memdesc:ga02300d71bc208f5e87ffa062427aa8bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Post an out of memory display error.  <a href="#ga02300d71bc208f5e87ffa062427aa8bf">More...</a><br /></td></tr>
+<tr class="separator:ga02300d71bc208f5e87ffa062427aa8bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaee85b8a6fbf6bedcb607e018fc13f764"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__api__server.html#gaee85b8a6fbf6bedcb607e018fc13f764">wth_object::wth_object_post_error</a> (struct <a class="el" href="classwth__object.html">wth_object</a> *obj, uint32_t code, const char *fmt,...)</td></tr>
 <tr class="memdesc:gaee85b8a6fbf6bedcb607e018fc13f764"><td class="mdescLeft">&#160;</td><td class="mdescRight">Post a fatal protocol error to a client.  <a href="#gaee85b8a6fbf6bedcb607e018fc13f764">More...</a><br /></td></tr>
 <tr class="separator:gaee85b8a6fbf6bedcb607e018fc13f764"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -87,6 +100,34 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>Common and exclusive API for servers. </p>
 <p>These functions are exclusive to a server. They will abort the program if called in the context of a client-side <a class="el" href="classwth__connection.html" title="A Waltham connection. ">wth_connection</a>. For the common functions, see <a class="el" href="group__api__common.html">Common API for both server and client</a>. </p>
+<h2 class="groupheader">Typedef Documentation</h2>
+<a id="ga4fc249eb0c3c36a12d7014cd02c5cc6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga4fc249eb0c3c36a12d7014cd02c5cc6a">&#9670;&nbsp;</a></span>wth_registry_callback_func</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef void(* wth_registry_callback_func) (struct wthp_registry *registry, void *user_data)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Prototype of the callback to be called whenever a client creates a registry. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">registry</td><td>The registry which has been created. </td></tr>
+    <tr><td class="paramname">user_data</td><td>The data set in wth_connection_set_registry_callback, generally identifying the client this registry pertains to.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>A function implementing this callback will receive a pointer to the newly-created registry, as well as the data previously set in wth_connection_set_registry_callback.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__api__server.html#gaca96980a0350051d95d53a7e485c673f" title="Set the callback to be called once a client creates a registry. ">wth_connection_set_registry_callback</a> </dd>
+<dd>
+<a class="el" href="group__api__client.html#ga71482299a4e8a68a8a1f3c5b574d10ab" title="Creates a new registry using the internal wth_display. ">wth_connection_create_registry</a> </dd></dl>
+
+</div>
+</div>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="ga9073b3086e003ba09ec15c7b142a4140"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga9073b3086e003ba09ec15c7b142a4140">&#9670;&nbsp;</a></span>wth_accept()</h2>
@@ -131,6 +172,79 @@ Functions</h2></td></tr>
 </dl>
 <p>See accept(2) for the documentation of the arguments.</p>
 <p>This creates a server-side <a class="el" href="classwth__connection.html" title="A Waltham connection. ">wth_connection</a>, representing a single connected client, by accepting a new connection from the listening socket. </p>
+
+</div>
+</div>
+<a id="ga02300d71bc208f5e87ffa062427aa8bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga02300d71bc208f5e87ffa062427aa8bf">&#9670;&nbsp;</a></span>wth_connection_post_error_no_memory()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void wth_connection_post_error_no_memory </td>
+          <td>(</td>
+          <td class="paramtype">struct <a class="el" href="classwth__connection.html">wth_connection</a> *&#160;</td>
+          <td class="paramname"><em>conn</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Post an out of memory display error. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">conn</td><td>The Waltham connection.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Post the out of memory error on the internal display object. </p>
+
+</div>
+</div>
+<a id="gaca96980a0350051d95d53a7e485c673f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaca96980a0350051d95d53a7e485c673f">&#9670;&nbsp;</a></span>wth_connection_set_registry_callback()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void wth_connection_set_registry_callback </td>
+          <td>(</td>
+          <td class="paramtype">struct <a class="el" href="classwth__connection.html">wth_connection</a> *&#160;</td>
+          <td class="paramname"><em>conn</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__api__server.html#ga4fc249eb0c3c36a12d7014cd02c5cc6a">wth_registry_callback_func</a>&#160;</td>
+          <td class="paramname"><em>registry_callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>user_data</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the callback to be called once a client creates a registry. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">conn</td><td>The Waltham connection. </td></tr>
+    <tr><td class="paramname">registry_callback</td><td>The registry callback. </td></tr>
+    <tr><td class="paramname">user_data</td><td>Any data to be passed to the callback, generally related to the client expected to create registries.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>The callback will be stored inside of the connection, and will be called each time the client creates a registry.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__api__client.html#ga71482299a4e8a68a8a1f3c5b574d10ab" title="Creates a new registry using the internal wth_display. ">wth_connection_create_registry</a> </dd></dl>
 
 </div>
 </div>

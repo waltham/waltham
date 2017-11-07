@@ -84,9 +84,6 @@ Functions</h2></td></tr>
 <tr class="memitem:ga842cca1f1ccb767bea5bd086e035194b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__api__common.html#ga842cca1f1ccb767bea5bd086e035194b">wth_connection::wth_connection_get_fd</a> (struct <a class="el" href="classwth__connection.html">wth_connection</a> *conn)</td></tr>
 <tr class="memdesc:ga842cca1f1ccb767bea5bd086e035194b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get connection file descriptor.  <a href="#ga842cca1f1ccb767bea5bd086e035194b">More...</a><br /></td></tr>
 <tr class="separator:ga842cca1f1ccb767bea5bd086e035194b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaf6dbc2744e207734f9d3fdca3f02af06"><td class="memItemLeft" align="right" valign="top">struct wth_display *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__api__common.html#gaf6dbc2744e207734f9d3fdca3f02af06">wth_connection::wth_connection_get_display</a> (struct <a class="el" href="classwth__connection.html">wth_connection</a> *conn)</td></tr>
-<tr class="memdesc:gaf6dbc2744e207734f9d3fdca3f02af06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Waltham display object.  <a href="#gaf6dbc2744e207734f9d3fdca3f02af06">More...</a><br /></td></tr>
-<tr class="separator:gaf6dbc2744e207734f9d3fdca3f02af06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gadb62b719598fd0d1f7242a9c003be263"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__api__common.html#gadb62b719598fd0d1f7242a9c003be263">wth_connection::wth_connection_destroy</a> (struct <a class="el" href="classwth__connection.html">wth_connection</a> *conn)</td></tr>
 <tr class="memdesc:gadb62b719598fd0d1f7242a9c003be263"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disconnect.  <a href="#gadb62b719598fd0d1f7242a9c003be263">More...</a><br /></td></tr>
 <tr class="separator:gadb62b719598fd0d1f7242a9c003be263"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -243,36 +240,6 @@ Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>A new <a class="el" href="classwth__connection.html" title="A Waltham connection. ">wth_connection</a>, or NULL on failure.</dd></dl>
 <p>This function is used to wrap an already connected file descriptor in a <a class="el" href="classwth__connection.html" title="A Waltham connection. ">wth_connection</a>. The <a class="el" href="classwth__connection.html" title="A Waltham connection. ">wth_connection</a> will own a duplicate of the fd, not the fd passed in. The user must close its fd after calling this.</p>
 <p>XXX: You could probably use this as an internal helper too, for the common things of <a class="el" href="group__api__client.html#ga92558808e3c20da42ed44fc2d540da07" title="Connect to a remote Waltham server. ">wth_connect_to_server()</a> and <a class="el" href="group__api__server.html#ga9073b3086e003ba09ec15c7b142a4140" title="Accept a Waltham client connection. ">wth_accept()</a>. But this is completely optional otherwise. </p>
-
-</div>
-</div>
-<a id="gaf6dbc2744e207734f9d3fdca3f02af06"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaf6dbc2744e207734f9d3fdca3f02af06">&#9670;&nbsp;</a></span>wth_connection_get_display()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">struct wth_display * wth_connection_get_display </td>
-          <td>(</td>
-          <td class="paramtype">struct <a class="el" href="classwth__connection.html">wth_connection</a> *&#160;</td>
-          <td class="paramname"><em>conn</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Get the Waltham display object. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">conn</td><td>The Waltham connection. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The Waltham display object.</dd></dl>
-<p>The wth_display is the fundamental protocol object in Waltham. It always exists if a connection exists. This function returns a pointer to wth_display, but it remains owned by the <a class="el" href="classwth__connection.html" title="A Waltham connection. ">wth_connection</a>.</p>
-<p>The wth_display gets destroyed when the <a class="el" href="classwth__connection.html" title="A Waltham connection. ">wth_connection</a> is destroyed.</p>
-<p>This method is only used by clients. </p>
 
 </div>
 </div>
